@@ -1,7 +1,7 @@
 package com.iblock.workflow.vars;
 
 /**
- * Created by baidu on 15/12/21.
+ * Created by qihong on 15/12/21.
  */
 public class ProcessVars {
     public static final String TOKEN = "token";

@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 /**
- * Created by baidu on 16/1/27.
+ * Created by qihong on 16/1/27.
  */
 public class ContentTypeFilter implements Filter {
 

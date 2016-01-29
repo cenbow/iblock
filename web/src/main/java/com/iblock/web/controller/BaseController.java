@@ -6,7 +6,7 @@ import com.iblock.web.info.UserInfo;
 import javax.servlet.http.HttpSession;
 
 /**
- * Created by baidu on 16/1/27.
+ * Created by qihong on 16/1/27.
  */
 public class BaseController {
 

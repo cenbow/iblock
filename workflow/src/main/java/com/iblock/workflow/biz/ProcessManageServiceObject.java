@@ -32,7 +32,7 @@ import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
- * User: 遐
+ * User: qihong
  * Date: 14-9-4
  * Time: 下午5:26
  * To change this template use File | Settings | File Templates.

@@ -1,7 +1,7 @@
 package com.iblock.web.constant;
 
 /**
- * Created by baidu on 16/1/27.
+ * Created by qihong on 16/1/27.
  */
 public class CommonProperties {
     

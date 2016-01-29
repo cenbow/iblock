@@ -4,7 +4,7 @@ import com.iblock.web.enums.ResponseStatus;
 import lombok.Data;
 
 /**
- * Created by baidu on 16/1/27.
+ * Created by qihong on 16/1/27.
  */
 @Data
 public class CommonResponse<T> {

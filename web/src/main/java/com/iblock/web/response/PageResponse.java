@@ -5,7 +5,7 @@ import com.iblock.web.info.PageInfo;
 import lombok.Data;
 
 /**
- * Created by baidu on 16/1/27.
+ * Created by qihong on 16/1/27.
  */
 @Data
 public class PageResponse<T> {

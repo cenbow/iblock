@@ -5,7 +5,7 @@ import lombok.Data;
 import org.activiti.engine.task.Task;
 
 /**
- * Created by baidu on 15/12/21.
+ * Created by qihong on 15/12/21.
  */
 @Data
 public class TaskInfoBean {

@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by baidu on 16/1/27.
+ * Created by qihong on 16/1/27.
  */
 public class AuthFilter implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {

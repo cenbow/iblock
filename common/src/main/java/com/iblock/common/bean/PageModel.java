@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * Created by baidu on 15/12/21.
+ * Created by qihong on 15/12/21.
  */
 @Data
 public class PageModel<T> {

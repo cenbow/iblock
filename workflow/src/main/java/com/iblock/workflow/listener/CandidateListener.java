@@ -6,7 +6,7 @@ import org.activiti.engine.delegate.TaskListener;
 import java.util.Arrays;
 
 /**
- * Created by baidu on 16/1/28.
+ * Created by qihong on 16/1/28.
  */
 public class CandidateListener implements TaskListener {
 

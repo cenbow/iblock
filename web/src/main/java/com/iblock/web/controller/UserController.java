@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpSession;
 
 /**
- * Created by baidu on 16/1/25.
+ * Created by qihong on 16/1/25.
  */
 
 @Controller

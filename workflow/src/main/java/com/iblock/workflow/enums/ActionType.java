@@ -1,7 +1,7 @@
 package com.iblock.workflow.enums;
 
 /**
- * Created by baidu on 15/12/20.
+ * Created by qihong on 15/12/20.
  */
 public enum ActionType {
     DEFAULT(0, "默认错误"),

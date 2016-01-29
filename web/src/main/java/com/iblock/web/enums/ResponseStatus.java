@@ -1,7 +1,7 @@
 package com.iblock.web.enums;
 
 /**
- * Created by baidu on 16/1/27.
+ * Created by qihong on 16/1/27.
  */
 
 public enum ResponseStatus {

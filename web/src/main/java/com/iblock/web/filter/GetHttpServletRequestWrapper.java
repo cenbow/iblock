@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.UnsupportedEncodingException;
 
 /**
- * Created by baidu on 16/1/27.
+ * Created by qihong on 16/1/27.
  */
 public class GetHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
