@@ -49,6 +49,21 @@
     </filter-mapping>
 
     <filter>
+        <filter-name>customSessionProviderFilter</filter-name>
+        <filter-class>
+            com.iblock.web.filter.CustomSessionProviderFilter
+        </filter-class>
+        <init-param>
+            <param-name>springHosted</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>customSessionProviderFilter</filter-name>
+        <url-pattern>*.do</url-pattern>
+    </filter-mapping>
+
+    <filter>
         <display-name>AuthFilter</display-name>
         <filter-name>AuthFilter</filter-name>
         <filter-class>com.iblock.web.filter.AuthFilter</filter-class>
