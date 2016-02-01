@@ -22,5 +22,104 @@
         enableCountByExample="false" enableUpdateByExample="false">
         </table>
 
+        <table schema="MS-USER" tableName="COMMENT" domainObjectName="Comment"
+               enableInsert="true" enableSelectByPrimaryKey="true"
+               enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
+               enableSelectByExample="false" enableDeleteByExample="false"
+               enableCountByExample="false" enableUpdateByExample="false">
+        </table>
+
+        <table schema="MS-USER" tableName="COMMENT_DIMENSION" domainObjectName="CommentDimension"
+               enableInsert="true" enableSelectByPrimaryKey="true"
+               enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
+               enableSelectByExample="false" enableDeleteByExample="false"
+               enableCountByExample="false" enableUpdateByExample="false">
+        </table>
+
+        <table schema="MS-USER" tableName="DESIGNER" domainObjectName="Designer"
+               enableInsert="true" enableSelectByPrimaryKey="true"
+               enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
+               enableSelectByExample="false" enableDeleteByExample="false"
+               enableCountByExample="false" enableUpdateByExample="false">
+        </table>
+
+        <table schema="MS-USER" tableName="DESIGNER_SKILL" domainObjectName="DesignerSkill"
+               enableInsert="true" enableSelectByPrimaryKey="true"
+               enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
+               enableSelectByExample="false" enableDeleteByExample="false"
+               enableCountByExample="false" enableUpdateByExample="false">
+        </table>
+
+        <table schema="MS-USER" tableName="JOB_INTEREST" domainObjectName="JobInterest"
+               enableInsert="true" enableSelectByPrimaryKey="true"
+               enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
+               enableSelectByExample="false" enableDeleteByExample="false"
+               enableCountByExample="false" enableUpdateByExample="false">
+        </table>
+
+        <table schema="MS-USER" tableName="MANAGER" domainObjectName="Manager"
+               enableInsert="true" enableSelectByPrimaryKey="true"
+               enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
+               enableSelectByExample="false" enableDeleteByExample="false"
+               enableCountByExample="false" enableUpdateByExample="false">
+        </table>
+
+        <table schema="MS-USER" tableName="MESSAGE" domainObjectName="Message"
+               enableInsert="true" enableSelectByPrimaryKey="true"
+               enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
+               enableSelectByExample="false" enableDeleteByExample="false"
+               enableCountByExample="false" enableUpdateByExample="false">
+        </table>
+
+        <table schema="MS-USER" tableName="PROJECT" domainObjectName="Project"
+               enableInsert="true" enableSelectByPrimaryKey="true"
+               enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
+               enableSelectByExample="false" enableDeleteByExample="false"
+               enableCountByExample="false" enableUpdateByExample="false">
+        </table>
+
+        <table schema="MS-USER" tableName="PROJECT_INTEREST" domainObjectName="ProjectInterest"
+               enableInsert="true" enableSelectByPrimaryKey="true"
+               enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
+               enableSelectByExample="false" enableDeleteByExample="false"
+               enableCountByExample="false" enableUpdateByExample="false">
+        </table>
+
+        <table schema="MS-USER" tableName="SKILL" domainObjectName="Skill"
+               enableInsert="true" enableSelectByPrimaryKey="true"
+               enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
+               enableSelectByExample="false" enableDeleteByExample="false"
+               enableCountByExample="false" enableUpdateByExample="false">
+        </table>
+
+        <table schema="MS-USER" tableName="SUB_PROCESS" domainObjectName="SubProcess"
+               enableInsert="true" enableSelectByPrimaryKey="true"
+               enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
+               enableSelectByExample="false" enableDeleteByExample="false"
+               enableCountByExample="false" enableUpdateByExample="false">
+        </table>
+
+        <table schema="MS-USER" tableName="SUB_PROCESS_EXPECT" domainObjectName="SubProcessExpect"
+               enableInsert="true" enableSelectByPrimaryKey="true"
+               enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
+               enableSelectByExample="false" enableDeleteByExample="false"
+               enableCountByExample="false" enableUpdateByExample="false">
+        </table>
+
+        <table schema="MS-USER" tableName="USER_RELATION" domainObjectName="UserRelation"
+               enableInsert="true" enableSelectByPrimaryKey="true"
+               enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
+               enableSelectByExample="false" enableDeleteByExample="false"
+               enableCountByExample="false" enableUpdateByExample="false">
+        </table>
+
+        <table schema="MS-USER" tableName="WORKFLOW_LOG" domainObjectName="WorkflowLog"
+               enableInsert="true" enableSelectByPrimaryKey="true"
+               enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
+               enableSelectByExample="false" enableDeleteByExample="false"
+               enableCountByExample="false" enableUpdateByExample="false">
+        </table>
+
+
     </context>
 </generatorConfiguration>
