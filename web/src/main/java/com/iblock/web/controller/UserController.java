@@ -1,8 +1,10 @@
 package com.iblock.web.controller;
 
+import com.iblock.common.advice.Auth;
 import com.iblock.common.enums.UserRole;
-import com.iblock.dao.po.User;
 import com.iblock.service.user.UserService;
+import com.iblock.web.constant.CommonProperties;
+import com.iblock.web.constant.RoleConstant;
 import com.iblock.web.enums.ResponseStatus;
 import com.iblock.web.info.UserInfo;
 import com.iblock.web.request.user.LoginRequest;
@@ -29,12 +31,19 @@ public class UserController extends BaseController {
     @Autowired
     protected UserService userService;
 
-    @RequestMapping(value = "/login.action", method = RequestMethod.POST, consumes = "application/json")
+    @RequestMapping(value = "/login.do", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
-    public CommonResponse<Integer> login(@RequestBody LoginRequest request) {
+    public CommonResponse<Integer> login(@RequestBody LoginRequest request, HttpSession session) {
         try {
             Integer i = userService.login(request.getUserName(), request.getPassword(), UserRole.getByCode(request
                     .getRole()));
+            if (i.compareTo(0) > 0) {
+                UserInfo info = new UserInfo();
+                info.setRole(request.getRole());
+                info.setUserId(i);
+                info.setUserName(request.getUserName());
+                session.setAttribute(CommonProperties.USER_INFO, info);
+            }
             return new CommonResponse<Integer>(i);
         } catch (Exception e) {
             log.error("login error!", e);
@@ -42,11 +51,12 @@ public class UserController extends BaseController {
         return new CommonResponse<Integer>(ResponseStatus.SYSTEM_ERROR);
     }
 
-    @RequestMapping(value = "/user.do", method = RequestMethod.POST, consumes = "application/json")
+    @RequestMapping(value = "/info.do", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
-    public CommonResponse<UserInfo> getUser(HttpSession session) {
+    @Auth(role = RoleConstant.DESIGNER)
+    public CommonResponse<UserInfo> getUser() {
         try {
-            return new CommonResponse<UserInfo>(new UserInfo(userService.getUser(getUserInfo(session).getUserId())));
+            return new CommonResponse<UserInfo>(new UserInfo(userService.getUser(getUserInfo().getUserId())));
         } catch (Exception e) {
             log.error("getUser error!", e);
         }

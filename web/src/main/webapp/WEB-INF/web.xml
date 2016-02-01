@@ -63,15 +63,15 @@
         <url-pattern>*.do</url-pattern>
     </filter-mapping>
 
-    <filter>
-        <display-name>AuthFilter</display-name>
-        <filter-name>AuthFilter</filter-name>
-        <filter-class>com.iblock.web.filter.AuthFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>AuthFilter</filter-name>
-        <url-pattern>*.do</url-pattern>
-    </filter-mapping>
+    <!--<filter>-->
+        <!--<display-name>AuthFilter</display-name>-->
+        <!--<filter-name>AuthFilter</filter-name>-->
+        <!--<filter-class>com.iblock.web.filter.AuthFilter</filter-class>-->
+    <!--</filter>-->
+    <!--<filter-mapping>-->
+        <!--<filter-name>AuthFilter</filter-name>-->
+        <!--<url-pattern>*.do</url-pattern>-->
+    <!--</filter-mapping>-->
 
     <servlet>
         <servlet-name>dispatcher</servlet-name>

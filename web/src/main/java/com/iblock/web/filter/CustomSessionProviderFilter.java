@@ -5,6 +5,7 @@ import com.iblock.web.session.DefaultSessionFactory;
 import com.iblock.web.session.SessionFactory;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import javax.servlet.Filter;
@@ -24,6 +25,7 @@ import java.lang.reflect.Constructor;
  * sessionFactory：指定SessionFactory实例的类名。当springHosted不为true时，SessionFactory的实例借助此参数构造，
  * sessionFactory类需要包含一个带FilterConfig参数的构造函数或一个无参的构造函数（优先级按序） </p>
  */
+@Component
 public class CustomSessionProviderFilter implements Filter {
 
     private final Logger logger = Logger.getLogger(this.getClass());

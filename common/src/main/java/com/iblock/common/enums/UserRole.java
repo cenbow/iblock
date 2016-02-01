@@ -5,7 +5,7 @@ package com.iblock.common.enums;
  */
 public enum UserRole {
 
-    EMPLOYER(1, "委托方"), EMPLOYEE(2, "被雇佣者"), MANAGER(3, "项目经理"), ADMINISTRATOR(4, "系统管理员");
+    DESIGNER(1, "设计师"), MANAGER(2, "项目经理"), AGENT(3, "经纪人"), ADMINISTRATOR(4, "系统管理员");
 
     private int role;
     private String name;
