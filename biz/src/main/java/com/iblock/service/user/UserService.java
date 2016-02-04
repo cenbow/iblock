@@ -3,6 +3,7 @@ package com.iblock.service.user;
 import com.iblock.common.enums.UserRole;
 import com.iblock.dao.UserDao;
 import com.iblock.dao.po.User;
+import com.iblock.dao.po.UserDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,11 @@ public class UserService {
         return user.getId();
     }
 
-    public User getUser(Integer userId) {
+    public User getUser(Long userId) {
         return userDao.selectByPrimaryKey(userId);
+    }
+
+    public UserDetail getUserDetail(Long userId) {
+        return userDao.selectDetailById(userId);
     }
 }

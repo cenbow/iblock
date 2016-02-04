@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+    <process id="iblock" name="iblock" isExecutable="true">
+        <startEvent id="startevent1" name="开始"></startEvent>
+        <userTask id="ManagerAudit" name="管理员审核" activiti:assignee="#{admin}">
+            <extensionElements>
+                <activiti:taskListener event="create" delegateExpression="#{candidateListener}"></activiti:taskListener>
+            </extensionElements>
+        </userTask>
+        <userTask id="AgentConfirm" name="经纪人确认"></userTask>
+        <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="SubmitProject"></sequenceFlow>
+        <exclusiveGateway id="isManagerAuditSuccess" name="是否审核成功"></exclusiveGateway>
+        <sequenceFlow id="flow5" sourceRef="ManagerAudit" targetRef="isManagerAuditSuccess"></sequenceFlow>
+        <userTask id="EvaluationAndFiling" name="评价及归档"></userTask>
+        <subProcess id="subprocess" name="并行子项目">
+            <multiInstanceLoopCharacteristics isSequential="false">
+                <loopCardinality>#{processNum}</loopCardinality>
+            </multiInstanceLoopCharacteristics>
+            <startEvent id="startevent2" name="Start"></startEvent>
+            <userTask id="HireDesigner" name="招募人员" activiti:assignee="#{manager}"></userTask>
+            <userTask id="SubprocessRunning" name="子项目进行中"></userTask>
+            <userTask id="Acceptance" name="验收"></userTask>
+            <endEvent id="end" name="End"></endEvent>
+            <sequenceFlow id="flow12" sourceRef="startevent2" targetRef="HireDesigner"></sequenceFlow>
+            <receiveTask id="Pay" name="支付款项"></receiveTask>
+            <sequenceFlow id="flow21" sourceRef="Pay" targetRef="end"></sequenceFlow>
+            <serviceTask id="SendCachingNotice" name="发送提现提醒"></serviceTask>
+            <sequenceFlow id="flow29" sourceRef="HireDesigner" targetRef="SubprocessRunning"></sequenceFlow>
+            <sequenceFlow id="flow30" sourceRef="SubprocessRunning" targetRef="Acceptance"></sequenceFlow>
+            <exclusiveGateway id="isAcceptanceSuccess" name="Exclusive Gateway"></exclusiveGateway>
+            <sequenceFlow id="flow31" sourceRef="Acceptance" targetRef="isAcceptanceSuccess"></sequenceFlow>
+            <sequenceFlow id="AcceptanceFail" name="验收失败" sourceRef="isAcceptanceSuccess" targetRef="SubprocessRunning"></sequenceFlow>
+            <sequenceFlow id="flow33" sourceRef="SendCachingNotice" targetRef="Pay"></sequenceFlow>
+            <sequenceFlow id="AcceptanceSuccess" name="验收成功" sourceRef="isAcceptanceSuccess" targetRef="SendCachingNotice"></sequenceFlow>
+        </subProcess>
+        <serviceTask id="sendManagerAuditFailMsg" name="发送审核失败信息"></serviceTask>
+        <sequenceFlow id="ManagerAuditSuccess" name="管理员审核成功" sourceRef="isManagerAuditSuccess" targetRef="AgentConfirm">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${action == 1}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="ManagerAuditFail" name="管理员审核失败" sourceRef="isManagerAuditSuccess" targetRef="sendManagerAuditFailMsg">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${action == 2}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow28" sourceRef="AgentConfirm" targetRef="subprocess"></sequenceFlow>
+        <sequenceFlow id="flow35" sourceRef="subprocess" targetRef="EvaluationAndFiling"></sequenceFlow>
+        <endEvent id="endevent5" name="End"></endEvent>
+        <sequenceFlow id="flow36" sourceRef="EvaluationAndFiling" targetRef="endevent5"></sequenceFlow>
+        <serviceTask id="SubmitProject" name="提交项目" activiti:delegateExpression="#{submitProjectDelegate}"></serviceTask>
+        <sequenceFlow id="flow38" sourceRef="SubmitProject" targetRef="ManagerAudit"></sequenceFlow>
+        <sequenceFlow id="flow39" sourceRef="sendManagerAuditFailMsg" targetRef="SubmitProject"></sequenceFlow>
+    </process>
+</definitions>

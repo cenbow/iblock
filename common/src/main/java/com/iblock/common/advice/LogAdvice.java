@@ -8,6 +8,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -18,7 +19,7 @@ import java.io.IOException;
  */
 @Component
 @Aspect
-public class LogAdvice extends BaseAdvice {
+public class LogAdvice extends BaseAdvice implements Ordered {
 
     public static final String BEFORE_INVOKE_MSG_FORMAT = "invokeId=[%s] start invoking [%s], params=[%s]";
     public static final String AFTER_INVOKE_MSG_FORMAT = "invokeId=[%s] complete invoking [%s], "
@@ -98,4 +99,7 @@ public class LogAdvice extends BaseAdvice {
         return joinPoint.getTarget().getClass().getSimpleName();
     }
 
+    public int getOrder() {
+        return 1;
+    }
 }

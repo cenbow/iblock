@@ -61,14 +61,13 @@ public class ProcessManageServiceObject implements ProcessManageService {
         if (processError != ProcessError.SUCCESS) {
             return new ProcessResultDTO(processError);
         }
-        String processToken = (String) varMap.get(ProcessVars.TOKEN);
         Map<String, Object> dataMap = new HashMap<String, Object>();
         if (varMap.containsKey(ProcessVars.DATA)) {
             dataMap = (Map<String, Object>) varMap.get(ProcessVars.DATA);
         }
         try {
             identityService.setAuthenticatedUserId((String) varMap.get(ProcessVars.USER_ID));
-            ProcessInstance instance = runtimeService.startProcessInstanceByKey(processToken, dataMap);
+            ProcessInstance instance = runtimeService.startProcessInstanceByKey("iblock", dataMap);
             return new ProcessResultDTO(ProcessError.SUCCESS, instance.getId());
         } catch (Exception e) {
             log.error(String.format("severity=[1], failed to start process. varMap=[%s]", varMap.toString()), e);
@@ -311,9 +310,6 @@ public class ProcessManageServiceObject implements ProcessManageService {
     private ProcessError validateStartProcessInput(Map<String, Object> varMap) {
         if (varMap == null || varMap.isEmpty()) {
             return ProcessError.INPUT_EMPTY;
-        }
-        if (!varMap.containsKey(ProcessVars.TOKEN)) {
-            return ProcessError.TOKEN_MISSING;
         }
         if (!varMap.containsKey(ProcessVars.USER_ID)) {
             return ProcessError.USER_ID_MISSING;

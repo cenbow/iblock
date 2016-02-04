@@ -12,6 +12,7 @@ import com.iblock.web.response.CommonResponse;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -51,12 +52,12 @@ public class UserController extends BaseController {
         return new CommonResponse<Integer>(ResponseStatus.SYSTEM_ERROR);
     }
 
-    @RequestMapping(value = "/info.do", method = RequestMethod.POST, consumes = "application/json")
-    @ResponseBody
+    @RequestMapping(value = "/getUserInfo/{userId}", method = RequestMethod.GET, consumes = "application/json")
     @Auth(role = RoleConstant.DESIGNER)
-    public CommonResponse<UserInfo> getUser() {
+    @ResponseBody
+    public CommonResponse<UserInfo> getUser(@PathVariable(value="userId") Long userId) {
         try {
-            return new CommonResponse<UserInfo>(new UserInfo(userService.getUser(getUserInfo().getUserId())));
+            return new CommonResponse<UserInfo>(new UserInfo(userService.getUser(userId)));
         } catch (Exception e) {
             log.error("getUser error!", e);
         }

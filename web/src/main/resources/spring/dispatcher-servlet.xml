@@ -18,10 +18,6 @@
               <context:include-filter type="annotation"
                                       expression="org.springframework.stereotype.Controller"/>
        </context:component-scan>
-       <!--<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">-->
-       <!--</bean>-->
-       <!--<bean-->
-       <!--class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" />-->
        <mvc:annotation-driven validator="validator" />
        <!-- 以下 validator  ConversionService 在使用 mvc:annotation-driven 会 自动注册-->
        <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">

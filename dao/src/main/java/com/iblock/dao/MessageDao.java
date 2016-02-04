@@ -1,6 +1,9 @@
 package com.iblock.dao;
 
 import com.iblock.dao.po.Message;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface MessageDao {
     /**
@@ -42,4 +45,6 @@ public interface MessageDao {
      * @mbggenerated Mon Feb 01 11:51:28 CST 2016
      */
     int updateByPrimaryKey(Message record);
+
+    List<Message> selectByUserAndStatus(@Param("userId") long userId, @Param("status") int status);
 }

@@ -1,6 +1,7 @@
 package com.iblock.dao;
 
 import com.iblock.dao.po.UserRelation;
+import org.apache.ibatis.annotations.Param;
 
 public interface UserRelationDao {
     /**
@@ -42,4 +43,6 @@ public interface UserRelationDao {
      * @mbggenerated Mon Feb 01 11:51:28 CST 2016
      */
     int updateByPrimaryKey(UserRelation record);
+
+    UserRelation selectByUsers(@Param("src") long src, @Param("target") long target);
 }

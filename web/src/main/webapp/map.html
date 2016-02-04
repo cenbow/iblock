@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <style type="text/css">
+        html {
+            height: 100%
+        }
+
+        body {
+            height: 100%;
+            margin: 0px;
+            padding: 0px
+        }
+
+        #container {
+            height: 90%
+        }
+    </style>
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=CDsm2QMezchFTTIr51XYi7Be"></script>
+
+    <style type="text/css">
+        .p-wrap:hover {
+            cursor: pointer
+        }
+
+        .point-region {
+            opacity: 0.9;
+            filter: Alpha(opacity=90);
+            width: 80px;
+            height: 80px;
+            border: none;
+            position: absolute;
+        }
+
+        .point-region:hover {
+            opacity: 1;
+            filter: Alpha(opacity=100);
+            background: #e84a01
+        }
+
+        .point-region .p-context {
+            position: absolute;
+            text-align: center;
+            left: 0;
+            top: 50%;
+            width: 100%;
+            margin-top: -18px;
+            font-size: 14px;
+            line-height: 18px;
+            color: #fff
+        }
+
+        .p-context p {
+            margin: 0;
+        }
+
+        .bg-circle {
+            box-shadow: 0 1px 2px rgba(0, 0, 0, .3);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #26b095
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<script type="text/javascript">
+    var mp = new BMap.Map('container');
+    mp.centerAndZoom(new BMap.Point(121.491, 31.233), 13);
+    mp.addControl(new BMap.NavigationControl());
+    mp.addControl(new BMap.ScaleControl());
+    mp.addControl(new BMap.OverviewMapControl());
+    mp.enableScrollWheelZoom();
+    mp.addEventListener("zoomend", function () {
+        displayData();
+    });
+
+    mp.addEventListener("tilesloaded",function(){
+        displayData();
+    });
+
+    function displayData() {
+        mp.clearOverlays();
+        if (mp.getZoom() <= 14) {
+            loadDistrict(mp);
+        } else {
+            var d = mp.getBounds();
+            var geo = {
+                maxLat: d.De,
+                minLat: d.Ie,
+                maxLon: d.Ee,
+                minLon: d.Je
+            };
+            loadUsers(mp, geo);
+        }
+
+    }
+
+    function loadDistrict(mp) {
+        $.ajax({
+            type: "get",
+            dataType: "json",
+            url: "/map/district/289",
+            success: function (data) {
+                for (var i = 0; i < data.data.length; i++) {
+                    var geo = data.data[i];
+                    var circle = new
+                            DistrictOverlay(new BMap.Point(geo.longitude, geo.lantitude), geo.id,
+                            geo.name, i + 5);
+                    mp.addOverlay(circle);
+                }
+            }
+        });
+    }
+
+    function loadUsers(mp, param) {
+        $.ajax({
+            type: "post",
+            dataType: "json",
+            contentType: 'application/json',
+            url: "/map/getUsers",
+            data: JSON.stringify(param),
+            success: function (data) {
+                for (var i = 0; i < data.data.length; i++) {
+                    var geo = data.data[i];
+                    var point = new BMap.Point(geo.longitude, geo.lantitude);
+                    var marker = new BMap.Marker(point);
+                    marker.setTitle(geo.userId);
+                    mp.addOverlay(marker);
+                    marker.addEventListener("click", function(){
+                        var that = this;
+                        $.ajax({
+                            type: "get",
+                            dataType: "json",
+                            url: "/map/getUserDetail/" + that.getTitle(),
+                            success: function (data) {
+                                var result = data.data;
+                                var sContent =
+                                        "<h4 style='margin:0 0 5px 0;padding:0.2em 0'>"+result.userName+"</h4>" +
+                                        "<img style='float:right;margin:4px' id='imgDemo' src='"+result.headFigure+"' width='139' height='104'/>" +
+                                        "<p style='margin:0;line-height:1.5;font-size:13px;text-indent:2em'>"+result.district + " "
+                                        +result.address+"</p>" +
+                                        "</div>";
+                                var infoWindow = new BMap.InfoWindow(sContent);
+                                that.openInfoWindow(infoWindow);
+                                document.getElementById('imgDemo').onload = function (){
+                                    infoWindow.redraw();   //防止在网速较慢，图片未加载时，生成的信息框高度比图片的总高度小，导致图片部分被隐藏
+                                }
+                            }
+                        });
+
+                    });
+                }
+            }
+        });
+    }
+
+    function DistrictOverlay(point, areaId, name, num) {
+        this._point = point;
+        this._areaId = areaId;
+        this._name = name;
+        this._num = num;
+    }
+    DistrictOverlay.prototype = new BMap.Overlay();
+    DistrictOverlay.prototype.initialize = function (map) {
+        this._map = map;
+        var div = this._div = $('<div class="p-wrap point-region bg-circle" data-id="' + this._areaId +
+                '"><div class="p-context"><p>' + this._name + '</p><p><i class="p-num">' + this._num +
+                '</i>人</p></div></div>')[0];
+        mp.getPanes().labelPane.appendChild(div);
+        return div
+    }
+    DistrictOverlay.prototype.draw = function () {
+        var map = this._map;
+        var pixel = map.pointToOverlayPixel(this._point);
+        this._div.style.left = pixel.x + "px";
+        this._div.style.top = pixel.y - 30 + "px";
+    }
+</script>
+</body>
+</html>
