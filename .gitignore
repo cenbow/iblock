@@ -30,3 +30,4 @@ tmp/**/*
 .classpath
 .settings/
 .loadpath
+/.DS_Store
