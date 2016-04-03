@@ -25,6 +25,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +39,7 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 @Log4j
+@Component
 public class ProcessManageServiceObject implements ProcessManageService {
 
     @Autowired
@@ -66,7 +68,7 @@ public class ProcessManageServiceObject implements ProcessManageService {
             dataMap = (Map<String, Object>) varMap.get(ProcessVars.DATA);
         }
         try {
-            identityService.setAuthenticatedUserId((String) varMap.get(ProcessVars.USER_ID));
+            identityService.setAuthenticatedUserId(varMap.get(ProcessVars.USER_ID).toString());
             ProcessInstance instance = runtimeService.startProcessInstanceByKey("iblock", dataMap);
             return new ProcessResultDTO(ProcessError.SUCCESS, instance.getId());
         } catch (Exception e) {
@@ -175,7 +177,7 @@ public class ProcessManageServiceObject implements ProcessManageService {
                 } else if((Integer)taskActionDTO.getActionMap().get("action") == ActionType.CANCEL.getCode()) {
                     List<HistoricTaskInstance> taskInstanceList = historyService.createHistoricTaskInstanceQuery().processInstanceId(task.getProcessInstanceId()).finished().orderByHistoricTaskInstanceStartTime().desc().list();
                     HistoricVariableInstanceEntity launcherEntity = (HistoricVariableInstanceEntity) historyService.createHistoricVariableInstanceQuery().processInstanceId(task.getProcessInstanceId()).variableName("launcher").singleResult();
-                    if(CollectionUtils.isNotEmpty(taskInstanceList) && !taskInstanceList.get(0).getTaskDefinitionKey().equals(ProcessVars.WAIT_FOR_RESUBMIT) || !launcherEntity.getTextValue().equals(taskActionDTO.getUserId())) {
+                    if(CollectionUtils.isNotEmpty(taskInstanceList) || !launcherEntity.getTextValue().equals(taskActionDTO.getUserId())) {
                         log.error(String.format("severity=[2], action user has not authority to cancel task. taskActionDTO=[%s]", ToStringBuilder.reflectionToString(taskActionDTO)));
                         return new TaskInfoBean(ProcessError.ACTION_INVALID);
                     }

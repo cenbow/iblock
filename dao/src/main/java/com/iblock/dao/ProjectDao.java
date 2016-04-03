@@ -1,6 +1,10 @@
 package com.iblock.dao;
 
+import com.iblock.common.bean.Page;
+import com.iblock.common.bean.ProjectSearchBean;
 import com.iblock.dao.po.Project;
+
+import java.util.List;
 
 public interface ProjectDao {
     /**
@@ -50,4 +54,9 @@ public interface ProjectDao {
      * @mbggenerated Mon Feb 01 11:51:28 CST 2016
      */
     int updateByPrimaryKey(Project record);
+
+    List<Project> list(ProjectSearchBean search);
+
+    int size(ProjectSearchBean search);
+
 }

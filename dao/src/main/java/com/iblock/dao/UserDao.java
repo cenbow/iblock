@@ -45,8 +45,7 @@ public interface UserDao {
      */
     int updateByPrimaryKey(User record);
 
-    User selectUser(@Param("userName") String userName, @Param("password") String password, @Param("role")
-                               Integer role);
+    User selectUser(@Param("userName") String userName, @Param("password") String password);
 
     UserDetail selectDetailById(Long id);
 }

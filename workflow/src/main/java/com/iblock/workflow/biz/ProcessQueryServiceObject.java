@@ -37,6 +37,7 @@ import org.activiti.engine.task.TaskQuery;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,6 +58,7 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 @Log4j
+@Component
 public class ProcessQueryServiceObject implements ProcessQueryService {
 
     private final Comparator<ActionLogDTO> actionLogDTOComparator = new Comparator<ActionLogDTO>() {
@@ -102,6 +104,11 @@ public class ProcessQueryServiceObject implements ProcessQueryService {
             log.error(String.format("severity=[1], ProcessQueryService.processActive error!. processId=[%s]", processId));
             return false;
         }
+    }
+
+    public TaskDTO queryTask(String assignee, String processId) {
+        Task task = taskService.createTaskQuery().taskAssignee(assignee).processInstanceId(processId).singleResult();
+        return buildTaskDTO(task);
     }
 
     public List<TaskDTO> queryTodoTaskList(String assignee, List<String> taskDefinitionKeyList) {
@@ -203,7 +210,7 @@ public class ProcessQueryServiceObject implements ProcessQueryService {
         taskDTO.setAssignee(task.getAssignee());
         taskDTO.setStartDate(task.getStartTime());
         taskDTO.setDueDate(task.getDueDate());
-        if (StringUtils.isNotEmpty(task.getTaskDefinitionKey()) && !task.getTaskDefinitionKey().equalsIgnoreCase(ProcessVars.WAIT_FOR_RESUBMIT)) {
+        if (StringUtils.isNotEmpty(task.getTaskDefinitionKey())) {
             taskDTO.setMemo("");
         } else {
             HistoricVariableInstance memoHis = historyService.createHistoricVariableInstanceQuery().taskId(task.getId()).variableName(ProcessVars.MEMO).singleResult();
@@ -236,7 +243,7 @@ public class ProcessQueryServiceObject implements ProcessQueryService {
         taskDTO.setAssignee(task.getAssignee());
         taskDTO.setStartDate(task.getCreateTime());
         taskDTO.setDueDate(task.getDueDate());
-        if (StringUtils.isNotEmpty(task.getTaskDefinitionKey()) && !task.getTaskDefinitionKey().equalsIgnoreCase(ProcessVars.WAIT_FOR_RESUBMIT)) {
+        if (StringUtils.isNotEmpty(task.getTaskDefinitionKey())) {
             taskDTO.setMemo("");
         } else {
             HistoricVariableInstance memoHis = historyService.createHistoricVariableInstanceQuery().taskId(task.getId()).variableName(ProcessVars.MEMO).singleResult();

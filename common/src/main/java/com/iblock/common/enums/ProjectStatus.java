@@ -1,15 +1,15 @@
 package com.iblock.common.enums;
 
 /**
- * Created by baidu on 16/2/1.
+ * Created by baidu on 16/4/3.
  */
-public enum FriendStatus {
-    APPLYING(1, "申请中"), NORMAL(2, "正常"), DELETE(0, "删除");
+public enum ProjectStatus {
+    DRAFT(1, "草稿"), PUBLISH(2, "发布"), FINISH(3, "完成"), DELETE(4, "删除");
 
     private int code;
     private String msg;
 
-    FriendStatus(int code, String msg) {
+    ProjectStatus(int code, String msg) {
         this.code = code;
         this.msg = msg;
     }

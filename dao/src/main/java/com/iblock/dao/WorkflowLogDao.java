@@ -1,6 +1,7 @@
 package com.iblock.dao;
 
 import com.iblock.dao.po.WorkflowLog;
+import org.apache.ibatis.annotations.Param;
 
 public interface WorkflowLogDao {
     /**
@@ -42,4 +43,8 @@ public interface WorkflowLogDao {
      * @mbggenerated Mon Feb 01 11:51:28 CST 2016
      */
     int updateByPrimaryKey(WorkflowLog record);
+
+    WorkflowLog selectByInstId(@Param("instId") String instId, @Param("type") int type);
+
+    WorkflowLog selectByProjectId(Long projectId);
 }

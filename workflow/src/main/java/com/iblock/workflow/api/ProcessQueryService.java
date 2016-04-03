@@ -19,6 +19,8 @@ public interface ProcessQueryService {
 
     boolean processActive(String processId);
 
+    TaskDTO queryTask(String assignee, String processId);
+
     List<TaskDTO> queryTodoTaskList(String assignee, List<String> taskDefinitionKeyList);
 
     public List<TaskDTO> queryDoneTaskList(String assignee, List<String> taskDefinitionKeyList, int action);

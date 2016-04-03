@@ -15,11 +15,6 @@ public class LoginRequest {
     @NotBlank
     private String userName;
     @NotBlank
-    private String password;
-    @Min(1)
-    private int role;
+    private String passwd;
 
-    public boolean validate() {
-        return StringUtils.isNotBlank(userName) && StringUtils.isNotBlank(password) && role > 0;
-    }
 }

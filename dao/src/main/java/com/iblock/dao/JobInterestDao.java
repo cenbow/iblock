@@ -42,4 +42,8 @@ public interface JobInterestDao {
      * @mbggenerated Mon Feb 01 11:51:28 CST 2016
      */
     int updateByPrimaryKey(JobInterest record);
+
+    int updateByUserAndId(JobInterest record);
+
+    JobInterest selectByUser(Long userId);
 }

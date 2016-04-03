@@ -25,5 +25,5 @@
        </bean>
        <mvc:default-servlet-handler/>
        <aop:aspectj-autoproxy/>
-
+<import resource="applicationContext-properties.xml"/>
 </beans>

@@ -22,4 +22,5 @@ public class ProcessVars {
     public static final String PASS_ID = "passId";
     public static final String STARTER_TYPE = "starter";
     public static final String MESSAGE = "message";
+    public static final String PROCESS_NUM = "processNum";
 }

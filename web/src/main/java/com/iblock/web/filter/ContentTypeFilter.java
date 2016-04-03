@@ -7,6 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -27,6 +28,7 @@ public class ContentTypeFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response,
                          FilterChain chain) throws IOException, ServletException {
 
+        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
         // 设置请求响应字符编码
         request.setCharacterEncoding(charset);
         response.setCharacterEncoding(charset);
@@ -37,8 +39,11 @@ public class ContentTypeFilter implements Filter {
         if (req.getMethod().equalsIgnoreCase("get")) {
             req = new GetHttpServletRequestWrapper(req, charset);
         }
+        httpServletResponse.setHeader("Access-Control-Allow-Origin", "*");
+        httpServletResponse.setHeader("Access-Control-Allow-Headers", "Origin, No-Cache, X-Requested-With, If-Modified-Since, Pragma, Last-Modified, Cache-Control, Expires, Content-Type, X-E4M-With");
+        httpServletResponse.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
 
-        chain.doFilter(req, response);
+        chain.doFilter(req, httpServletResponse);
 
     }
 

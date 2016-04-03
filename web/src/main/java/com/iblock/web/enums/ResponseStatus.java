@@ -11,7 +11,8 @@ public enum ResponseStatus {
     SYSTEM_ERROR(500, "由于系统繁忙，很抱歉我们暂时无法为您提供服务，请您耐心等待一会，稍后重试。"),
     EXTERNAL_INTERFACE_ERROR(501, "外部接口错误"),
     NO_AUTH(403, "没有权限"),
-    PARAM_ERROR(415, "参数错误或无参数");
+    PARAM_ERROR(415, "参数错误或无参数"),
+    VALIDATE_ERROR(501, "校验错误");
 
     private int code;
     private String value;

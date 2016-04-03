@@ -15,12 +15,12 @@
         <javaClientGenerator targetPackage="com.iblock.dao"
                              targetProject="dao/src/main/java" type="XMLMAPPER"/>
 
-        <table schema="MS-USER" tableName="USER" domainObjectName="User"
-        enableInsert="true" enableSelectByPrimaryKey="true"
-        enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
-        enableSelectByExample="false" enableDeleteByExample="false"
-        enableCountByExample="false" enableUpdateByExample="false">
-        </table>
+        <!--<table schema="MS-USER" tableName="USER" domainObjectName="User"-->
+        <!--enableInsert="true" enableSelectByPrimaryKey="true"-->
+        <!--enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"-->
+        <!--enableSelectByExample="false" enableDeleteByExample="false"-->
+        <!--enableCountByExample="false" enableUpdateByExample="false">-->
+        <!--</table>-->
 
         <!--<table schema="MS-USER" tableName="COMMENT" domainObjectName="Comment"-->
                <!--enableInsert="true" enableSelectByPrimaryKey="true"-->
@@ -56,6 +56,13 @@
                <!--enableSelectByExample="false" enableDeleteByExample="false"-->
                <!--enableCountByExample="false" enableUpdateByExample="false">-->
         <!--</table>-->
+
+        <table schema="MS-USER" tableName="COMMON_EXPERIENCE" domainObjectName="CommonExperience"
+               enableInsert="true" enableSelectByPrimaryKey="true"
+               enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
+               enableSelectByExample="false" enableDeleteByExample="false"
+               enableCountByExample="false" enableUpdateByExample="false">
+        </table>
 
         <!--<table schema="MS-USER" tableName="MANAGER" domainObjectName="Manager"-->
                <!--enableInsert="true" enableSelectByPrimaryKey="true"-->
@@ -121,11 +128,11 @@
         <!--</table>-->
 
 
-        <table schema="MS-USER" tableName="USER_GEO" domainObjectName="UserGeo"
-        enableInsert="true" enableSelectByPrimaryKey="true"
-        enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
-        enableSelectByExample="false" enableDeleteByExample="false"
-        enableCountByExample="false" enableUpdateByExample="false"></table>
+        <!--<table schema="MS-USER" tableName="USER_GEO" domainObjectName="UserGeo"-->
+        <!--enableInsert="true" enableSelectByPrimaryKey="true"-->
+        <!--enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"-->
+        <!--enableSelectByExample="false" enableDeleteByExample="false"-->
+        <!--enableCountByExample="false" enableUpdateByExample="false"></table>-->
 
         <!--<table schema="MS-USER" tableName="DISTRICT" domainObjectName="District"-->
                <!--enableInsert="true" enableSelectByPrimaryKey="true"-->
@@ -133,5 +140,11 @@
                <!--enableSelectByExample="false" enableDeleteByExample="false"-->
                <!--enableCountByExample="false" enableUpdateByExample="false">-->
         <!--</table>-->
+
+        <!--<table schema="MS-USER" tableName="WORK_EXPERIENCE" domainObjectName="WorkExperience"-->
+               <!--enableInsert="true" enableSelectByPrimaryKey="true"-->
+               <!--enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"-->
+               <!--enableSelectByExample="false" enableDeleteByExample="false"-->
+               <!--enableCountByExample="false" enableUpdateByExample="false"></table>-->
     </context>
 </generatorConfiguration>

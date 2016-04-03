@@ -16,12 +16,8 @@ public class UserService {
     @Autowired
     private UserDao userDao;
 
-    public Integer login(String userName, String password, UserRole role) {
-        User user = userDao.selectUser(userName, password, role.getRole());
-        if (user == null) {
-            return null;
-        }
-        return user.getId();
+    public User login(String userName, String password) {
+        return userDao.selectUser(userName, password);
     }
 
     public User getUser(Long userId) {
@@ -30,5 +26,9 @@ public class UserService {
 
     public UserDetail getUserDetail(Long userId) {
         return userDao.selectDetailById(userId);
+    }
+
+    public boolean update(User user) {
+        return userDao.updateByPrimaryKeySelective(user) > 0;
     }
 }

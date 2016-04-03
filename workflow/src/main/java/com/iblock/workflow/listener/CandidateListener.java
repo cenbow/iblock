@@ -7,6 +7,7 @@ import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.delegate.TaskListener;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +17,7 @@ import java.util.List;
  * Created by qihong on 16/1/28.
  */
 @Log4j
+@Service("candidateListener")
 public class CandidateListener implements TaskListener {
 
     @Autowired

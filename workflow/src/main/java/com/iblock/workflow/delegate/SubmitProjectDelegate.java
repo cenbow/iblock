@@ -6,12 +6,14 @@ import com.iblock.workflow.vars.ProcessVars;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
 /**
  * Created by baidu on 16/2/1.
  */
+@Service("submitProjectDelegate")
 public class SubmitProjectDelegate implements JavaDelegate {
 
     @Autowired
@@ -22,11 +24,12 @@ public class SubmitProjectDelegate implements JavaDelegate {
         if(!varMap.containsKey(ProcessVars.PROJECT_KEY)){
             throw new Exception("project info missing!");
         }
-        ProjectBo project = (ProjectBo) varMap.get(ProcessVars.PROJECT_KEY);
+        Long projectId = (Long) varMap.get(ProcessVars.PROJECT_KEY);
+        Long manager = (Long) varMap.get(ProcessVars.MANAGER);
         String processId = execution.getProcessInstanceId();
-        boolean result = projectService.submitProject(project, processId);
+        boolean result = projectService.publish(projectId, processId, manager);
         if(!result){
-            throw new Exception("Save expense error!");
+            throw new Exception("Save project delegate error!");
         }
     }
 }

@@ -145,4 +145,19 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="selectByInstId" resultMap="BaseResultMap" parameterType="map" >
+    select
+    <include refid="Base_Column_List" />
+    from WORKFLOW_LOG
+    where workflow_id = #{instId}
+    and workflow_type = #{type}
+  </select>
+
+  <select id="selectByProjectId" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from WORKFLOW_LOG
+    where out_biz_id = #{projectId}
+  </select>
 </mapper>

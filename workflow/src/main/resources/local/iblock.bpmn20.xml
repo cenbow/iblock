@@ -2,9 +2,10 @@
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
     <process id="iblock" name="iblock" isExecutable="true">
         <startEvent id="startevent1" name="开始"></startEvent>
-        <userTask id="ManagerAudit" name="管理员审核" activiti:assignee="#{admin}">
+        <userTask id="ManagerAudit" name="管理员审核">
             <extensionElements>
                 <activiti:taskListener event="create" delegateExpression="#{candidateListener}"></activiti:taskListener>
+                <activiti:taskListener event="complete" delegateExpression="#{acceptCompleteListener}"></activiti:taskListener>
             </extensionElements>
         </userTask>
         <userTask id="AgentConfirm" name="经纪人确认"></userTask>
@@ -24,7 +25,7 @@
             <sequenceFlow id="flow12" sourceRef="startevent2" targetRef="HireDesigner"></sequenceFlow>
             <receiveTask id="Pay" name="支付款项"></receiveTask>
             <sequenceFlow id="flow21" sourceRef="Pay" targetRef="end"></sequenceFlow>
-            <serviceTask id="SendCachingNotice" name="发送提现提醒"></serviceTask>
+            <serviceTask id="SendCachingNotice" name="发送提现提醒" activiti:delegateExpression="#{notifyDelegate}"></serviceTask>
             <sequenceFlow id="flow29" sourceRef="HireDesigner" targetRef="SubprocessRunning"></sequenceFlow>
             <sequenceFlow id="flow30" sourceRef="SubprocessRunning" targetRef="Acceptance"></sequenceFlow>
             <exclusiveGateway id="isAcceptanceSuccess" name="Exclusive Gateway"></exclusiveGateway>
@@ -33,11 +34,11 @@
             <sequenceFlow id="flow33" sourceRef="SendCachingNotice" targetRef="Pay"></sequenceFlow>
             <sequenceFlow id="AcceptanceSuccess" name="验收成功" sourceRef="isAcceptanceSuccess" targetRef="SendCachingNotice"></sequenceFlow>
         </subProcess>
-        <serviceTask id="sendManagerAuditFailMsg" name="发送审核失败信息"></serviceTask>
+        <serviceTask id="SendManagerAuditFailMsg" name="发送审核失败信息" activiti:delegateExpression="#{notifyDelegate}"></serviceTask>
         <sequenceFlow id="ManagerAuditSuccess" name="管理员审核成功" sourceRef="isManagerAuditSuccess" targetRef="AgentConfirm">
             <conditionExpression xsi:type="tFormalExpression"><![CDATA[${action == 1}]]></conditionExpression>
         </sequenceFlow>
-        <sequenceFlow id="ManagerAuditFail" name="管理员审核失败" sourceRef="isManagerAuditSuccess" targetRef="sendManagerAuditFailMsg">
+        <sequenceFlow id="ManagerAuditFail" name="管理员审核失败" sourceRef="isManagerAuditSuccess" targetRef="SendManagerAuditFailMsg">
             <conditionExpression xsi:type="tFormalExpression"><![CDATA[${action == 2}]]></conditionExpression>
         </sequenceFlow>
         <sequenceFlow id="flow28" sourceRef="AgentConfirm" targetRef="subprocess"></sequenceFlow>
@@ -46,6 +47,165 @@
         <sequenceFlow id="flow36" sourceRef="EvaluationAndFiling" targetRef="endevent5"></sequenceFlow>
         <serviceTask id="SubmitProject" name="提交项目" activiti:delegateExpression="#{submitProjectDelegate}"></serviceTask>
         <sequenceFlow id="flow38" sourceRef="SubmitProject" targetRef="ManagerAudit"></sequenceFlow>
-        <sequenceFlow id="flow39" sourceRef="sendManagerAuditFailMsg" targetRef="SubmitProject"></sequenceFlow>
+        <sequenceFlow id="flow39" sourceRef="SendManagerAuditFailMsg" targetRef="SubmitProject"></sequenceFlow>
     </process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_iblock">
+        <bpmndi:BPMNPlane bpmnElement="iblock" id="BPMNPlane_iblock">
+            <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+                <omgdc:Bounds height="35.0" width="35.0" x="0.0" y="156.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="ManagerAudit" id="BPMNShape_ManagerAudit">
+                <omgdc:Bounds height="60.0" width="100.0" x="230.0" y="78.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="AgentConfirm" id="BPMNShape_AgentConfirm">
+                <omgdc:Bounds height="60.0" width="100.0" x="470.0" y="48.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="isManagerAuditSuccess" id="BPMNShape_isManagerAuditSuccess">
+                <omgdc:Bounds height="40.0" width="40.0" x="380.0" y="88.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="EvaluationAndFiling" id="BPMNShape_EvaluationAndFiling">
+                <omgdc:Bounds height="60.0" width="100.0" x="1660.0" y="54.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="subprocess" id="BPMNShape_subprocess">
+                <omgdc:Bounds height="162.0" width="990.0" x="620.0" y="1.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="startevent2" id="BPMNShape_startevent2">
+                <omgdc:Bounds height="35.0" width="35.0" x="640.0" y="95.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="HireDesigner" id="BPMNShape_HireDesigner">
+                <omgdc:Bounds height="60.0" width="100.0" x="720.0" y="80.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="SubprocessRunning" id="BPMNShape_SubprocessRunning">
+                <omgdc:Bounds height="60.0" width="100.0" x="870.0" y="83.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="Acceptance" id="BPMNShape_Acceptance">
+                <omgdc:Bounds height="60.0" width="100.0" x="1020.0" y="21.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
+                <omgdc:Bounds height="35.0" width="35.0" x="1560.0" y="88.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="Pay" id="BPMNShape_Pay">
+                <omgdc:Bounds height="60.0" width="100.0" x="1410.0" y="73.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="SendCachingNotice" id="BPMNShape_SendCachingNotice">
+                <omgdc:Bounds height="60.0" width="100.0" x="1260.0" y="76.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="isAcceptanceSuccess" id="BPMNShape_isAcceptanceSuccess">
+                <omgdc:Bounds height="40.0" width="40.0" x="1170.0" y="91.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="SendManagerAuditFailMsg" id="BPMNShape_SendManagerAuditFailMsg">
+                <omgdc:Bounds height="60.0" width="100.0" x="470.0" y="208.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="endevent5" id="BPMNShape_endevent5">
+                <omgdc:Bounds height="35.0" width="35.0" x="1810.0" y="69.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="SubmitProject" id="BPMNShape_SubmitProject">
+                <omgdc:Bounds height="60.0" width="100.0" x="80.0" y="141.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+                <omgdi:waypoint x="35.0" y="173.0"></omgdi:waypoint>
+                <omgdi:waypoint x="80.0" y="171.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+                <omgdi:waypoint x="330.0" y="108.0"></omgdi:waypoint>
+                <omgdi:waypoint x="380.0" y="108.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
+                <omgdi:waypoint x="675.0" y="112.0"></omgdi:waypoint>
+                <omgdi:waypoint x="720.0" y="110.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
+                <omgdi:waypoint x="1510.0" y="103.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1560.0" y="105.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow29" id="BPMNEdge_flow29">
+                <omgdi:waypoint x="820.0" y="110.0"></omgdi:waypoint>
+                <omgdi:waypoint x="832.0" y="110.0"></omgdi:waypoint>
+                <omgdi:waypoint x="832.0" y="113.0"></omgdi:waypoint>
+                <omgdi:waypoint x="870.0" y="113.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow30" id="BPMNEdge_flow30">
+                <omgdi:waypoint x="970.0" y="113.0"></omgdi:waypoint>
+                <omgdi:waypoint x="982.0" y="100.0"></omgdi:waypoint>
+                <omgdi:waypoint x="982.0" y="51.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1020.0" y="51.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow31" id="BPMNEdge_flow31">
+                <omgdi:waypoint x="1120.0" y="51.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1132.0" y="51.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1132.0" y="111.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1170.0" y="111.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="AcceptanceFail" id="BPMNEdge_AcceptanceFail">
+                <omgdi:waypoint x="1170.0" y="111.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1158.0" y="111.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1158.0" y="113.0"></omgdi:waypoint>
+                <omgdi:waypoint x="970.0" y="113.0"></omgdi:waypoint>
+                <bpmndi:BPMNLabel>
+                    <omgdc:Bounds height="16.0" width="100.0" x="1170.0" y="111.0"></omgdc:Bounds>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow33" id="BPMNEdge_flow33">
+                <omgdi:waypoint x="1360.0" y="106.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1372.0" y="106.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1372.0" y="103.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1410.0" y="103.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="AcceptanceSuccess" id="BPMNEdge_AcceptanceSuccess">
+                <omgdi:waypoint x="1210.0" y="111.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1222.0" y="111.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1222.0" y="106.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1260.0" y="106.0"></omgdi:waypoint>
+                <bpmndi:BPMNLabel>
+                    <omgdc:Bounds height="16.0" width="100.0" x="1210.0" y="111.0"></omgdc:Bounds>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="ManagerAuditSuccess" id="BPMNEdge_ManagerAuditSuccess">
+                <omgdi:waypoint x="420.0" y="108.0"></omgdi:waypoint>
+                <omgdi:waypoint x="432.0" y="108.0"></omgdi:waypoint>
+                <omgdi:waypoint x="432.0" y="78.0"></omgdi:waypoint>
+                <omgdi:waypoint x="470.0" y="78.0"></omgdi:waypoint>
+                <bpmndi:BPMNLabel>
+                    <omgdc:Bounds height="16.0" width="100.0" x="420.0" y="108.0"></omgdc:Bounds>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="ManagerAuditFail" id="BPMNEdge_ManagerAuditFail">
+                <omgdi:waypoint x="420.0" y="108.0"></omgdi:waypoint>
+                <omgdi:waypoint x="432.0" y="108.0"></omgdi:waypoint>
+                <omgdi:waypoint x="432.0" y="238.0"></omgdi:waypoint>
+                <omgdi:waypoint x="470.0" y="238.0"></omgdi:waypoint>
+                <bpmndi:BPMNLabel>
+                    <omgdc:Bounds height="16.0" width="100.0" x="420.0" y="108.0"></omgdc:Bounds>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow28" id="BPMNEdge_flow28">
+                <omgdi:waypoint x="570.0" y="78.0"></omgdi:waypoint>
+                <omgdi:waypoint x="582.0" y="78.0"></omgdi:waypoint>
+                <omgdi:waypoint x="582.0" y="82.0"></omgdi:waypoint>
+                <omgdi:waypoint x="620.0" y="82.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow35" id="BPMNEdge_flow35">
+                <omgdi:waypoint x="1610.0" y="82.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1622.0" y="82.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1622.0" y="84.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1660.0" y="84.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow36" id="BPMNEdge_flow36">
+                <omgdi:waypoint x="1760.0" y="84.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1810.0" y="86.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow38" id="BPMNEdge_flow38">
+                <omgdi:waypoint x="180.0" y="171.0"></omgdi:waypoint>
+                <omgdi:waypoint x="192.0" y="158.0"></omgdi:waypoint>
+                <omgdi:waypoint x="192.0" y="108.0"></omgdi:waypoint>
+                <omgdi:waypoint x="230.0" y="108.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="flow39" id="BPMNEdge_flow39">
+                <omgdi:waypoint x="470.0" y="238.0"></omgdi:waypoint>
+                <omgdi:waypoint x="458.0" y="250.0"></omgdi:waypoint>
+                <omgdi:waypoint x="458.0" y="171.0"></omgdi:waypoint>
+                <omgdi:waypoint x="180.0" y="171.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
 </definitions>

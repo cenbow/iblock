@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Data
 public class UserInfo implements Serializable {
 
-    private Integer userId;
+    private Long userId;
     private String userName;
     private int role;
 
