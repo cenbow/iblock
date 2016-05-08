@@ -1,0 +1,102 @@
+<div  ng-controller="ProjectListController">    
+    <div class="p+">
+    <div class="card">
+
+	<div  class="p+" id="filterBox">
+
+            <strong class="fs-subhead display-block">搜索条件</strong>
+		<div>
+        <div>
+            <lx-select  class="rc-select"  ng-model="search.industry"
+                   lx-choices="options.industry"
+                   lx-fixed-label="true"
+                   lx-label="请选择行业"
+                   lx-display-filter="true"
+                   lx-filter="SelectSearchFilter(newValue,'industry',options)"
+                   lx-multiple="true">
+            <lx-select-selected>
+                {{ $selected|getName:"industry" }}
+            </lx-select-selected>
+     
+            <lx-select-choices>
+                {{ $choice|getName:"industry" }}
+            </lx-select-choices>
+            </lx-select>
+            </div>
+
+		</div>
+        <div>
+        <lx-select  class="rc-select"  ng-model="search.city"
+                   lx-choices="options.city"
+                   lx-fixed-label="true"
+                   lx-label="请选择城市"
+                   lx-display-filter="true"
+                   lx-filter="SelectSearchFilter(newValue,'city',options)"
+                   lx-multiple="true">
+            <lx-select-selected>
+                {{ $selected|getName:"city" }}
+            </lx-select-selected>
+     
+            <lx-select-choices>
+                {{ $choice|getName:"city" }}
+            </lx-select-choices>
+            </lx-select>
+        </div>
+        <div flex-container="row" flex-column="12" flex-gutter="24" class="mt+" >
+        <div flex-item = "3">
+        <lx-text-field lx-fixed-label="true" class="rc-text" lx-label="最低薪酬"><input type="number" ng-model="search.minPay" min="0" max="search.maxPay"/>
+        </lx-text-field>
+        </div>
+
+        <span flex-item="1">元</span>
+        <div flex-item="3">
+        <lx-text-field  lx-fixed-label="true" class="rc-text" lx-label="最高薪酬">
+        <input type="number" ng-model="search.maxPay" min="search.minPay" max="2000"/>
+
+            </lx-text-field>
+
+        </div>
+
+        <span flex-item="1">元</span>
+
+        <div flex-item="4">
+        <lx-button lx-color="blue" ng-click="searchProject(1)">应用</lx-button>
+        </div>
+    </div>
+
+
+	</div>
+</div>
+    </div>
+    <div class="p+"  ng-repeat="project in projects">
+    <div class="card">
+            <div class="p+">
+                <strong class="fs-title display-block"><a class="tc-blue-600" href="/project/{{project.id}}">{{project.name}}</a></strong>
+                <span class="fs-subhead tc-black-2 display-block">
+                	<span>发布时间: {{project.startDate}}</span>
+                	<span>{{project.status|projectStatusName}}</span>
+                	<a class="rc-tag tc-blue-500" href="/projects?tag={{project.industry}}">
+                		<lx-icon lx-id="tag"></lx-icon>
+                		<span>{{project.industry}}</span>
+                	</a>
+                	<a class="rc-tag tc-blue-500" href="/projects?location={{project.city}}">
+                		<lx-icon lx-id="map-marker"></lx-icon>
+                		<span>{{project.city}}</span>
+                	</a>
+                	
+                </span>
+     
+                <div class="paragraph fs-body-1 mt+">
+                    <p>
+                          {{project.shortDesc}}...<span><a class = "tc-blue-600" href="project/{{project.id}}">[查看更多]</a></span>
+                    </p>
+                </div>
+        </div>
+    </div>
+    </div>
+
+    <div class="p+ center">
+        <span style="text-align:center"> < 1 | 2 | 3  | n > </span>
+    </div>
+
+</div>

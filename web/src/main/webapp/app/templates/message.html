@@ -1,0 +1,32 @@
+<div  ng-controller="MsgController">
+	<lx-tabs lx-active-tab="activeTab">
+    <lx-tab lx-label="未读消息">
+        <div class="mt+" ng-repeat="msg in messages">
+            <div class="card" >
+                <div class="p+">        
+                        <div class="p+">
+                                <span class="fs-subhead tc-black-2 display-block">
+                                    {{msg.sendTime}}
+                                </span>
+                                <div flex-container="row" flex-column="12" flex-gutter="24">
+                                    <div flex-item>
+                                        <span>{{msg.msg}}</span>
+                                    </div>
+                                    <div ng-if="msg.type===1" class="ml+ mb+">
+                                        <lx-button lx-color="blue" lx-type="raised" ng-click="accept(msg)">接受</lx-button>
+                                    </div>
+                                    <div ng-if="msg.type===1" class="ml+ mb+">
+                                        <lx-button lx-color="grey" lx-type="raised" >拒绝</lx-button> 
+                                    </div>
+                                </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </lx-tab>
+ 
+    <lx-tab lx-label="已读消息">
+        <p class="p+">已读消息</p>
+    </lx-tab>
+</lx-tabs>
+</div>

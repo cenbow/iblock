@@ -1,0 +1,10 @@
+{
+  "status":0,
+  "msg": "",
+  "data": {
+    "industries":[1,2,3],
+    "cities":[1,2,3],
+    "minPay":8000,
+    "maxPay":8010
+  }
+}

@@ -1,0 +1,92 @@
+<div class="p+">
+	<div class="card" >
+	    <div class="p+ ">
+	        <strong class="fs-headline display-block  tc-blue-500	"> 
+	        	发布新项目
+	        </strong>
+
+	         <div class="paragraph fs-body-1 mt+"> 
+	            <lx-text-field lx-label="项目标题" lx-allow-clear="true" 
+	            lx-error="project.title|isEmptyOrNull"
+	            >
+	        		<input type="text" ng-model="project.title">
+	    		</lx-text-field>
+
+				<span class="text-field-error" ng-if="project.title|isEmptyOrNull">请填写项目名称</span>
+				
+		<div flex-container="row" flex-gutter="24">
+    		<div flex-item>
+				<lx-select ng-model="vm.province"
+	               lx-choices="options.regions"
+	               lx-label="省份/直辖市"
+	               lx-multiple="false">
+
+		        <lx-select-selected>
+		            {{ $selected.name }}
+		        </lx-select-selected>
+		 
+		        <lx-select-choices>
+		            {{ $choice.name }}
+		        </lx-select-choices>
+		        </lx-select>
+			</div>
+			<div flex-item>
+				<lx-select ng-disabled = "!vm.province" ng-model="project.city"
+	               lx-choices="vm.province.cities"
+	               lx-label="城市"
+	               lx-multiple="false"
+	               lx-error="project.city.id|isEmptyOrNull"
+	               >
+
+
+		        <lx-select-selected>
+		            {{ $selected.name }}
+		        </lx-select-selected>
+		 
+		        <lx-select-choices>
+		            {{ $choice.name }}
+		        </lx-select-choices>
+		        </lx-select>
+			</div>
+		</div>
+
+				<span class="text-field-error" ng-if="project.city|isEmptyOrNull">请选择城市</span>
+		<div flex-container="row" flex-column="12" flex-gutter="24" flex-align="center">
+    		<div flex-item="6">
+		
+				<lx-select ng-model="project.industry"
+	               lx-choices="options.industries"
+	               lx-label="项目行业"
+	               lx-error="project.industry.id|isEmptyOrNull"
+	               lx-multiple="false">
+
+		        <lx-select-selected>
+		            {{ $selected.name }}
+		        </lx-select-selected>
+		 
+		        <lx-select-choices>
+		            {{ $choice.name }}
+		        </lx-select-choices>
+		        </lx-select>
+		    </div>
+		    <div flex-item="6" flex-align="bottom">
+    			<lx-checkbox ng-model="project.isLongTerm" lx-color="blue" class="mt++">驻场项目</lx-checkbox>
+    		</div>
+    	</div>
+				<span class="text-field-error" ng-if="project.industry|isEmptyOrNull">请选择行业</span>
+
+		    	<lx-text-field lx-label="项目描述" 
+	               lx-error="project.description|withinLength:50:10000|negative">
+		        	<textarea row="5" ng-model="project.description"></textarea>
+		    	</lx-text-field>
+
+				<span class="text-field-error" ng-if="project.description|withinLength:50:10000|negative">项目描述为50-10000字</span>
+
+	        </div> 
+		</div>
+	    <div class="card__actions">
+	        <lx-button ng-disabled = "!validate(project)" ng-click="add(project)" lx-color="blue" lx-type="raised">创建项目</lx-button>
+	        <lx-button ng-click="project={};vm={};"  lx-type="raised">重置</lx-button>
+	    </div>
+	</div>
+</div>

@@ -1,0 +1,11 @@
+{
+    "status":0,
+    "msg":"Success",
+    "data":{
+	    "token":"1242344334343dxx",
+	    "userId":"18621895323",
+	    "userName":"yinshi",
+	    "id":"12222",
+	    "role":2
+    }
+}

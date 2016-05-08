@@ -1,0 +1,26 @@
+{
+  "name": "angularsandbox",
+  "version": "1.0.0",
+  "description": "Angular sand box",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wingland/angularsandbox.git"
+  },
+  "keywords": [
+    "angular",
+    "testing"
+  ],
+  "author": "Lucia",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wingland/angularsandbox/issues"
+  },
+  "homepage": "https://github.com/wingland/angularsandbox#readme",
+  "dependencies": {
+    "express": "^4.13.4"
+  }
+}

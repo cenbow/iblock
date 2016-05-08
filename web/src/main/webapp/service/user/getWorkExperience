@@ -1,0 +1,19 @@
+{
+  "status": 0, 
+  "msg": "", 
+  "data": {
+    "experience":[{
+      "id": 123,
+      "industry":1,
+      "corporate":"XX设计有限公司",
+      "time": 4,
+      "desc":"担任设计师职位"
+    },{
+      "id": 124,
+      "industry":2,
+      "corporate":"XX设计有限公司",
+      "time": 4,
+      "desc":"担任设计师职位"
+    }]
+  }
+}

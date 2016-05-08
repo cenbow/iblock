@@ -1,0 +1,61 @@
+
+    <header class="headercontrollers" ng-controller="HeaderController">
+        <div class="header-top bgc-blue-600 tc-white">
+            <div class="header-top__wrapper">
+                <div class="header-top__left">
+
+                    <a ui-sref="app.home" class="header-top__logo">
+                        <img src="/img/iblock_logo.png">
+
+                    </a>    
+
+                    <a href="/" class="fs-title tc-white"> iBlock </a>
+                        <lx-search-filter lx-color="white" >
+                            <input type="text" ng-model="search.keyword" placeholder="{{$state.current.name==='app.designer'?'寻找设计师':'寻找项目'}}" ng-enter="searchKeyword($state.current.name)">
+                        </lx-search-filter>
+                        </div>
+
+                <div class="header-top__right">
+                    <div>
+                    <lx-button lx-color="{{$state.current.name==='app.home'?'blue':'white'}}" lx-size="l" lx-type="{{$state.current.name==='app.home'?'raised':'flat'}}"
+                        my-href="/">首页</lx-button>
+                    <lx-dropdown lx-position="left" lx-over-toggle="false">
+                        <lx-dropdown-toggle>
+                            <lx-button lx-color="{{$state.current.name==='app.projects'?'blue':'white'}}" lx-size="l" lx-type="{{$state.current.name==='app.projects'?'raised':'flat'}}"
+                                >项目</lx-button>
+                        </lx-dropdown-toggle>
+                        <lx-dropdown-menu class="bgc-blue-600">
+                            <ul>
+                                <li><a class="dropdown-link tc-white" my-href="/projects">所有项目</a></li>
+                                <li><a class="dropdown-link tc-white" my-href="/myproject" ng-show = "{{role!==4}}">我的项目</a></li>
+                                <li><a class="dropdown-link tc-white" my-href="/project/new" ng-show = "{{role===3}}">创建新项目</a></li>
+                            </ul>
+                        </lx-dropdown-menu>
+                    </lx-dropdown>
+                    <lx-button lx-color="{{$state.current.name==='app.designer'?'blue':'white'}}" lx-size="l" lx-type="{{$state.current.name==='app.designer'?'raised':'flat'}}"
+                        my-href="/designer">设计师</lx-button>
+                    <lx-button lx-color="{{$state.current.name==='app.myinfo'?'blue':'white'}}"  lx-size="l" lx-type="{{$state.current.name==='app.myinfo'?'raised':'flat'}}"
+                        my-href="/myinfo">我的信息</lx-button>
+                </div>
+                <lx-dropdown lx-position="left" lx-over-toggle="false">
+                    <lx-dropdown-toggle>
+                        <lx-button lx-size="l" lx-color="white" lx-type="icon"><lx-icon lx-id="account"></lx></lx-button>
+                    </lx-dropdown-toggle>
+
+                    <lx-dropdown-menu class="bgc-blue-600">
+                        <ul >
+                            <li ><a class="dropdown-link tc-white" my-href="/mysecurity">账号安全</a></li>
+                            <li><a class="dropdown-link tc-white" my-href="/myaccount">个人账户</a></li>
+                            <li><a class="dropdown-link tc-white" ng-click="logout()">登出</a></li>
+                        </ul>
+                    </lx-dropdown-menu>
+                </lx-dropdown>
+                
+                {{username}}
+                  <lx-button lx-size="l" lx-color="white" lx-type="icon" my-href="/message"><lx-icon lx-id="email"></lx></lx-button>
+
+       
+                </div>
+            </div>
+        </div>
+    </header>

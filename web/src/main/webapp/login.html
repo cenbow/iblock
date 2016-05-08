@@ -1,0 +1,57 @@
+<!doctype html>
+
+<html lang="zh-cn" ng-app="login">
+<head>
+	<meta charset="utf-8">
+	<title>
+	</title>
+	<!-- Head -->
+    <link rel="stylesheet" href="bower_components/lumx/dist/lumx.css">
+    <link rel="stylesheet" href="css/core.css">
+	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+	 <!-- Before body closing tag -->
+	<script src="bower_components/jquery/dist/jquery.js"></script>
+	<script src="bower_components/velocity/velocity.js"></script>
+	<script src="bower_components/moment/min/moment-with-locales.js"></script>
+	<script src="bower_components/angular/angular.js"></script>
+  	<script src="bower_components/angular-resource/angular-resource.js"></script>
+  	<script src="bower_components/angular-cookies/angular-cookies.js"></script>
+	<script src="bower_components/lumx/dist/lumx.js"></script>
+	<script src="app/filter/common.js"></script>
+	<script src="app/service/service.js"></script>
+	<script src="app/login.js"></script>	
+</head>
+<body ng-controller="LoginFormControll">
+	<div class="p+ rc-scale-fixed rc-middle">
+	    <div class="card" >
+	        <div class="p+ ">
+	            <strong class="fs-headline display-block center tc-blue-500	"> 
+	            	iBlock
+	            </strong>
+	             <span class="fs-subhead tc-black-2 display-block center">在这里结交设计圈</span>
+ 
+	 
+	             <div class="paragraph fs-body-1 mt+"> 
+	                <lx-text-field lx-label="手机号" lx-allow-clear="true" >
+		        		<input type="text" ng-model="input.username">
+		    		</lx-text-field>
+    				<!--<span class="text-field-error" ng-if="input.username|isEmptyOrNull">用户名不能为空</span>-->
+					<lx-text-field lx-label="密码" lx-allow-clear="true" >
+				        <input type="password" ng-model="input.password">
+				   	</lx-text-field>  
+    				<!--<span class="text-field-error" ng-if="input.password|isEmptyOrNull">密码不能为空</span>-->
+	            </div> 
+	    	</div>
+	        <div class="card__actions center">
+	            <lx-button ng-disabled = "(input.username|isEmptyOrNull) ||(input.password|isEmptyOrNull)" lx-color="blue" lx-type="raised" ng-click="login()">登录</lx-button>
+	            <lx-button lx-color="grey" lx-type="raised"  ng-click="forgetPassword()">忘记密码?</lx-button> 
+    				<span class="text-field-error">{{errorMessage}}</span>
+	        </div>
+	    </div>
+	</div>
+		<!--<div class="p+ pt0 card">
+		    	</div>-->
+</body>
+
+
+</html>

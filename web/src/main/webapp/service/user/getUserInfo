@@ -1,0 +1,17 @@
+{
+  "status": 0, 
+  "msg": "", 
+  "data": {
+    "userid": "1232", 
+    "username": "贾翕",
+    "education": 1,
+    "status":0,
+    "role":2,
+    "contactPhone":"18812345678",
+    "geo":{
+    	"province":1,
+    	"city":1,
+    	"street":"杨浦市区五角场街道"
+    }
+	}
+}

@@ -1,0 +1,163 @@
+<div class="p+" ng-controller="DesignerListController">
+	<div class="p+">
+	   <div class="card">
+
+	<div  class="p+" id="filterBox">
+
+            <strong class="fs-subhead display-block">搜索条件</strong>
+		<div>
+        <div>
+            <lx-select  class="rc-select"  ng-model="search.industry"
+                   lx-choices="options.industry"
+                   lx-fixed-label="true"
+                   lx-label="请选择行业"
+                   lx-display-filter="true"
+                   lx-filter="SelectSearchFilter(newValue,'industry',options)"
+                   lx-multiple="true">
+            <lx-select-selected>
+                {{ $selected|getName:"industry" }}
+            </lx-select-selected>
+     
+            <lx-select-choices>
+                {{ $choice|getName:"industry" }}
+            </lx-select-choices>
+            </lx-select>
+         </div>
+
+		</div>
+
+        <div>
+            <lx-select  class="rc-select"  ng-model="search.skill"
+                   lx-choices="options.skill"
+                   lx-fixed-label="true"
+                   lx-label="请选择技能"
+                   lx-display-filter="true"
+                   lx-filter="SelectSearchFilter(newValue,'skill',options)"
+                   lx-multiple="true">
+            <lx-select-selected>
+                {{ $selected|getName:"skill" }}
+            </lx-select-selected>
+     
+            <lx-select-choices>
+                {{ $choice|getName:"skill" }}
+            </lx-select-choices>
+            </lx-select>
+         </div>
+        <div>
+        <lx-select  class="rc-select"  ng-model="search.city"
+                   lx-choices="options.city"
+                   lx-fixed-label="true"
+                   lx-label="请选择城市"
+                   lx-display-filter="true"
+                   lx-filter="SelectSearchFilter(newValue,'city',options)"
+                   lx-multiple="true">
+            <lx-select-selected>
+                {{ $selected|getName:"city" }}
+            </lx-select-selected>
+     
+            <lx-select-choices>
+                {{ $choice|getName:"city" }}
+            </lx-select-choices>
+            </lx-select>
+        </div>
+        <div flex-container="row" flex-column="12" flex-gutter="24" class="mt+" >
+        <div flex-item = "3">
+        <lx-text-field lx-fixed-label="true" class="rc-text" lx-label="最低薪酬"><input type="number" ng-model="search.minPay" min="0" max="search.maxPay"/>
+        </lx-text-field>
+        </div>
+
+        <span flex-item="1">元</span>
+        <div flex-item="3">
+        <lx-text-field  lx-fixed-label="true" class="rc-text" lx-label="最高薪酬">
+        <input type="number" ng-model="search.maxPay" min="search.minPay" max="2000"/>
+
+            </lx-text-field>
+
+        </div>
+
+        <span flex-item="1">元</span>
+
+        <div flex-item="4">
+        <lx-button lx-color="blue" ng-click="searchUser(1)">应用</lx-button>
+        </div>
+    </div>
+
+
+	</div>
+</div>
+</div>
+	<div class="p+" ng-repeat="user in users">
+		<div class="card" >
+	        <div flex-container="row" style="height: 140px">
+	            <div  class="card__img card__img--left" style="height: 150px">
+	                <img src="/img/head.jpg">
+	            </div>
+	 
+	            <div flex-item flex-container="column">
+	                <div>
+	                    <div class="p+">
+	                        <strong class="fs-subhead display-block">{{user.name}}</strong>
+	                        <span class="fs-subhead tc-black-2 display-block">
+	                        	{{user.city}}
+	                        </span>
+	                        <a class="rc-tag tc-blue-500" ng-repeat = "item in user.industry" href="/designer?tag={{item}}">
+                				<lx-icon lx-id="tag"></lx-icon>
+                				<span>{{item}}</span>
+                			</a>
+                		</div>
+	                </div>
+	 
+	                <div class="card__actions" style="padding: 0px;">
+	                    <lx-button lx-color="black" lx-type="flat" ng-click="employ(user.id)">招聘到项目</lx-button>
+	                    <lx-button lx-color="orange" lx-type="flat" >添加到共同经历</lx-button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+  <div class="p+" flex-container="row" flex-column="24" flex-align="space-between center">
+     <!-- <div class="card mr+">
+        <lx-button lx-type="icon" lx-size="m" lx-color="blue"> <i class="mdi mdi-chevron-double-left"></i></lx-button>
+      </div>-->
+
+  <div flex-item-order="1" flex-container="row">
+      <div class="card mr+" >
+        <lx-button lx-type="flat" lx-size="m" lx-color="blue"> 首页</lx-button>
+      </div>
+      <div class="card mr+" >
+        <lx-button lx-type="flat" lx-size="m" lx-color="blue"> 上一页</lx-button>
+      </div>
+  </div>
+  <div flex-item-order="2" flex-container="row">
+    <div class="card mr+" ng-repeat="index in pageFirst">
+        <lx-button lx-type="{{index==pageNo?'raised':'flat'}}" lx-size="m" lx-color="blue"> {{index}}</lx-button>
+      </div>
+
+    <div class=" mr+" ng-if="firstDot"> 
+      <lx-button  lx-type="{{index==pageNo?'raised':'flat'}}" lx-size="m" lx-color="blue"> <strong>...</strong></lx-button>
+     </div>
+
+    <div class="card mr+" ng-repeat="index in pageMiddle">
+        <lx-button lx-type="{{index==pageNo?'raised':'flat'}}" lx-size="m" lx-color="blue"> {{index}}</lx-button>
+      </div>
+
+    <div class=" mr+" ng-if="secondDot"> 
+      <lx-button lx-type="{{index==pageNo?'raised':'flat'}}" lx-size="m" lx-color="blue"> <strong>...</strong></lx-button>
+     </div>
+    <div class="card mr+" ng-repeat="index in pageLast">
+        <lx-button lx-type="{{index==pageNo?'raised':'flat'}}" lx-size="m" lx-color="blue"> {{index}}</lx-button>
+      </div>
+  </div>
+
+<div flex-item-order="3" flex-container="row">
+  
+      <div class="card mr+">
+        <lx-button lx-type="flat" lx-size="m" lx-color="blue"> 下一页</lx-button>
+      </div>
+
+      <div class="card" >
+        <lx-button lx-type="flat" lx-size="m" lx-color="blue"> 末页</lx-button>
+      </div>
+  </div>
+</div>
+</div>

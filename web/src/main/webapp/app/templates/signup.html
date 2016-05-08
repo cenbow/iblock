@@ -1,0 +1,147 @@
+<div class="p+ rc-scale-fixed-600 rc-middle" ng-controller="SignupFormControll" >
+	    <div class="card" >
+	        <div class="p+">
+	            <strong class="fs-headline display-block center tc-blue-500	"> 
+	            	iBlock
+	            </strong>
+	             <span class="fs-subhead tc-black-2 display-block center">注册成为{{input.role===2?"项目经理":"设计师"}}</span>
+ 		
+ 		
+	         <div class="paragraph fs-body-1 mt+"> 
+	         	 	<lx-text-field lx-label="手机号" lx-allow-clear="true" 
+	      				lx-error="!validateMobile(input.mobile)">
+	        			<input type="text" ng-model="input.mobile">
+	    			</lx-text-field>
+					<span class="text-field-error" ng-if="!validateMobile(input.mobile)">请填写正确的手机号</span>
+
+			<div flex-container="row" flex-align="middle" flex-gutter="24">
+	    		
+				<div flex-item="3">
+	        		<lx-button style="margin-top:2em" ng-disabled = "!validateMobile(input.mobile) || lastSend< 30" ng-click="sendValidationCode(input.mobile)"  lx-color="blue" lx-type="raised">
+	        		{{lastSend >=30?"发送验证码":30 - lastSend + "秒后重试"}}</lx-button>
+				</div>
+				<div flex-item="9">
+	    			<lx-text-field flex-item lx-label="手机验证码"  ng-disabled="!allowValidateCode"lx-allow-clear="true" 
+		      				lx-error="!validateValidationCode(input.validationCode)">
+		        				<input type="text" ng-model="input.validationCode">
+		    				</lx-text-field>
+				</div>
+			</div>
+					<lx-text-field lx-label="密码" lx-allow-clear="true" 
+	      				lx-error="!validatePassword(input.password)">
+	        			<input type="password" ng-model="input.password">
+	    			</lx-text-field>
+					<span class="text-field-error" ng-if="!validatePassword(input.password)">密码至少包含8个字符串,至少一个大小写字母 一个数字</span>
+					<lx-text-field lx-label="姓名" lx-allow-clear="true" 
+	      				lx-error="!validateUsername(input.username)">
+	        			<input type="text" ng-model="input.username">
+	    			</lx-text-field>
+					<span class="text-field-error" ng-if="!validateUsername(input.username)">姓名不得少于两位字符</span>
+
+					<lx-select ng-model="input.gender"
+		               lx-choices="options.gender"
+		               lx-label="性别"
+		               lx-error="input.gender|isEmptyOrNull"
+		               lx-multiple="false">
+
+			        <lx-select-selected>
+			            {{ $selected |getName:"gender" }}
+			        </lx-select-selected>
+			 
+			        <lx-select-choices>
+			            {{ $choice |getName:"gender"}}
+			        </lx-select-choices>
+			        </lx-select>
+			        <span class="text-field-error" ng-if="input.gender|isEmptyOrNull">请选择性别</span>
+			    	
+
+							<div flex-container="row" flex-columns="12" flex-gutter="24">
+								<div flex-item="4">
+									<lx-select  ng-model="input.province"
+						               lx-choices="options.province"
+						               lx-fixed-label="true"
+						               lx-label="省份/直辖市"
+						               lx-multiple="false"
+
+						               lx-error="input.province|isEmptyOrNull">
+
+							        <lx-select-selected>
+							            {{ $selected|getName:"province" }}
+							        </lx-select-selected>
+							 
+							        <lx-select-choices>
+							            {{ $choice|getName:"province" }}
+							        </lx-select-choices>
+							        </lx-select>
+								</div>
+								<div flex-item="4">
+									<lx-select   ng-disabled = "!input.province" ng-model="input.city"
+						               lx-choices="input.province|getCities"
+						               lx-label="城市"
+						               lx-fixed-label="true"
+						               lx-multiple="false"
+						               lx-error="input.city|isEmptyOrNull" >
+
+
+							        <lx-select-selected>
+							            {{ $selected|getName:"city" }}
+							        </lx-select-selected>
+							 
+							        <lx-select-choices>
+							            {{ $choice|getName:"city" }}
+							        </lx-select-choices>
+							        </lx-select>
+								</div>
+
+								<div flex-item="4">
+									<lx-select   ng-disabled = "!input.city" ng-model="input.district"
+						               lx-choices="input.city|getDistricts"
+						               lx-label="区"
+						               lx-fixed-label="true"
+						               lx-multiple="false"
+						               lx-error="input.distict|isEmptyOrNull" >
+
+
+							        <lx-select-selected>
+							            {{ $selected|getName:"district" }}
+							        </lx-select-selected>
+							 
+							        <lx-select-choices>
+							            {{ $choice|getName:"district" }}
+							        </lx-select-choices>
+							        </lx-select>
+								</div>
+								<div flex-item="2">
+								</div>
+							</div>
+
+									<lx-text-field lx-label="所在街道"  ng-if="input.role===1"
+						               lx-fixed-label="true" >
+						        		<input type="text" ng-model="input.street">
+						    		</lx-text-field>
+
+									<lx-text-field lx-label="所在公司名称"  ng-if="input.role===2"
+						               lx-fixed-label="true" >
+						        		<input type="text" ng-model="input.corporateName" 
+						        		lx-error="!validateCorporateName(input.corporateName)">
+						    		</lx-text-field>
+
+									<span class="text-field-error"  ng-if="input.role===2 &&!validateCorporateName(input.corporateName)">公司名称不得少于5个字</span>
+
+									<lx-text-field lx-label="所在公司简介"  ng-if="input.role===2"
+						               lx-fixed-label="true" >
+						        		<textarea type="text" ng-model="input.corporateBio"
+						        		lx-error="!validateCorporateBio(input.corporateBio)"></textarea>
+						    		</lx-text-field>
+
+									<span class="text-field-error" ng-if="input.role===2 &&!validateCorporateBio(input.corporateBio)">公司简介不得少于20个字</span>
+								</div>
+	 	   </div>
+	      	<div class="card__actions center">
+	            <lx-button ng-disabled = "!validateForm()" lx-color="blue" lx-type="raised" ng-click="signup()">注册</lx-button>
+	            <lx-button my-href="/login.html" lx-color="grey" lx-type="raised" >已有账号，直接登录</lx-button>
+
+    				<span class="text-field-error">{{errorMessage}}</span>
+	        </div>
+	    </div>
+</div>

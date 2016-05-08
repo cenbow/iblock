@@ -1,0 +1,40 @@
+<!doctype html>
+
+<html lang="zh-cn" ng-app="app">
+<head>
+	<meta charset="utf-8" >
+	<title>
+	</title>
+	<!-- Head -->
+
+    <link rel="stylesheet" href="/bower_components/boostrap/css/bootstrap.css">
+    <link rel="stylesheet" href="/bower_components/lumx/dist/lumx.css">
+    <link rel="stylesheet" href="/css/core.css">
+    <!--<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700">-->
+	 <!-- Before body closing tag -->
+	<script src="/bower_components/jquery/dist/jquery.js"></script>
+	<script src="/bower_components/velocity/velocity.js"></script>
+	<script src="/bower_components/moment/min/moment-with-locales.js"></script>
+	<script src="/bower_components/angular/angular.js"></script>
+  	<script src="/bower_components/angular-resource/angular-resource.js"></script>
+  	<script src="/bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="/bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+	<script src="/bower_components/lumx/dist/lumx.js"></script>
+    <script src="/app/app.js"></script>
+	<script src="/app/service/service.js"></script>
+	<script src="/app/filter/common.js"></script>
+    <script src="/app/controllers/headerCtrl.js"></script>
+    <script src="/app/controllers/msgCtrl.js"></script>
+    <script src="/app/controllers/projectListCtrl.js"></script>
+    <script src="/app/controllers/userCtrl.js"></script>
+</head>
+<body>
+ <div class="header" ui-view="header"></div>
+ <div class="app__main">
+ 	<div class="body_wrapper" ui-view="main">
+ 	</div>
+ </div>
+</body>
+
+
+</html>

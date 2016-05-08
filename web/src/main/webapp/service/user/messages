@@ -1,0 +1,31 @@
+{
+	"status":"",
+	"msg":"",
+	"length":"",
+	"data":{
+		"pageNo": 1, 
+    	"pageSize": 20, 
+    	"order": "asc",
+    	"orderBy": "sendTime",
+    	"totalCount":2 ,
+    	"results":[{
+			"status": 0
+			"sendTime":"2015-12-12 12:01:21",
+			"type":1,
+			"msg":"{贾翕|user?id=12} 请求解除 {项目名称|project?id=12} 阶段二与 {方璐|user?id=11} 的合约",
+			"service":"project/step/acceptRemoveHiring",
+			"postparams":{
+				"hireid":12
+			}
+		},{
+			"status": 0
+			"sendTime":"2015-12-12 12:01:21",
+			"type":1,
+			"msg":"{贾翕|user?id=12} 请求解除 {项目名称|project?id=12} 阶段二与 {方璐|user?id=11} 的合约",
+			"service":"project/step/acceptRemoveHiring",
+			"postparams":{
+				"hireid":12
+			}
+		}]
+	}
+}
