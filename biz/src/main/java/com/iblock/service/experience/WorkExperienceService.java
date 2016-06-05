@@ -24,13 +24,18 @@ public class WorkExperienceService {
         return list == null ? new ArrayList<WorkExperience>() : list;
     }
 
-    public boolean addOrUpdate(WorkExperience experience) {
+    public Long addOrUpdate(WorkExperience experience) {
+        experience.setStatus((byte) CommonStatus.NORMAL.getCode());
         if (experience.getId() == null) {
             experience.setAddTime(new Date());
-            experience.setStatus((byte) CommonStatus.NORMAL.getCode());
-            return workExperienceDao.insertSelective(experience) > 0;
+            workExperienceDao.insertSelective(experience);
+            return experience.getId();
         } else {
-            return workExperienceDao.updateByPrimaryKeySelective(experience) > 0;
+            if (workExperienceDao.selectByPrimaryKey(experience.getId()).getUserId().equals(experience.getId())
+                    || workExperienceDao.updateByPrimaryKeyWithBLOBs(experience) < 0) {
+                throw new RuntimeException("数据不匹配");
+            }
+            return experience.getId();
         }
     }
 

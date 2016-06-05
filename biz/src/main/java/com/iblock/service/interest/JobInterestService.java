@@ -18,13 +18,11 @@ public class JobInterestService {
     private JobInterestDao jobInterestDao;
 
     public boolean addOrUpdate(JobInterest interest) {
-        JobInterest i = jobInterestDao.selectByUser(interest.getUserId());
-        if (i == null) {
+        if (interest.getId() == null) {
             interest.setAddTime(new Date());
             interest.setStatus(true);
-            return jobInterestDao.insert(interest) > 0;
+            return jobInterestDao.insertSelective(interest) > 0;
         } else {
-            interest.setId(i.getId());
             return jobInterestDao.updateByUserAndId(interest) > 0;
         }
     }

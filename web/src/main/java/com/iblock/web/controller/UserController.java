@@ -3,22 +3,31 @@ package com.iblock.web.controller;
 import com.iblock.common.advice.Auth;
 import com.iblock.common.enums.Education;
 import com.iblock.common.enums.UserRole;
+import com.iblock.dao.po.JobInterest;
 import com.iblock.dao.po.Manager;
 import com.iblock.dao.po.Skill;
 import com.iblock.dao.po.User;
 import com.iblock.dao.po.UserGeo;
+import com.iblock.dao.po.WorkExperience;
 import com.iblock.service.bo.UserUpdateBo;
+import com.iblock.service.experience.WorkExperienceService;
 import com.iblock.service.file.FileService;
+import com.iblock.service.interest.JobInterestService;
 import com.iblock.service.user.UserService;
 import com.iblock.web.constant.CommonProperties;
 import com.iblock.web.constant.RoleConstant;
 import com.iblock.web.enums.ResponseStatus;
+import com.iblock.web.info.AddWorkExperienceInfo;
 import com.iblock.web.info.GeoInfo;
+import com.iblock.web.info.IdRequestInfo;
+import com.iblock.web.info.JobInterestInfo;
 import com.iblock.web.info.KVInfo;
 import com.iblock.web.info.SkillInfo;
 import com.iblock.web.info.UserDisplayInfo;
 import com.iblock.web.info.UserInfo;
 import com.iblock.web.info.UserUpdateInfo;
+import com.iblock.web.info.WorkExperienceInfo;
+import com.iblock.web.info.WorkExperienceResultInfo;
 import com.iblock.web.request.user.LoginRequest;
 import com.iblock.web.request.user.SendValidateCodeRequest;
 import com.iblock.web.request.user.SignUpRequest;
@@ -48,6 +57,7 @@ import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -64,6 +74,12 @@ public class UserController extends BaseController {
 
     @Autowired
     protected FileService fileService;
+
+    @Autowired
+    protected JobInterestService jobInterestService;
+
+    @Autowired
+    protected WorkExperienceService workExperienceService;
 
     @RequestMapping(value = "/login", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
@@ -119,6 +135,21 @@ public class UserController extends BaseController {
             log.error("sendValidateCode error!", e);
         }
         return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/skills", method = RequestMethod.GET)
+    @ResponseBody
+    public CommonResponse<List<KVInfo>> skills() {
+        try {
+            List<KVInfo> result = new ArrayList<KVInfo>();
+            for (Skill skill : userService.getSkills()) {
+                result.add(new KVInfo(skill.getId(), skill.getName()));
+            }
+            return new CommonResponse<List<KVInfo>>(result);
+        } catch (Exception e) {
+            log.error("skills error!", e);
+        }
+        return new CommonResponse<List<KVInfo>>(ResponseStatus.SYSTEM_ERROR);
     }
 
     @RequestMapping(value = "/info/{userId}", method = RequestMethod.GET)
@@ -263,6 +294,138 @@ public class UserController extends BaseController {
             return new CommonResponse<Boolean>(userService.update(user));
         } catch (Exception e) {
             log.error("getUserFavicon error!", e);
+        }
+        return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/getWorkPrefs/{userId}", method = RequestMethod.GET)
+    @Auth
+    @ResponseBody
+    public CommonResponse<JobInterestInfo> getWorkPrefs(@PathVariable(value = "userId") Long userId) {
+
+        try {
+            JobInterest interest = jobInterestService.get(userId);
+            if (interest == null) {
+                return new CommonResponse<JobInterestInfo>(null, ResponseStatus.SUCCESS);
+            }
+            return new CommonResponse<JobInterestInfo>(JobInterestInfo.parse(interest));
+        } catch (Exception e) {
+            log.error("getWorkPrefs error!", e);
+        }
+        return new CommonResponse<JobInterestInfo>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/updateWorkPrefs", method = RequestMethod.POST)
+    @Auth(role = RoleConstant.DESIGNER)
+    @ResponseBody
+    public CommonResponse<Boolean> updateWorkPrefs(@RequestBody JobInterestInfo info) {
+
+        try {
+            JobInterest interest = jobInterestService.get(getUserInfo().getUserId());
+            if (interest == null) {
+                interest = new JobInterest();
+                interest.setUserId(getUserInfo().getUserId());
+            }
+            if (info.getIsLongTerm() != null) {
+                interest.setResident(info.getIsLongTerm());
+            }
+            if (info.getMaxPay() != null) {
+                interest.setEndPay(info.getMaxPay());
+            }
+            if (info.getMinPay() != null) {
+                interest.setStartPay(info.getMinPay());
+            }
+            if (info.getCities() != null) {
+                StringBuffer sb = new StringBuffer();
+                for (KVInfo kv : info.getCities()) {
+                    sb.append(kv.getId()).append(",");
+                }
+                interest.setCityList(sb.toString());
+            }
+            if (info.getIndustries() != null) {
+                StringBuffer sb = new StringBuffer();
+                for (KVInfo kv : info.getIndustries()) {
+                    sb.append(kv.getId()).append(",");
+                }
+                interest.setJobTypeList(sb.toString());
+            }
+
+            return new CommonResponse<Boolean>(jobInterestService.addOrUpdate(interest));
+        } catch (Exception e) {
+            log.error("updateWorkPrefs error!", e);
+        }
+        return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/getWorkExperience/{userId}", method = RequestMethod.GET)
+    @Auth
+    @ResponseBody
+    public CommonResponse<WorkExperienceResultInfo> getWorkExperience(@PathVariable(value = "userId") Long userId) {
+
+        try {
+            WorkExperienceResultInfo info = new WorkExperienceResultInfo();
+            List<WorkExperience> experiences = workExperienceService.getByUser(userId);
+            if (experiences == null) {
+                info.setExperiences(new ArrayList<WorkExperienceInfo>());
+                return new CommonResponse<WorkExperienceResultInfo>(info, ResponseStatus.SUCCESS);
+            }
+            List<WorkExperienceInfo> list = new ArrayList<WorkExperienceInfo>();
+            for (WorkExperience experience : experiences) {
+                list.add(WorkExperienceInfo.parse(experience));
+            }
+            info.setExperiences(list);
+            return new CommonResponse<WorkExperienceResultInfo>(info);
+        } catch (Exception e) {
+            log.error("getWorkExperience error!", e);
+        }
+        return new CommonResponse<WorkExperienceResultInfo>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/addWorkExperience", method = RequestMethod.POST)
+    @Auth(role = RoleConstant.DESIGNER)
+    @ResponseBody
+    public CommonResponse<Long> addWorkExperience(@RequestBody AddWorkExperienceInfo info) {
+
+        try {
+            WorkExperience experience = new WorkExperience();
+            experience.setYear(info.getTime());
+            experience.setDesc(info.getDesc());
+            experience.setUserId(getUserInfo().getUserId());
+            experience.setIndustry(info.getIndustry().getId());
+            return new CommonResponse<Long>(workExperienceService.addOrUpdate(experience));
+        } catch (Exception e) {
+            log.error("addWorkExperience error!", e);
+        }
+        return new CommonResponse<Long>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/deleteWorkExperience", method = RequestMethod.POST)
+    @Auth(role = RoleConstant.DESIGNER)
+    @ResponseBody
+    public CommonResponse<Boolean> deleteWorkExperience(@RequestBody IdRequestInfo info) {
+
+        try {
+            return new CommonResponse<Boolean>(workExperienceService.remove(info.getId(), getUserInfo().getUserId()));
+        } catch (Exception e) {
+            log.error("deleteWorkExperience error!", e);
+        }
+        return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/updateWorkExperience", method = RequestMethod.POST)
+    @Auth(role = RoleConstant.DESIGNER)
+    @ResponseBody
+    public CommonResponse<Boolean> updateWorkExperience(@RequestBody WorkExperienceInfo info) {
+        try {
+            WorkExperience experience = new WorkExperience();
+            experience.setId(info.getId());
+            experience.setUserId(getUserInfo().getUserId());
+            experience.setYear(info.getTime());
+            experience.setDesc(info.getDesc());
+            experience.setIndustry(info.getIndustry().getId());
+            return new CommonResponse<Boolean>(workExperienceService.addOrUpdate(experience) > 0);
+        } catch (Exception e) {
+            log.error("updateWorkExperience error!", e);
         }
         return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
     }
