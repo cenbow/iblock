@@ -50,4 +50,6 @@ public interface ManagerDao {
      * @mbggenerated Mon Feb 01 11:51:28 CST 2016
      */
     int updateByPrimaryKey(Manager record);
+
+    Manager selectByUser(Long userId);
 }

@@ -21,7 +21,7 @@ import java.io.IOException;
  */
 public class RedisSessionFactory implements SessionFactory<RedisHttpSession> {
 
-    protected static final String DEFAULT_SESSION_COOKIE_NAME = "REDIS_SID";
+    public static final String DEFAULT_SESSION_COOKIE_NAME = "REDIS_SID";
     protected static final int DEFAULT_INTERVAL = 60 * 60; // 1 hr
 
     private final Logger logger = Logger.getLogger(this.getClass());
@@ -198,6 +198,7 @@ public class RedisSessionFactory implements SessionFactory<RedisHttpSession> {
     private void setCookie(String name, String value, HttpServletResponse response) {
         Cookie cookie = new Cookie(name, value);
         cookie.setMaxAge(cookieMaxAge);
+        cookie.setDomain(".iblock.com");
         cookie.setPath("/");
         response.addCookie(cookie);
     }

@@ -1,20 +1,32 @@
 package com.iblock.web.controller;
 
 import com.iblock.common.advice.Auth;
+import com.iblock.common.enums.Education;
 import com.iblock.common.enums.UserRole;
+import com.iblock.dao.po.Manager;
+import com.iblock.dao.po.Skill;
 import com.iblock.dao.po.User;
+import com.iblock.dao.po.UserGeo;
+import com.iblock.service.bo.UserUpdateBo;
 import com.iblock.service.file.FileService;
 import com.iblock.service.user.UserService;
 import com.iblock.web.constant.CommonProperties;
 import com.iblock.web.constant.RoleConstant;
 import com.iblock.web.enums.ResponseStatus;
+import com.iblock.web.info.GeoInfo;
+import com.iblock.web.info.KVInfo;
+import com.iblock.web.info.SkillInfo;
+import com.iblock.web.info.UserDisplayInfo;
 import com.iblock.web.info.UserInfo;
+import com.iblock.web.info.UserUpdateInfo;
 import com.iblock.web.request.user.LoginRequest;
 import com.iblock.web.request.user.SendValidateCodeRequest;
 import com.iblock.web.request.user.SignUpRequest;
 import com.iblock.web.response.CommonResponse;
+import com.iblock.web.session.RedisSessionFactory;
 import lombok.extern.log4j.Log4j;
 import nl.captcha.Captcha;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +39,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by qihong on 16/1/25.
@@ -51,12 +67,12 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
-    public CommonResponse<UserInfo> login(@RequestBody LoginRequest request, HttpSession session) {
+    public CommonResponse<UserInfo> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         try {
             User user = userService.login(request.getUserName(), request.getPasswd());
             if (user != null) {
                 UserInfo info = new UserInfo(user);
-                session.setAttribute(CommonProperties.USER_INFO, info);
+                httpRequest.getSession().setAttribute(CommonProperties.USER_INFO, info);
                 return new CommonResponse<UserInfo>(info);
             }
             return new CommonResponse<UserInfo>(ResponseStatus.NO_AUTH);
@@ -79,7 +95,6 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "/sendValidateCode", method = RequestMethod.POST, consumes = "application/json")
-    @Auth(role = RoleConstant.DESIGNER)
     @ResponseBody
     public CommonResponse<Boolean> sendValidateCode(@RequestBody SendValidateCodeRequest request) {
         try {
@@ -95,33 +110,53 @@ public class UserController extends BaseController {
         return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
     }
 
-    @RequestMapping(value = "/getUserInfo/{userId}", method = RequestMethod.GET, consumes = "application/json")
-    @Auth(role = RoleConstant.DESIGNER)
-    @ResponseBody
-    public CommonResponse<UserInfo> getUser(@PathVariable(value="userId") Long userId) {
-        try {
-            return new CommonResponse<UserInfo>(new UserInfo(userService.getUser(userId)));
-        } catch (Exception e) {
-            log.error("getUser error!", e);
-        }
-        return new CommonResponse<UserInfo>(ResponseStatus.SYSTEM_ERROR);
-    }
-
     @RequestMapping(value = "/signup", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
-    public CommonResponse<Boolean> signUp(SignUpRequest request) {
+    public CommonResponse<Boolean> signUp(@RequestBody SignUpRequest request) {
         try {
-
-//            return new CommonResponse<Boolean>(new UserInfo(userService.getUser(userId)));
+            return new CommonResponse<Boolean>(userService.signUp(request.toUserBo()));
         } catch (Exception e) {
-            log.error("getUser error!", e);
+            log.error("sendValidateCode error!", e);
         }
         return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
     }
 
+    @RequestMapping(value = "/info/{userId}", method = RequestMethod.GET)
+    @Auth(role = RoleConstant.LOGIN)
+    @ResponseBody
+    public CommonResponse<UserDisplayInfo> getUser(@PathVariable(value = "userId") Long userId) {
+        try {
+            UserDisplayInfo info = new UserDisplayInfo();
+            User user = userService.getUser(userId);
+            info.setUserId(userId);
+            info.setUsername(user.getUserName());
+            info.setAvatar(user.getHeadFigure());
+            info.setRole(user.getRole().intValue());
+            info.setEducation(new KVInfo(user.getEducation(), Education.getByCode(user.getEducation()).getMsg()));
+            info.setRating(5);
+            info.setContactPhone(user.getMobile());
+            info.setOnline(user.getOnline());
+            if (StringUtils.isNotBlank(user.getSkills())) {
+                List<SkillInfo> skills = new ArrayList<SkillInfo>();
+                for (Skill skill : userService.getSkillByIds(user.getSkills())) {
+                    skills.add(new SkillInfo(skill.getId(), skill.getName()));
+                }
+                info.setSkills(skills);
+            }
+            UserGeo geo = userService.getUserGeo(userId);
+            if (geo != null) {
+                info.setGeo(GeoInfo.parse(userService.getUserGeo(userId)));
+            }
+            return new CommonResponse<UserDisplayInfo>(info);
+        } catch (Exception e) {
+            log.error("getUser error!", e);
+        }
+        return new CommonResponse<UserDisplayInfo>(ResponseStatus.SYSTEM_ERROR);
+    }
+
     @RequestMapping(value = "/getUserFavicon/{userId}", method = RequestMethod.GET)
     @Auth
-    public void getUserFavicon(@PathVariable(value="userId") Long userId, HttpServletResponse response) {
+    public void getUserFavicon(@PathVariable(value = "userId") Long userId, HttpServletResponse response) {
         FileInputStream fis = null;
         try {
             User user = userService.getUser(userId);
@@ -146,6 +181,71 @@ public class UserController extends BaseController {
                 }
             }
         }
+    }
+
+    @RequestMapping(value = "/updateUserInfo", method = RequestMethod.POST)
+    @Auth
+    @ResponseBody
+    public CommonResponse<Boolean> updateUserInfo(@RequestBody UserUpdateInfo info) {
+
+        try {
+            User user = userService.getUser(getUserInfo().getUserId());
+            if (user == null) {
+                return new CommonResponse<Boolean>(false, ResponseStatus.NOT_FOUND);
+            }
+            UserUpdateBo bo = new UserUpdateBo();
+            if (info.getOnline() != null) {
+                user.setOnline(info.getOnline());
+            }
+            if (info.getEducation() != null) {
+                user.setEducation((byte) info.getEducation().getId());
+            }
+            if (info.getSkills() != null) {
+                StringBuffer skills = new StringBuffer();
+                if (CollectionUtils.isNotEmpty(info.getSkills())) {
+                    for (KVInfo kv : info.getSkills()) {
+                        skills.append(kv.getId()).append(",");
+                    }
+                }
+                user.setSkills(skills.toString());
+            }
+            bo.setUser(user);
+            if (info.getGeo() != null) {
+                UserGeo userGeo = userService.getUserGeo(user.getId());
+                if (userGeo == null) {
+                    userGeo = new UserGeo();
+                    userGeo.setUserId(user.getId());
+                }
+                userGeo.setDistrict(info.getGeo().getDistrict().getName());
+                userGeo.setDistrictId(info.getGeo().getDistrict().getId());
+                userGeo.setCity(info.getGeo().getCity().getName());
+                userGeo.setCityId(info.getGeo().getCity().getId());
+                userGeo.setProvince(info.getGeo().getProvince().getName());
+                userGeo.setProvinceId(info.getGeo().getProvince().getId());
+                userGeo.setAddress(info.getGeo().getAddress());
+                userGeo.setLongitude(info.getGeo().getLongitude());
+                userGeo.setLatitude(info.getGeo().getLatitude());
+                bo.setUserGeo(userGeo);
+            }
+
+            if (info.getCorporateBio() != null || info.getCorporateName() != null) {
+                Manager manager = userService.getManager(user.getId());
+                if (manager == null) {
+                    return new CommonResponse<Boolean>(false, ResponseStatus.NOT_FOUND);
+                }
+                if (info.getCorporateName() != null) {
+                    manager.setCompanyName(info.getCorporateName());
+                }
+                if (info.getCorporateBio() != null) {
+                    manager.setDesc(info.getCorporateBio());
+                }
+                bo.setManager(manager);
+            }
+            return new CommonResponse<Boolean>(userService.update(bo));
+        } catch (Exception e) {
+            log.error("updateUserInfo error!", e);
+        }
+        return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
     }
 
     @RequestMapping(value = "/updateUserFavicon", method = RequestMethod.POST)

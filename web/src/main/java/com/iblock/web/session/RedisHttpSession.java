@@ -204,7 +204,6 @@ class RedisHttpSession implements HttpSession {
         if (name == null) {
             throw new NullPointerException();
         }
-
         String attributeInMD5 = execute(new JedisHgetCallBack(name));
         if (attributeInMD5 == null) {
             return null;

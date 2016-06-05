@@ -9,4 +9,5 @@ public class RoleConstant {
     public final static String MANAGER = "2";
     public final static String AGENT = "3";
     public final static String ADMINISTRATOR = "4";
+    public final static String LOGIN = "1,2,3,4";
 }

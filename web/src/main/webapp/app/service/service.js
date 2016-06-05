@@ -13,8 +13,8 @@ projectServices.factory('Projects',['$resource',
 ]);
 
 var restServices = angular.module('rest',[]);
-restServices.value("servieBasePath","http://192.168.147.106:8080/");
-//restServices.value("servieBasePath","/service/");
+//restServices.value("servieBasePath","http://192.168.147.106:8080/");
+restServices.value("servieBasePath","/");
 
 restServices.factory('post', ['$http','servieBasePath',function($http, servieBasePath){
 	return function(servicePath,urlObject,success,fail,error){

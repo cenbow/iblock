@@ -49,5 +49,7 @@ public interface UserGeoDao {
     List<UserGeo> selectByCoordinate(@Param("maxLat") double maxLat, @Param("minLat") double minLat, @Param("maxLon")
     double maxLon, @Param("minLon") double minLon);
 
+    UserGeo selectByUser(Long userId);
+
     List<UserGeo> selectByDistinct(int distinctId);
 }

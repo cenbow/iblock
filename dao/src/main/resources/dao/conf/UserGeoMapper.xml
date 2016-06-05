@@ -246,4 +246,11 @@
     where distinct_id=#{distinctId}
     and status = 1
   </select>
+
+  <select id="selectByUser" parameterType="map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from USER_GEO
+    where user_id = #{userId}
+  </select>
 </mapper>

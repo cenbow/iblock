@@ -29,7 +29,7 @@ public class JobInterestController extends BaseController {
     @Autowired
     private JobInterestService jobInterestService;
 
-    @RequestMapping(value = "/getWorkPrefs/{userId}", method = RequestMethod.GET, consumes = "application/json")
+    @RequestMapping(value = "/getWorkPrefs/{userId}", method = RequestMethod.GET)
     @Auth(role = RoleConstant.DESIGNER)
     @ResponseBody
     public CommonResponse<JobInterestInfo> getWorkPrefs(@PathVariable(value="userId") Long userId) {

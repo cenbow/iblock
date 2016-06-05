@@ -5,7 +5,7 @@ package com.iblock.common.enums;
  */
 public enum Education {
 
-    UNDERGRADUATE(1, "本科"), MASTER(2, "硕士"), PHD(3, "博士");
+    UNDERGRADUATE(1, "本科"), MASTER(2, "硕士"), PHD(3, "博士"), OTHER(4, "其他");
 
     private int code;
     private String msg;
@@ -13,6 +13,15 @@ public enum Education {
     Education(int code, String msg) {
         this.code = code;
         this.msg = msg;
+    }
+
+    public static Education getByCode(int code) {
+        for (Education e : Education.values()) {
+            if (e.getCode() == code) {
+                return e;
+            }
+        }
+        return null;
     }
 
     public int getCode() {

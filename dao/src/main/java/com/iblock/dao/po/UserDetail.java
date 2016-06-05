@@ -20,6 +20,12 @@ public class UserDetail {
 
     private String headFigure;
 
+    private Byte education;
+
+    private String skills;
+
+    private Boolean online;
+
     private String province;
 
     private Integer provinceId;

@@ -121,4 +121,22 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectAll" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from SKILL
+    where status = 1
+  </select>
+
+  <select id="selectByIds" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from SKILL
+    where status = 1
+    and id in
+    <foreach collection="list" item="item" index="index" close=")" open="(" separator=",">
+      #{item}
+    </foreach>
+  </select>
 </mapper>
