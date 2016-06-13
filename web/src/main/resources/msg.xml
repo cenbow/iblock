@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <messages>
-    <message type="0" action="1" detail="您的项目 {project} 通过审核，经纪人为｛agent}">
+    <message type="0" action="1" detail="您的项目 {project} 通过审核，经纪人为 {agent}">
     </message>
     <message type="0" action="2" detail="您的项目 {project} 未通过审核，请对项目进行修改并重新提交">
     </message>
@@ -8,11 +8,12 @@
              detail="{manager} 希望应聘您为项目 {project} 项目设计师,如已达成协议，请确认；如您和改项目不熟悉，请拒绝。">
         <params>
             <param name="hireid"/>
+            <param name="accept"/>
         </params>
     </message>
-    <message type="0" action="4" detail="设计师 {designer} 接受了您在项目{project} 的招聘申请。">
+    <message type="0" action="4" detail="设计师 {designer} 接受了您在项目 {project} 的招聘申请。">
     </message>
-    <message type="0" action="5" detail="设计师 {designer} 拒绝了您在项目{project} 的招聘申请。">
+    <message type="0" action="5" detail="设计师 {designer} 拒绝了您在项目 {project} 的招聘申请。">
     </message>
     <message type="2" action="6" detail="项目 {project} 已完结，请给项目经理 {manager} 评分。如已达成协议，请确认；如您和该项目不熟悉，请拒绝。">
         <params>

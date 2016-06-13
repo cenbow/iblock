@@ -40,7 +40,7 @@ public class MsgContentUtil {
         Document document = saxReader.read(this.getClass().getClassLoader()
                 .getResourceAsStream("msg.xml"));
         Element root = document.getRootElement();
-        List<Element> modules = root.elements("messages");
+        List<Element> modules = root.elements("message");
         for (Element ele : modules) {
             Msg msg = new Msg();
             msg.setAction(Integer.parseInt(ele.attributeValue("action")));

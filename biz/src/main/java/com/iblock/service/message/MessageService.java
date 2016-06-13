@@ -108,7 +108,7 @@ public class MessageService {
         Message message = new Message();
         Msg msg = MsgContentUtil.getInstance().getMsg(action.getCode());
         if (msg == null) {
-            throw new InnerLogicException("invalid msg action" + action.getCode());
+            throw new InnerLogicException("invalid msg action " + action.getCode());
         }
         message.setSourceId(sourceId);
         message.setTargetId(targetId);
@@ -119,7 +119,8 @@ public class MessageService {
         message.setType((byte) msg.getType());
         String content = msg.getContent();
         if (project != null) {
-            content = content.replaceAll("\\{project\\}", "{" + project.getName() + "|project?id=" + project.getId() + "}");
+            content = content.replaceAll("\\{project\\}", "{" + project.getName() + "|project?id=" + project.getId() +
+                    "}");
         }
         if (manager != null) {
             content = content.replaceAll("\\{manager\\}", "{" + manager.getUserName() + "|user?id=" + manager.getId() + "}");

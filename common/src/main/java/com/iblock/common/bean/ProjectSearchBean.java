@@ -17,6 +17,7 @@ public class ProjectSearchBean {
     private String keyword;
     private Integer maxPay;
     private Integer minPay;
+    private Integer status;
     private List<Integer> city;
     private List<Integer> industry;
     private Boolean resident;

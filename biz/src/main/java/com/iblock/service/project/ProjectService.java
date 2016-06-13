@@ -45,7 +45,8 @@ public class ProjectService {
     @Autowired
     private MessageService messageService;
 
-    public long save(Project p, Long managerId) {
+    @Transactional
+    public long save(Project p, Long managerId) throws InvalidRequestException {
         if (p.getId() == null) {
             p.setAddTime(new Date());
             p.setManagerId(managerId);
@@ -53,14 +54,16 @@ public class ProjectService {
             projectDao.insertSelective(p);
         } else {
             Project tmp = projectDao.selectByPrimaryKey(p.getId());
-            if (!tmp.getManagerId().equals(managerId)) {
-                return -1L;
+            if (!tmp.getManagerId().equals(managerId) || (tmp.getStatus().intValue() != ProjectStatus.AUDIT.getCode()
+            && tmp.getStatus().intValue() != ProjectStatus.AUDIT_DENY.getCode())) {
+                throw new InvalidRequestException();
             }
             projectDao.updateByPrimaryKeySelective(p);
         }
         return p.getId();
     }
 
+    @Transactional
     public boolean terminate(long id, long managerId) throws InvalidRequestException {
         Project pro = projectDao.selectByPrimaryKey(id);
         if (!pro.getManagerId().equals(managerId)) {
@@ -70,6 +73,7 @@ public class ProjectService {
         return projectDao.updateByPrimaryKeySelective(pro) > 0;
     }
 
+    @Transactional
     public boolean start(long id, long agentId) throws InvalidRequestException {
         Project pro = projectDao.selectByPrimaryKey(id);
         if (!pro.getAgentId().equals(agentId)) {
@@ -106,6 +110,7 @@ public class ProjectService {
         return projectDao.updateByPrimaryKeySelective(pro) > 0;
     }
 
+    @Transactional
     public boolean completeHire(long id, long agentId) throws InvalidRequestException {
         Project pro = projectDao.selectByPrimaryKey(id);
         if (!pro.getAgentId().equals(agentId)) {
@@ -121,7 +126,7 @@ public class ProjectService {
         if (!pro.getAgentId().equals(agentId)) {
             throw new InvalidRequestException("you have no auth, agent id is wrong");
         }
-        if (pro.getStatus().intValue() == ProjectStatus.RECRUITING.getCode()) {
+        if (pro.getStatus().intValue() != ProjectStatus.RECRUITING.getCode()) {
             throw new InvalidRequestException("project status is wrong, hire is not allowed");
         }
         User user = userDao.selectByPrimaryKey(userId);
@@ -138,7 +143,8 @@ public class ProjectService {
         designer.setProjectId(id);
         Map<String, String> params = new HashMap<String, String>();
         params.put("hireid", String.valueOf(pro.getId()));
-        messageService.send(-1L, userId, MessageAction.HIRE, null, agentId, userId, pro, params);
+        params.put("accept", "true");
+        messageService.send(-1L, userId, MessageAction.HIRE, pro.getManagerId(), null, userId, pro, params);
         return projectDesignerDao.insertSelective(designer) > 0;
     }
 
@@ -150,7 +156,7 @@ public class ProjectService {
         if (designer == null) {
             throw new InvalidRequestException("wrong designer");
         }
-        if (pro.getStatus().intValue() == ProjectStatus.RECRUITING.getCode()) {
+        if (pro.getStatus().intValue() != ProjectStatus.RECRUITING.getCode()) {
             throw new InvalidRequestException("project status is wrong, hire is not allowed");
         }
         User user = userDao.selectByPrimaryKey(userId);
@@ -165,6 +171,10 @@ public class ProjectService {
         params.put("hireid", String.valueOf(pro.getId()));
         messageService.send(-1L, userId, accept ? MessageAction.ACCEPT_HIRE : MessageAction.DENY_HIRE, null, null,
                 userId, pro, params);
+        if (accept) {
+            pro.setHired(pro.getHired() + 1);
+            projectDao.updateByPrimaryKeySelective(pro);
+        }
         return projectDesignerDao.updateByPrimaryKey(designer) > 0;
     }
 

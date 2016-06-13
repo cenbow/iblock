@@ -3,6 +3,7 @@ package com.iblock.web.controller;
 import com.iblock.common.advice.Auth;
 import com.iblock.common.bean.Page;
 import com.iblock.common.bean.ProjectSearchBean;
+import com.iblock.common.enums.ProjectStatus;
 import com.iblock.dao.po.JobInterest;
 import com.iblock.dao.po.Project;
 import com.iblock.service.bo.ProjectAcceptBo;
@@ -14,6 +15,7 @@ import com.iblock.web.info.ProjectDetailInfo;
 import com.iblock.web.request.PageRequest;
 import com.iblock.web.request.project.AcceptHiringRequest;
 import com.iblock.web.request.project.HireRequest;
+import com.iblock.web.request.project.ProjectCreateRequest;
 import com.iblock.web.request.project.ProjectIdRequest;
 import com.iblock.web.request.project.ProjectSearchRequest;
 import com.iblock.web.request.project.ProjectUpdateRequest;
@@ -45,10 +47,10 @@ public class ProjectController extends BaseController {
     private JobInterestService jobInterestService;
 
 
-    @RequestMapping(value = "/save", method = RequestMethod.POST, consumes = "application/json")
+    @RequestMapping(value = "/new", method = RequestMethod.POST, consumes = "application/json")
     @Auth(role = RoleConstant.MANAGER)
     @ResponseBody
-    public CommonResponse<Long> save(@RequestBody ProjectUpdateRequest project) {
+    public CommonResponse<Long> save(@RequestBody ProjectCreateRequest project) {
         try {
             long id = projectService.save(project.toProject(), getUserInfo().getUserId());
             if (id > 0) {
@@ -63,11 +65,11 @@ public class ProjectController extends BaseController {
     @RequestMapping(value = "/update/{projectid}", method = RequestMethod.POST, consumes = "application/json")
     @Auth(role = RoleConstant.MANAGER)
     @ResponseBody
-    public CommonResponse<Long> save(@PathVariable("projectid") Long projectId, @RequestBody ProjectUpdateRequest
-            project) {
+    public CommonResponse<Long> save(@RequestBody ProjectUpdateRequest project, @PathVariable("projectid") Long projectId) {
         try {
-            Project p = project.toProject();
-            p.setId(projectId);
+            Project p = projectService.get(projectId);
+            project.updateProject(p);
+            p.setStatus((byte) ProjectStatus.AUDIT.getCode());
             long id = projectService.save(p, getUserInfo().getUserId());
             if (id > 0) {
                 return new CommonResponse<Long>(id);
@@ -103,6 +105,7 @@ public class ProjectController extends BaseController {
             ProjectSearchBean bean = new ProjectSearchBean();
             bean.setPageSize(request.getPageSize());
             bean.setPageNo(request.getPageNo());
+            bean.setStatus(ProjectStatus.RECRUITING.getCode());
             if (interest != null) {
                 bean.setResident(interest.getResident());
                 bean.setMinPay(interest.getStartPay());
@@ -136,6 +139,7 @@ public class ProjectController extends BaseController {
             ProjectSearchBean bean = new ProjectSearchBean();
             bean.setPageNo(request.getPageNo());
             bean.setPageSize(request.getPageSize());
+            bean.setStatus(ProjectStatus.RECRUITING.getCode());
             return new CommonResponse<Page<Project>>(projectService.search(bean));
         } catch (Exception e) {
             log.error("latest project error!", e);
@@ -155,7 +159,7 @@ public class ProjectController extends BaseController {
     }
 
     @RequestMapping(value = "/accept", method = RequestMethod.POST, consumes = "application/json")
-    @Auth(role = RoleConstant.MANAGER)
+    @Auth(role = RoleConstant.ADMINISTRATOR)
     @ResponseBody
     public CommonResponse<Boolean> accept(@RequestBody ProjectAcceptBo acceptBo) {
         try {
@@ -185,7 +189,7 @@ public class ProjectController extends BaseController {
     }
 
     @RequestMapping(value = "/completeHire", method = RequestMethod.POST, consumes = "application/json")
-    @Auth(role = RoleConstant.AGENT)
+    @Auth(role = RoleConstant.MANAGER)
     @ResponseBody
     public CommonResponse<Boolean> completeHire(@RequestBody ProjectIdRequest request) {
         try {
@@ -200,7 +204,7 @@ public class ProjectController extends BaseController {
     }
 
     @RequestMapping(value = "/start", method = RequestMethod.POST, consumes = "application/json")
-    @Auth(role = RoleConstant.AGENT)
+    @Auth(role = RoleConstant.MANAGER)
     @ResponseBody
     public CommonResponse<Boolean> start(@RequestBody ProjectIdRequest request) {
         try {

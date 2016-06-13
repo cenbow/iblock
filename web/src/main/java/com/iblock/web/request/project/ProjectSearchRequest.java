@@ -1,6 +1,7 @@
 package com.iblock.web.request.project;
 
 import com.iblock.common.bean.ProjectSearchBean;
+import com.iblock.common.enums.ProjectStatus;
 import com.iblock.web.info.KVInfo;
 import lombok.Data;
 
@@ -25,6 +26,7 @@ public class ProjectSearchRequest {
         ProjectSearchBean bean = new ProjectSearchBean();
         bean.setPageNo(pageNo);
         bean.setPageSize(pageSize);
+        bean.setStatus(ProjectStatus.RECRUITING.getCode());
         if (city != null) {
             List<Integer> list = new ArrayList<Integer>();
             for (KVInfo kv : city) {
