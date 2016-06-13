@@ -12,13 +12,12 @@ public class ProjectSearchBean {
 
     private int pageNo;
     private int pageSize;
-    private Integer role;
-    private Long userId;
-    private Integer status;
     private String order;
     private String orderBy;
     private String keyword;
     private Integer maxPay;
-    private List<String> city;
+    private Integer minPay;
+    private List<Integer> city;
     private List<Integer> industry;
+    private Boolean resident;
 }

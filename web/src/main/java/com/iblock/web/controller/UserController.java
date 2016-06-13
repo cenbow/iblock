@@ -13,6 +13,7 @@ import com.iblock.service.bo.UserUpdateBo;
 import com.iblock.service.experience.WorkExperienceService;
 import com.iblock.service.file.FileService;
 import com.iblock.service.interest.JobInterestService;
+import com.iblock.service.message.MessageService;
 import com.iblock.service.user.UserService;
 import com.iblock.web.constant.CommonProperties;
 import com.iblock.web.constant.RoleConstant;
@@ -77,6 +78,9 @@ public class UserController extends BaseController {
 
     @Autowired
     protected JobInterestService jobInterestService;
+
+    @Autowired
+    protected MessageService messageService;
 
     @Autowired
     protected WorkExperienceService workExperienceService;
@@ -247,12 +251,9 @@ public class UserController extends BaseController {
                     userGeo = new UserGeo();
                     userGeo.setUserId(user.getId());
                 }
-                userGeo.setDistrict(info.getGeo().getDistrict().getName());
-                userGeo.setDistrictId(info.getGeo().getDistrict().getId());
+                userGeo.setDistrict(info.getGeo().getDistrict());
                 userGeo.setCity(info.getGeo().getCity().getName());
                 userGeo.setCityId(info.getGeo().getCity().getId());
-                userGeo.setProvince(info.getGeo().getProvince().getName());
-                userGeo.setProvinceId(info.getGeo().getProvince().getId());
                 userGeo.setAddress(info.getGeo().getAddress());
                 userGeo.setLongitude(info.getGeo().getLongitude());
                 userGeo.setLatitude(info.getGeo().getLatitude());

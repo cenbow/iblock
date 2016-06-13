@@ -10,9 +10,8 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class GeoInfo {
-    private KVInfo province;
     private KVInfo city;
-    private KVInfo district;
+    private String district;
     private String address;
     private Float longitude;
     private Float latitude;
@@ -23,8 +22,7 @@ public class GeoInfo {
         GeoInfo info = new GeoInfo();
         info.setAddress(geo.getAddress());
         info.setCity(new KVInfo(geo.getCityId(), geo.getCity()));
-        info.setProvince(new KVInfo(geo.getProvinceId(), geo.getProvince()));
-        info.setDistrict(new KVInfo(geo.getProvinceId(), geo.getDistrict()));
+        info.setDistrict(geo.getDistrict());
         info.setLatitude(geo.getLatitude());
         info.setLongitude(geo.getLongitude());
         return info;

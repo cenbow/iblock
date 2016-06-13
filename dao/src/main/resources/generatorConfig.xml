@@ -57,12 +57,12 @@
                <!--enableCountByExample="false" enableUpdateByExample="false">-->
         <!--</table>-->
 
-        <table schema="MS-USER" tableName="COMMON_EXPERIENCE" domainObjectName="CommonExperience"
-               enableInsert="true" enableSelectByPrimaryKey="true"
-               enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
-               enableSelectByExample="false" enableDeleteByExample="false"
-               enableCountByExample="false" enableUpdateByExample="false">
-        </table>
+        <!--<table schema="MS-USER" tableName="COMMON_EXPERIENCE" domainObjectName="CommonExperience"-->
+               <!--enableInsert="true" enableSelectByPrimaryKey="true"-->
+               <!--enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"-->
+               <!--enableSelectByExample="false" enableDeleteByExample="false"-->
+               <!--enableCountByExample="false" enableUpdateByExample="false">-->
+        <!--</table>-->
 
         <!--<table schema="MS-USER" tableName="MANAGER" domainObjectName="Manager"-->
                <!--enableInsert="true" enableSelectByPrimaryKey="true"-->
@@ -71,14 +71,21 @@
                <!--enableCountByExample="false" enableUpdateByExample="false">-->
         <!--</table>-->
 
-        <!--<table schema="MS-USER" tableName="MESSAGE" domainObjectName="Message"-->
+        <table schema="MS-USER" tableName="MESSAGE" domainObjectName="Message"
+               enableInsert="true" enableSelectByPrimaryKey="true"
+               enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
+               enableSelectByExample="false" enableDeleteByExample="false"
+               enableCountByExample="false" enableUpdateByExample="false">
+        </table>
+
+        <!--<table schema="MS-USER" tableName="PROJECT" domainObjectName="Project"-->
                <!--enableInsert="true" enableSelectByPrimaryKey="true"-->
                <!--enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"-->
                <!--enableSelectByExample="false" enableDeleteByExample="false"-->
                <!--enableCountByExample="false" enableUpdateByExample="false">-->
         <!--</table>-->
 
-        <!--<table schema="MS-USER" tableName="PROJECT" domainObjectName="Project"-->
+        <!--<table schema="MS-USER" tableName="PROJECT_DESIGNER" domainObjectName="ProjectDesigner"-->
                <!--enableInsert="true" enableSelectByPrimaryKey="true"-->
                <!--enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"-->
                <!--enableSelectByExample="false" enableDeleteByExample="false"-->

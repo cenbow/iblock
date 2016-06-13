@@ -5,8 +5,9 @@ package com.iblock.common.enums;
  */
 public enum MessageAction {
 
-    SUBMIT_SUCCESS(11, "提交项目成功"), AUDIT_FAIL(12, "审核失败"),
-    ADD_FRIEND(21, "申请添加好友"), FRIEND_AGREE(22, "同意添加好友"), FRIEND_DENY(23, "拒绝添加好友");
+    AUDIT_SUCCESS(1, "审核成功"), AUDIT_FAIL(2, "审核失败"),
+    HIRE(3, "招募"), ACCEPT_HIRE(4, "同意招募"), DENY_HIRE(5, "拒绝招募"), MANAGER_RATING(6, "为项目经理打分"), DESIGNER_RATING(7,
+            "为设计师打分");
 
     private int code;
     private String msg;

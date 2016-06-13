@@ -3,34 +3,33 @@ package com.iblock.web.controller;
 import com.iblock.common.advice.Auth;
 import com.iblock.common.bean.Page;
 import com.iblock.common.bean.ProjectSearchBean;
+import com.iblock.dao.po.JobInterest;
 import com.iblock.dao.po.Project;
-import com.iblock.dao.po.WorkflowLog;
 import com.iblock.service.bo.ProjectAcceptBo;
-import com.iblock.service.bo.ProjectBo;
+import com.iblock.service.interest.JobInterestService;
 import com.iblock.service.project.ProjectService;
 import com.iblock.web.constant.RoleConstant;
 import com.iblock.web.enums.ResponseStatus;
-import com.iblock.web.info.JobInterestInfo;
+import com.iblock.web.info.ProjectDetailInfo;
+import com.iblock.web.request.PageRequest;
+import com.iblock.web.request.project.AcceptHiringRequest;
+import com.iblock.web.request.project.HireRequest;
+import com.iblock.web.request.project.ProjectIdRequest;
+import com.iblock.web.request.project.ProjectSearchRequest;
+import com.iblock.web.request.project.ProjectUpdateRequest;
 import com.iblock.web.response.CommonResponse;
-import com.iblock.workflow.api.ProcessManageService;
-import com.iblock.workflow.api.ProcessQueryService;
-import com.iblock.workflow.dtos.BaseResultDTO;
-import com.iblock.workflow.dtos.ProcessResultDTO;
-import com.iblock.workflow.dtos.TaskActionDTO;
-import com.iblock.workflow.enums.ProcessError;
-import com.iblock.workflow.vars.ProcessVars;
 import lombok.extern.log4j.Log4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by baidu on 16/4/3.
@@ -41,19 +40,17 @@ import java.util.Map;
 public class ProjectController extends BaseController {
 
     @Autowired
-    private ProcessManageService processManageService;
-    @Autowired
-    private ProcessQueryService processQueryService;
-    @Autowired
     private ProjectService projectService;
+    @Autowired
+    private JobInterestService jobInterestService;
 
 
     @RequestMapping(value = "/save", method = RequestMethod.POST, consumes = "application/json")
     @Auth(role = RoleConstant.MANAGER)
     @ResponseBody
-    public CommonResponse<Long> save(@RequestBody ProjectBo project) {
+    public CommonResponse<Long> save(@RequestBody ProjectUpdateRequest project) {
         try {
-            long id = projectService.save(project, getUserInfo().getUserId());
+            long id = projectService.save(project.toProject(), getUserInfo().getUserId());
             if (id > 0) {
                 return new CommonResponse<Long>(id);
             }
@@ -63,48 +60,94 @@ public class ProjectController extends BaseController {
         return new CommonResponse<Long>(ResponseStatus.SYSTEM_ERROR);
     }
 
-    @RequestMapping(value = "/publish/{projectId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/update/{projectid}", method = RequestMethod.POST, consumes = "application/json")
     @Auth(role = RoleConstant.MANAGER)
     @ResponseBody
-    public CommonResponse<Boolean> publish(@PathVariable(value = "projectId") long id) {
+    public CommonResponse<Long> save(@PathVariable("projectid") Long projectId, @RequestBody ProjectUpdateRequest
+            project) {
         try {
-            Map<String, Object> map = new HashMap<String, Object>();
-            Map<String, Object> objectMap = new HashMap<String, Object>();
-            map.put(ProcessVars.USER_ID, getUserInfo().getUserId());
-            objectMap.put(ProcessVars.PROJECT_KEY, id);
-            objectMap.put(ProcessVars.MANAGER, getUserInfo().getUserId());
-            map.put(ProcessVars.DATA, objectMap);
-            ProcessResultDTO dto = processManageService.startProcess(map);
-            if (dto.getProcessId() != null) {
-                return new CommonResponse<Boolean>(true);
+            Project p = project.toProject();
+            p.setId(projectId);
+            long id = projectService.save(p, getUserInfo().getUserId());
+            if (id > 0) {
+                return new CommonResponse<Long>(id);
             }
         } catch (Exception e) {
-            log.error("publish project error!", e);
+            log.error("save project error!", e);
         }
-        return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
+        return new CommonResponse<Long>(ResponseStatus.SYSTEM_ERROR);
     }
 
-
-
-    @RequestMapping(value = "/search", method = RequestMethod.GET)
-    @Auth(role = RoleConstant.DESIGNER)
+    @RequestMapping(value = "/details/{projectid}", method = RequestMethod.GET, consumes = "application/json")
     @ResponseBody
-    public CommonResponse<Page<Project>> search(@RequestParam("pageNo") int pageNo, @RequestParam("pageSize") int
-            pageSize,
-                                          @RequestParam(value = "order", required = false) int order, @RequestParam
-                                                  (value = "orderBy", required = false) int orderBy,
-                                          @RequestParam(value = "keyword", required = false) int keyword, @RequestParam
-                                                      (value = "maxPay", required = false) int maxPay,
-                                          @RequestParam(value = "city", required = false) int city, @RequestParam
-                                                  (value = "industry", required = false) int industry) {
+    public CommonResponse<ProjectDetailInfo> detail(@PathVariable("projectid") Long projectId) {
+        try {
+            Project p = projectService.get(projectId);
+            if (p == null) {
+                return new CommonResponse<ProjectDetailInfo>(ResponseStatus.NOT_FOUND);
+            }
+            ProjectDetailInfo info = ProjectDetailInfo.parse(p);
+            // todo
+            return new CommonResponse<ProjectDetailInfo>(info);
+        } catch (Exception e) {
+            log.error("get project error!", e);
+        }
+        return new CommonResponse<ProjectDetailInfo>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/recommended", method = RequestMethod.POST, consumes = "application/json")
+    @ResponseBody
+    public CommonResponse<Page<Project>> recommended(@RequestBody PageRequest request) {
+        try {
+            JobInterest interest = jobInterestService.get(getUserInfo().getUserId());
+            ProjectSearchBean bean = new ProjectSearchBean();
+            bean.setPageSize(request.getPageSize());
+            bean.setPageNo(request.getPageNo());
+            if (interest != null) {
+                bean.setResident(interest.getResident());
+                bean.setMinPay(interest.getStartPay());
+                bean.setMaxPay(interest.getEndPay());
+                if (StringUtils.isNotBlank(interest.getJobTypeList())) {
+                    List<Integer> list = new ArrayList<Integer>();
+                    for (String s : interest.getJobTypeList().split(",")) {
+                        list.add(Integer.parseInt(s));
+                    }
+                    bean.setIndustry(list);
+                }
+                if (StringUtils.isNotBlank(interest.getCityList())) {
+                    List<Integer> list = new ArrayList<Integer>();
+                    for (String s : interest.getCityList().split(",")) {
+                        list.add(Integer.parseInt(s));
+                    }
+                    bean.setCity(list);
+                }
+            }
+            return new CommonResponse<Page<Project>>(projectService.search(bean));
+        } catch (Exception e) {
+            log.error("recommended project error!", e);
+        }
+        return new CommonResponse<Page<Project>>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/latest", method = RequestMethod.POST, consumes = "application/json")
+    @ResponseBody
+    public CommonResponse<Page<Project>> latest(@RequestBody PageRequest request) {
         try {
             ProjectSearchBean bean = new ProjectSearchBean();
-            bean.setPageSize(pageSize);
-            bean.setPageNo(pageNo);
-            bean.setUserId(getUserInfo().getUserId());
-            bean.setRole(getUserInfo().getRole());
-            // todo
+            bean.setPageNo(request.getPageNo());
+            bean.setPageSize(request.getPageSize());
             return new CommonResponse<Page<Project>>(projectService.search(bean));
+        } catch (Exception e) {
+            log.error("latest project error!", e);
+        }
+        return new CommonResponse<Page<Project>>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/search", method = RequestMethod.POST, consumes = "application/json")
+    @ResponseBody
+    public CommonResponse<Page<Project>> search(@RequestBody ProjectSearchRequest request) {
+        try {
+            return new CommonResponse<Page<Project>>(projectService.search(request.toBean()));
         } catch (Exception e) {
             log.error("search project error!", e);
         }
@@ -116,19 +159,102 @@ public class ProjectController extends BaseController {
     @ResponseBody
     public CommonResponse<Boolean> accept(@RequestBody ProjectAcceptBo acceptBo) {
         try {
-            Map<String, Object> map = new HashMap<String, Object>();
-            map.put(ProcessVars.ACTION, acceptBo.getAccept() ? 1 : 2);
-            TaskActionDTO action = new TaskActionDTO();
-            action.setUserId(getUserInfo().getUserId().toString());
-            action.setActionMap(map);
-            action.setTaskId(processQueryService.queryTask(getUserInfo().getUserId().toString(), projectService
-                    .getWorkflowId(acceptBo.getId())).getTaskId());
-            BaseResultDTO result = processManageService.operateTask(action);
-            if (result.getCode() == ProcessError.SUCCESS.getCode()) {
-                return new CommonResponse<Boolean>(true);
+            if (!projectService.accept(acceptBo)) {
+                return new CommonResponse<Boolean>(ResponseStatus.VALIDATE_ERROR);
             }
+            return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);
         } catch (Exception e) {
             log.error("accept project error!", e);
+        }
+        return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/terminate", method = RequestMethod.POST, consumes = "application/json")
+    @Auth(role = RoleConstant.MANAGER)
+    @ResponseBody
+    public CommonResponse<Boolean> terminate(@RequestBody ProjectIdRequest request) {
+        try {
+            if (!projectService.terminate(request.getId(), getUserInfo().getUserId())) {
+                return new CommonResponse<Boolean>(ResponseStatus.VALIDATE_ERROR);
+            }
+            return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);
+        } catch (Exception e) {
+            log.error("terminate project error!", e);
+        }
+        return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/completeHire", method = RequestMethod.POST, consumes = "application/json")
+    @Auth(role = RoleConstant.AGENT)
+    @ResponseBody
+    public CommonResponse<Boolean> completeHire(@RequestBody ProjectIdRequest request) {
+        try {
+            if (!projectService.completeHire(request.getId(), getUserInfo().getUserId())) {
+                return new CommonResponse<Boolean>(ResponseStatus.VALIDATE_ERROR);
+            }
+            return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);
+        } catch (Exception e) {
+            log.error("completeHire project error!", e);
+        }
+        return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/start", method = RequestMethod.POST, consumes = "application/json")
+    @Auth(role = RoleConstant.AGENT)
+    @ResponseBody
+    public CommonResponse<Boolean> start(@RequestBody ProjectIdRequest request) {
+        try {
+            if (!projectService.start(request.getId(), getUserInfo().getUserId())) {
+                return new CommonResponse<Boolean>(ResponseStatus.VALIDATE_ERROR);
+            }
+            return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);
+        } catch (Exception e) {
+            log.error("start project error!", e);
+        }
+        return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/end", method = RequestMethod.POST, consumes = "application/json")
+    @Auth(role = RoleConstant.AGENT)
+    @ResponseBody
+    public CommonResponse<Boolean> end(@RequestBody ProjectIdRequest request) {
+        try {
+            if (!projectService.end(request.getId(), getUserInfo().getUserId())) {
+                return new CommonResponse<Boolean>(ResponseStatus.VALIDATE_ERROR);
+            }
+            return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);
+        } catch (Exception e) {
+            log.error("end project error!", e);
+        }
+        return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/hire", method = RequestMethod.POST, consumes = "application/json")
+    @Auth(role = RoleConstant.AGENT)
+    @ResponseBody
+    public CommonResponse<Boolean> hire(@RequestBody HireRequest request) {
+        try {
+            if (!projectService.hire(request.getId(), request.getUserid(), getUserInfo().getUserId())) {
+                return new CommonResponse<Boolean>(ResponseStatus.VALIDATE_ERROR);
+            }
+            return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);
+        } catch (Exception e) {
+            log.error("hire project error!", e);
+        }
+        return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/acceptHiring", method = RequestMethod.POST, consumes = "application/json")
+    @Auth(role = RoleConstant.DESIGNER)
+    @ResponseBody
+    public CommonResponse<Boolean> acceptHiring(@RequestBody AcceptHiringRequest request) {
+        try {
+            if (!projectService.acceptHiring(request.getHireid(), getUserInfo().getUserId(), request.isAccept())) {
+                return new CommonResponse<Boolean>(ResponseStatus.VALIDATE_ERROR);
+            }
+            return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);
+        } catch (Exception e) {
+            log.error("acceptHiring project error!", e);
         }
         return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
     }

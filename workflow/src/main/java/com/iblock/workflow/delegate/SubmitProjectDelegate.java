@@ -1,7 +1,6 @@
 package com.iblock.workflow.delegate;
 
 import com.iblock.service.project.ProjectService;
-import com.iblock.service.bo.ProjectBo;
 import com.iblock.workflow.vars.ProcessVars;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
@@ -27,9 +26,5 @@ public class SubmitProjectDelegate implements JavaDelegate {
         Long projectId = (Long) varMap.get(ProcessVars.PROJECT_KEY);
         Long manager = (Long) varMap.get(ProcessVars.MANAGER);
         String processId = execution.getProcessInstanceId();
-        boolean result = projectService.publish(projectId, processId, manager);
-        if(!result){
-            throw new Exception("Save project delegate error!");
-        }
     }
 }

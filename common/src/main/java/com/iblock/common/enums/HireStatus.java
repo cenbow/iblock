@@ -1,16 +1,16 @@
 package com.iblock.common.enums;
 
 /**
- * Created by baidu on 16/4/3.
+ * Created by baidu on 16/6/13.
  */
-public enum ProjectStatus {
-    AUDIT_DENY(0, "审核未通过"), AUDIT(1, "审核中"), RECRUITING(2, "招募中"), READY(3, "已就绪"), ONGOING(4, "进行中"), FINISH(5,
-            "已完成"), TERMINATION(6, "已终止");
+public enum HireStatus {
+
+    HIRING(1, "招募中"), ACCEPT(2, "同意"), DENY(0, "否决");
 
     private int code;
     private String msg;
 
-    ProjectStatus(int code, String msg) {
+    HireStatus(int code, String msg) {
         this.code = code;
         this.msg = msg;
     }

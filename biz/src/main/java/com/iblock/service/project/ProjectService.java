@@ -1,24 +1,34 @@
 package com.iblock.service.project;
 
 import com.iblock.common.bean.Page;
-import com.iblock.common.bean.PageModel;
 import com.iblock.common.bean.ProjectSearchBean;
 import com.iblock.common.enums.CommonStatus;
+import com.iblock.common.enums.HireStatus;
+import com.iblock.common.enums.MessageAction;
 import com.iblock.common.enums.ProjectStatus;
+import com.iblock.common.enums.UserRole;
 import com.iblock.common.enums.WorkflowType;
+import com.iblock.common.exception.InnerLogicException;
 import com.iblock.common.exception.InvalidRequestException;
 import com.iblock.dao.ProjectDao;
+import com.iblock.dao.ProjectDesignerDao;
+import com.iblock.dao.UserDao;
 import com.iblock.dao.WorkflowLogDao;
 import com.iblock.dao.po.Project;
+import com.iblock.dao.po.ProjectDesigner;
+import com.iblock.dao.po.User;
 import com.iblock.dao.po.WorkflowLog;
-import com.iblock.service.bo.ProjectBo;
-import com.iblock.service.bo.ProjectSearchBo;
+import com.iblock.service.bo.ProjectAcceptBo;
+import com.iblock.service.message.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by baidu on 16/2/1.
@@ -29,40 +39,137 @@ public class ProjectService {
     @Autowired
     private ProjectDao projectDao;
     @Autowired
-    private WorkflowLogDao workflowLogDao;
+    private ProjectDesignerDao projectDesignerDao;
+    @Autowired
+    private UserDao userDao;
+    @Autowired
+    private MessageService messageService;
 
-    public long save(ProjectBo bo, Long managerId) {
-        Project p;
-        if (bo.getId() == null) {
-            p = bo.toProject();
+    public long save(Project p, Long managerId) {
+        if (p.getId() == null) {
             p.setAddTime(new Date());
             p.setManagerId(managerId);
-            p.setStatus((byte) ProjectStatus.DRAFT.getCode());
+            p.setStatus((byte) ProjectStatus.AUDIT.getCode());
             projectDao.insertSelective(p);
         } else {
-            p = projectDao.selectByPrimaryKey(bo.getId());
-            if (!p.getManagerId().equals(managerId)) {
+            Project tmp = projectDao.selectByPrimaryKey(p.getId());
+            if (!tmp.getManagerId().equals(managerId)) {
                 return -1L;
             }
-            bo.updateProject(p);
             projectDao.updateByPrimaryKeySelective(p);
         }
         return p.getId();
     }
 
-    @Transactional
-    public boolean publish(long id, String processId, long managerId) throws InvalidRequestException {
+    public boolean terminate(long id, long managerId) throws InvalidRequestException {
         Project pro = projectDao.selectByPrimaryKey(id);
-        if (pro == null || !pro.getManagerId().equals(managerId)) {
+        if (!pro.getManagerId().equals(managerId)) {
             throw new InvalidRequestException();
         }
-        WorkflowLog log = new WorkflowLog();
-        log.setOutBizId(id);
-        log.setWorkflowType((byte) WorkflowType.PROJECT.getCode());
-        log.setWorkflowId(processId);
-        log.setStatus((byte) CommonStatus.NORMAL.getCode());
-        log.setAddTime(new Date());
-        return workflowLogDao.insertSelective(log) > 0;
+        pro.setStatus((byte) ProjectStatus.TERMINATION.getCode());
+        return projectDao.updateByPrimaryKeySelective(pro) > 0;
+    }
+
+    public boolean start(long id, long agentId) throws InvalidRequestException {
+        Project pro = projectDao.selectByPrimaryKey(id);
+        if (!pro.getAgentId().equals(agentId)) {
+            throw new InvalidRequestException();
+        }
+        pro.setStatus((byte) ProjectStatus.ONGOING.getCode());
+        return projectDao.updateByPrimaryKeySelective(pro) > 0;
+    }
+
+    @Transactional
+    public boolean end(long id, long agentId) throws InvalidRequestException, InnerLogicException, IOException {
+        Project pro = projectDao.selectByPrimaryKey(id);
+        if (!pro.getAgentId().equals(agentId)) {
+            throw new InvalidRequestException();
+        }
+        pro.setStatus((byte) ProjectStatus.FINISH.getCode());
+        List<ProjectDesigner> designers = projectDesignerDao.selectByProject(pro.getId());
+        if (designers != null) {
+            Map<String, String> managerMap = new HashMap<String, String>();
+            Map<String, String> designerMap = new HashMap<String, String>();
+            managerMap.put("id", String.valueOf(id));
+            managerMap.put("userid", String.valueOf(pro.getManagerId()));
+            managerMap.put("rating", "5");
+            designerMap.put("id", String.valueOf(id));
+            designerMap.put("rating", "5");
+            for (ProjectDesigner designer : designers) {
+                designerMap.put("userid", String.valueOf(designer.getDesignerId()));
+                messageService.send(-1L, pro.getManagerId(), MessageAction.DESIGNER_RATING, null, null, designer
+                        .getDesignerId(), pro, designerMap);
+                messageService.send(-1L, designer.getDesignerId(), MessageAction.MANAGER_RATING, pro.getManagerId(), null,
+                        null, pro, designerMap);
+            }
+        }
+        return projectDao.updateByPrimaryKeySelective(pro) > 0;
+    }
+
+    public boolean completeHire(long id, long agentId) throws InvalidRequestException {
+        Project pro = projectDao.selectByPrimaryKey(id);
+        if (!pro.getAgentId().equals(agentId)) {
+            throw new InvalidRequestException();
+        }
+        pro.setStatus((byte) ProjectStatus.READY.getCode());
+        return projectDao.updateByPrimaryKeySelective(pro) > 0;
+    }
+
+    @Transactional
+    public boolean hire(long id, long userId, long agentId) throws InvalidRequestException, InnerLogicException, IOException {
+        Project pro = projectDao.selectByPrimaryKey(id);
+        if (!pro.getAgentId().equals(agentId)) {
+            throw new InvalidRequestException("you have no auth, agent id is wrong");
+        }
+        if (pro.getStatus().intValue() == ProjectStatus.RECRUITING.getCode()) {
+            throw new InvalidRequestException("project status is wrong, hire is not allowed");
+        }
+        User user = userDao.selectByPrimaryKey(userId);
+        if (user.getStatus().intValue() != CommonStatus.NORMAL.getCode()) {
+            throw new InvalidRequestException("designer status is invalid");
+        }
+        if (user.getRole().intValue() != UserRole.DESIGNER.getRole()) {
+            throw new InvalidRequestException("designer role is invalid");
+        }
+        ProjectDesigner designer = new ProjectDesigner();
+        designer.setStatus((byte) HireStatus.HIRING.getCode());
+        designer.setAddTime(new Date());
+        designer.setDesignerId(userId);
+        designer.setProjectId(id);
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("hireid", String.valueOf(pro.getId()));
+        messageService.send(-1L, userId, MessageAction.HIRE, null, agentId, userId, pro, params);
+        return projectDesignerDao.insertSelective(designer) > 0;
+    }
+
+    @Transactional
+    public boolean acceptHiring(long id, long userId, boolean accept) throws InvalidRequestException,
+            InnerLogicException, IOException {
+        Project pro = projectDao.selectByPrimaryKey(id);
+        ProjectDesigner designer = projectDesignerDao.selectByProjectAndDesigner(id, userId);
+        if (designer == null) {
+            throw new InvalidRequestException("wrong designer");
+        }
+        if (pro.getStatus().intValue() == ProjectStatus.RECRUITING.getCode()) {
+            throw new InvalidRequestException("project status is wrong, hire is not allowed");
+        }
+        User user = userDao.selectByPrimaryKey(userId);
+        if (user.getStatus().intValue() != CommonStatus.NORMAL.getCode()) {
+            throw new InvalidRequestException("designer status is invalid");
+        }
+        if (user.getRole().intValue() != UserRole.DESIGNER.getRole()) {
+            throw new InvalidRequestException("designer role is invalid");
+        }
+        designer.setStatus((byte) (accept ? HireStatus.ACCEPT.getCode(): HireStatus.DENY.getCode()));
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("hireid", String.valueOf(pro.getId()));
+        messageService.send(-1L, userId, accept ? MessageAction.ACCEPT_HIRE : MessageAction.DENY_HIRE, null, null,
+                userId, pro, params);
+        return projectDesignerDao.updateByPrimaryKey(designer) > 0;
+    }
+
+    public Project get(Long id) {
+        return projectDao.selectByPrimaryKey(id);
     }
 
     public Page<Project> search(ProjectSearchBean search) {
@@ -72,8 +179,18 @@ public class ProjectService {
                 .getOrderBy());
     }
 
-    public String getWorkflowId(Long id) {
-        return workflowLogDao.selectByProjectId(id).getWorkflowId();
+    @Transactional
+    public boolean accept(ProjectAcceptBo bo) throws InvalidRequestException, InnerLogicException, IOException {
+        Project p = projectDao.selectByPrimaryKey(bo.getId());
+        if (p == null || p.getStatus().intValue() != ProjectStatus.AUDIT.getCode()) {
+            throw new InvalidRequestException();
+        }
+        p.setId(bo.getId());
+        p.setStatus((byte) (bo.getAccept() ? ProjectStatus.RECRUITING.getCode() : ProjectStatus.AUDIT_DENY.getCode()));
+        p.setAgentId(bo.getBrokerId());
+        messageService.send(-1L, p.getManagerId(), bo.getAccept() ? MessageAction.AUDIT_SUCCESS : MessageAction
+                .AUDIT_FAIL, null, bo.getBrokerId(), null, p, null);
+        return projectDao.updateByPrimaryKeySelective(p) > 0;
     }
 
 }

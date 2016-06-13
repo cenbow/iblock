@@ -18,7 +18,5 @@ public class NotifyDelegate implements JavaDelegate {
     private MessageService messageService;
 
     public void execute(DelegateExecution execution) throws Exception {
-        messageService.systemSend(MessageAction.getByCode((Integer) execution.getVariable(ProcessVars.MESSAGE)),
-                execution.getProcessInstanceId());
     }
 }

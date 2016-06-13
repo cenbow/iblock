@@ -51,9 +51,7 @@ public class SignUpRequest {
 
         UserGeo userGeo = new UserGeo();
         userGeo.setAddress(street);
-        userGeo.setDistrictId(district);
         userGeo.setCityId(city);
-        userGeo.setProvinceId(province);
         userGeo.setAddTime(new Date());
         userGeo.setStatus((byte) CommonStatus.NORMAL.getCode());
         bo.setUserGeo(userGeo);
