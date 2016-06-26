@@ -57,8 +57,8 @@ Response:
 经纪人通过前台登录，个人用户信息和项目经理除了公司资料外一致。可以查看我的项目。(项目审核由经纪人负责)
 
 ## 2.2 删除管理员或经纪人
-URL: admin/user/delete/:id
-POST
+POST URL: admin/user/delete/:id
+
 
 Request body empty
 
@@ -71,9 +71,9 @@ Response:
 ```
 
 ## 2.3 查看用户状态
-URL: admin/user/status/:id
+GET URL: admin/user/status/:id
 
-GET
+
 Response
 ```json
 {
@@ -92,9 +92,9 @@ Response
 
 ## 2.4 冻结用户
 
-URL: admin/user/freeze/:id
+POST URL: admin/user/freeze/:id
 
-POST
+
 Response
 ```json
 {
@@ -107,9 +107,9 @@ Response
 
 ## 2.5 解冻用户
 
-URL: admin/user/unfreeze/:id
+POST URL: admin/user/unfreeze/:id
 
-POST
+
 Response
 ```json
 {
@@ -125,9 +125,9 @@ Response
 
 ## 3.1 查看新创建项目列表
 
-URL: admin/project/allnew
+POST URL: admin/project/allnew
 
-POST
+
 Requeset
 ```json
 {
@@ -169,9 +169,9 @@ Response
 
 ## 3.2 分配项目经纪人
 
-URL: admin/project/addbroker
+POST URL: admin/project/addbroker
 
-POST
+
 
 Request:
 ```json
@@ -181,7 +181,6 @@ Request:
 }
 ```
 
-POST
 Response
 ```json
 {
@@ -194,18 +193,18 @@ Response
 
 ## 3.3 查看所有冻结项目
 
-URL: admin/project/allfreezed
+POST URL: admin/project/allfreezed
 
-POST
+
 
 Request, Response 同3.1
 
 
 ## 3.4 冻结项目
 
-URL: admin/project/freeze/:id
+POST URL: admin/project/freeze/:id
 
-POST
+
 
 Request: no body
 
@@ -221,9 +220,9 @@ Response
 
 ## 3.5 解冻项目
 
-URL: admin/project/unfreeze/:id
+POST URL: admin/project/unfreeze/:id
 
-POST
+
 
 Request: no body
 
@@ -240,9 +239,9 @@ Response
 # 4 字典管理 (admin/meta)
 ## 4.1 查看所有元数据 （似乎和user/skills , user/industries 重复了?)
 
-URL: admin/meta/all/:type
+GET URL: admin/meta/all/:type
 
-GET
+
 
 1.admin/meta/all/skill
 2.admin/meta/all/industry
@@ -265,9 +264,9 @@ Response:
 
 ## 4.2 添加元数据
 
-URL: admin/meta/:type/add
+POST URL: admin/meta/:type/add
 
-POST:
+
 Request:
 ```json
 {
@@ -291,9 +290,8 @@ Response:
 
 ## 4.3 删除元数据
 
-URL: admin/meta/:type/delete/:id
+POST URL: admin/meta/:type/delete/:id
 
-POST:
 
 Request: No body
 
@@ -313,10 +311,8 @@ Response:
 
 ## 5.1 发送全站站内信
 
-URL: admin/message/announce
+POST URL: admin/message/announce
 
-
-POST:
 
 Request:
 ```json
