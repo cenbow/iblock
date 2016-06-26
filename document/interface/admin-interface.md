@@ -29,8 +29,8 @@
 
 # 2 用户管理 （admin/user)
 ## 2.1 添加管理员或经纪人
-URL: admin/user/add
-POST
+POST URL: admin/user/add
+
 Request:
 ```json
 {
@@ -181,6 +181,7 @@ Request:
 }
 ```
 
+
 Response
 ```json
 {
@@ -221,7 +222,6 @@ Response
 ## 3.5 解冻项目
 
 POST URL: admin/project/unfreeze/:id
-
 
 
 Request: no body
@@ -293,6 +293,7 @@ Response:
 POST URL: admin/meta/:type/delete/:id
 
 
+
 Request: No body
 
 Response: 
@@ -312,6 +313,7 @@ Response:
 ## 5.1 发送全站站内信
 
 POST URL: admin/message/announce
+
 
 
 Request:
