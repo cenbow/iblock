@@ -36,7 +36,7 @@ Request:
 {
     "userid":"",
     "username":"",
-    "password":""
+    "password":"",
     "role":3
 }
 ```
