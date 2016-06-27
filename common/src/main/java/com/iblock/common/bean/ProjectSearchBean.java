@@ -21,4 +21,5 @@ public class ProjectSearchBean {
     private List<Integer> city;
     private List<Integer> industry;
     private Boolean resident;
+    private Boolean freeze;
 }

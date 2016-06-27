@@ -14,6 +14,7 @@
         <result column="agent_id" jdbcType="BIGINT" property="agentId"/>
         <result column="status" jdbcType="TINYINT" property="status"/>
         <result column="resident" jdbcType="BIT" property="resident"/>
+        <result column="freeze" jdbcType="BIT" property="freeze"/>
         <result column="city" jdbcType="INTEGER" property="city"/>
         <result column="min_pay" jdbcType="INTEGER" property="minPay"/>
         <result column="address" jdbcType="VARCHAR" property="address"/>
@@ -46,7 +47,7 @@
         -->
         id, industry, name, manager_id, agent_id, status, resident, city, min_pay, address,
         head_count, achievement_visable, add_time, update_time, hired, max_pay,
-        district, industry_age, skills, image, start_time, end_time
+        district, industry_age, skills, image, start_time, end_time, freeze
     </sql>
     <sql id="Blob_Column_List">
         <!--
@@ -83,7 +84,7 @@
         max_pay, district,
         industry_age, skills,
         image, start_time, end_time,
-        `desc`)
+        `desc`, freeze)
         values (#{id,jdbcType=BIGINT}, #{industry,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR},
         #{managerId,jdbcType=BIGINT}, #{agentId,jdbcType=BIGINT}, #{status,jdbcType=TINYINT},
         #{resident,jdbcType=BIT}, #{city,jdbcType=INTEGER}, #{minPay,jdbcType=INTEGER},
@@ -92,7 +93,7 @@
         #{maxPay,jdbcType=INTEGER}, #{district,jdbcType=VARCHAR},
         #{industryAge,jdbcType=INTEGER}, #{skills,jdbcType=VARCHAR},
         #{image,jdbcType=VARCHAR}, #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP},
-        #{desc,jdbcType=LONGVARCHAR})
+        #{desc,jdbcType=LONGVARCHAR}, #{freeze,jdbcType=BIT})
     </insert>
     <insert id="insertSelective" parameterType="com.iblock.dao.po.Project" useGeneratedKeys="true" keyProperty="id">
         <!--
@@ -122,6 +123,9 @@
             </if>
             <if test="resident != null">
                 resident,
+            </if>
+            <if test="freeze != null">
+                freeze,
             </if>
             <if test="city != null">
                 city,
@@ -193,6 +197,9 @@
             </if>
             <if test="resident != null">
                 #{resident,jdbcType=BIT},
+            </if>
+            <if test="freeze != null">
+                #{freeze,jdbcType=BIT},
             </if>
             <if test="city != null">
                 #{city,jdbcType=INTEGER},
@@ -270,6 +277,9 @@
             <if test="resident != null">
                 resident = #{resident,jdbcType=BIT},
             </if>
+            <if test="freeze != null">
+                freeze = #{freeze,jdbcType=BIT},
+            </if>
             <if test="city != null">
                 city = #{city,jdbcType=INTEGER},
             </if>
@@ -334,6 +344,7 @@
         agent_id = #{agentId,jdbcType=BIGINT},
         status = #{status,jdbcType=TINYINT},
         resident = #{resident,jdbcType=BIT},
+        freeze = #{freeze,jdbcType=BIT},
         city = #{city,jdbcType=INTEGER},
         min_pay = #{minPay,jdbcType=INTEGER},
         address = #{address,jdbcType=VARCHAR},
@@ -365,6 +376,7 @@
         agent_id = #{agentId,jdbcType=BIGINT},
         status = #{status,jdbcType=TINYINT},
         resident = #{resident,jdbcType=BIT},
+        freeze = #{freeze,jdbcType=BIT},
         city = #{city,jdbcType=INTEGER},
         min_pay = #{minPay,jdbcType=INTEGER},
         address = #{address,jdbcType=VARCHAR},
@@ -404,6 +416,12 @@
             </if>
             <if test="search.status != null">
                 and status = #{search.status}
+            </if>
+            <if test="resident != null">
+                and resident = #{resident}
+            </if>
+            <if test="freeze != null">
+                and freeze = #{freeze}
             </if>
             <if test="search.city != null">
                 and city in
@@ -458,6 +476,9 @@
         </if>
         <if test="resident != null">
             and resident = #{resident}
+        </if>
+        <if test="freeze != null">
+            and freeze = #{freeze}
         </if>
         order by update_time desc
         limit (search.pageNo - 1) * pageSize, pageSize

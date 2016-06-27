@@ -51,6 +51,7 @@ public class ProjectService {
             p.setAddTime(new Date());
             p.setManagerId(managerId);
             p.setStatus((byte) ProjectStatus.AUDIT.getCode());
+            p.setFreeze(false);
             projectDao.insertSelective(p);
         } else {
             Project tmp = projectDao.selectByPrimaryKey(p.getId());
@@ -62,6 +63,11 @@ public class ProjectService {
         }
         return p.getId();
     }
+
+    public boolean update(Project p) {
+        return projectDao.updateByPrimaryKeySelective(p) > 0;
+    }
+
 
     @Transactional
     public boolean terminate(long id, long managerId) throws InvalidRequestException {

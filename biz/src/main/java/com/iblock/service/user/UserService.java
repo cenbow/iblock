@@ -1,10 +1,13 @@
 package com.iblock.service.user;
 
+import com.iblock.common.enums.CommonStatus;
 import com.iblock.common.enums.UserRole;
+import com.iblock.dao.IndustryDao;
 import com.iblock.dao.ManagerDao;
 import com.iblock.dao.SkillDao;
 import com.iblock.dao.UserDao;
 import com.iblock.dao.UserGeoDao;
+import com.iblock.dao.po.Industry;
 import com.iblock.dao.po.Manager;
 import com.iblock.dao.po.Skill;
 import com.iblock.dao.po.User;
@@ -34,6 +37,8 @@ public class UserService {
     private ManagerDao managerDao;
     @Autowired
     private SkillDao skillDao;
+    @Autowired
+    private IndustryDao industryDao;
 
     public User login(String userName, String password) {
         return userDao.selectUser(userName, password);
@@ -57,7 +62,7 @@ public class UserService {
 
     @Transactional
     public boolean signUp(UserUpdateBo bo) {
-        userDao.insertSelective(bo.getUser());
+        simpleAdd(bo.getUser());
         bo.getUserGeo().setUserId(bo.getUser().getId());
         if (bo.getUser().getRole().intValue() == UserRole.MANAGER.getRole()) {
             bo.getManager().setUserId(bo.getUser().getId());
@@ -65,6 +70,10 @@ public class UserService {
         }
         userGeoDao.insertSelective(bo.getUserGeo());
         return true;
+    }
+
+    public boolean simpleAdd(User user) {
+        return userDao.insertSelective(user) > 0;
     }
 
     @Transactional
@@ -84,6 +93,23 @@ public class UserService {
         return true;
     }
 
+    public boolean addSkill(String name) {
+        if (skillDao.selectByName(name) != null) {
+            return false;
+        }
+        Skill skill = new Skill();
+        skill.setAddTime(new Date());
+        skill.setName(name);
+        return skillDao.insertSelective(skill) > 0;
+    }
+
+    public boolean deleteSkill(Integer id) {
+        Skill skill = skillDao.selectByPrimaryKey(id);
+        skill.setStatus((byte) CommonStatus.DELETE.getCode());
+        return skillDao.updateByPrimaryKeySelective(skill) > 0;
+    }
+
+
     public List<Skill> getSkills() {
         return skillDao.selectAll();
     }
@@ -100,5 +126,35 @@ public class UserService {
             }
         }
         return skillDao.selectByIds(list);
+    }
+
+    public List<Industry> getIndustries() {
+        return industryDao.selectAll();
+    }
+
+    public List<Industry> getIndustryByIds(String ids) {
+        List<Integer> list = new ArrayList<Integer>();
+        for (String s : ids.split(",")) {
+            if (StringUtils.isNotBlank(s)) {
+                list.add(Integer.parseInt(s));
+            }
+        }
+        return industryDao.selectByIds(list);
+    }
+
+    public boolean addIndustry(String name) {
+        if (industryDao.selectByName(name) != null) {
+            return false;
+        }
+        Industry industry = new Industry();
+        industry.setAddTime(new Date());
+        industry.setName(name);
+        return industryDao.insertSelective(industry) > 0;
+    }
+
+    public boolean deleteIndustry(Integer id) {
+        Industry industry = industryDao.selectByPrimaryKey(id);
+        industry.setStatus((byte) CommonStatus.DELETE.getCode());
+        return industryDao.updateByPrimaryKeySelective(industry) > 0;
     }
 }

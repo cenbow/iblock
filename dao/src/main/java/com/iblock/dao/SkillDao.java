@@ -48,4 +48,6 @@ public interface SkillDao {
     List<Skill> selectAll();
 
     List<Skill> selectByIds(List<Integer> ids);
+
+    Skill selectByName(String name);
 }

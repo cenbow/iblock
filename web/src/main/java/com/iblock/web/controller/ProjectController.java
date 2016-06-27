@@ -105,6 +105,7 @@ public class ProjectController extends BaseController {
             ProjectSearchBean bean = new ProjectSearchBean();
             bean.setPageSize(request.getPageSize());
             bean.setPageNo(request.getPageNo());
+            bean.setFreeze(false);
             bean.setStatus(ProjectStatus.RECRUITING.getCode());
             if (interest != null) {
                 bean.setResident(interest.getResident());
@@ -139,6 +140,7 @@ public class ProjectController extends BaseController {
             ProjectSearchBean bean = new ProjectSearchBean();
             bean.setPageNo(request.getPageNo());
             bean.setPageSize(request.getPageSize());
+            bean.setFreeze(false);
             bean.setStatus(ProjectStatus.RECRUITING.getCode());
             return new CommonResponse<Page<Project>>(projectService.search(bean));
         } catch (Exception e) {

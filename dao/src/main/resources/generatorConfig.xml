@@ -71,12 +71,12 @@
                <!--enableCountByExample="false" enableUpdateByExample="false">-->
         <!--</table>-->
 
-        <table schema="MS-USER" tableName="MESSAGE" domainObjectName="Message"
-               enableInsert="true" enableSelectByPrimaryKey="true"
-               enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
-               enableSelectByExample="false" enableDeleteByExample="false"
-               enableCountByExample="false" enableUpdateByExample="false">
-        </table>
+        <!--<table schema="MS-USER" tableName="MESSAGE" domainObjectName="Message"-->
+               <!--enableInsert="true" enableSelectByPrimaryKey="true"-->
+               <!--enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"-->
+               <!--enableSelectByExample="false" enableDeleteByExample="false"-->
+               <!--enableCountByExample="false" enableUpdateByExample="false">-->
+        <!--</table>-->
 
         <!--<table schema="MS-USER" tableName="PROJECT" domainObjectName="Project"-->
                <!--enableInsert="true" enableSelectByPrimaryKey="true"-->
@@ -105,6 +105,13 @@
                <!--enableSelectByExample="false" enableDeleteByExample="false"-->
                <!--enableCountByExample="false" enableUpdateByExample="false">-->
         <!--</table>-->
+
+        <table schema="MS-USER" tableName="INDUSTRY" domainObjectName="Industry"
+        enableInsert="true" enableSelectByPrimaryKey="true"
+        enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
+        enableSelectByExample="false" enableDeleteByExample="false"
+        enableCountByExample="false" enableUpdateByExample="false">
+        </table>
 
         <!--<table schema="MS-USER" tableName="SUB_PROCESS" domainObjectName="SubProcess"-->
                <!--enableInsert="true" enableSelectByPrimaryKey="true"-->

@@ -45,6 +45,7 @@ public class ProjectSearchRequest {
         bean.setKeyword(keyword);
         bean.setMaxPay(maxPay);
         bean.setMinPay(minPay);
+        bean.setFreeze(false);
         return bean;
     }
 
