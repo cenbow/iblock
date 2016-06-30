@@ -42,7 +42,7 @@ public class MessageService {
     public Page<Message> getMsgs(long userId, int pageNo, int pageSize, boolean read, Integer role) {
         syncBroadCast(userId, role);
         List<Message> messages = messageDao.selectByUserAndStatus(userId, read ? MessageStatus.READ.getCode() :
-                MessageStatus.UNREAD.getCode(), (pageNo -1)*pageSize, pageSize);
+                MessageStatus.UNREAD.getCode(), (pageNo - 1) * pageSize, pageSize);
         int count = messageDao.countByUserAndStatus(userId, read ? MessageStatus.READ.getCode() :
                 MessageStatus.UNREAD.getCode());
         return new Page<Message>(messages, pageNo, pageSize, count, "sendTime", "desc");
@@ -93,6 +93,7 @@ public class MessageService {
         if (CollectionUtils.isNotEmpty(messages)) {
             for (Message message : messages) {
                 message.setTargetId(userId);
+                message.setId(null);
                 messageDao.insertSelective(message);
             }
         }
@@ -180,8 +181,6 @@ public class MessageService {
         }
         return message;
     }
-
-
 
 
 }

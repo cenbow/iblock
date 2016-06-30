@@ -218,24 +218,24 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <select id="selectByUserAndStatus" parameterType="map">
+    <select id="selectByUserAndStatus" parameterType="map" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from MESSAGE
         where target_id=#{userId}
         and status=#{status}
-        order by add_time, desc
+        order by add_time desc
         limit #{offset}, #{pageSize}
     </select>
 
-    <select id="countByUserAndStatus" parameterType="map">
+    <select id="countByUserAndStatus" parameterType="map" resultType="java.lang.Integer">
     select count(1)
     from MESSAGE
     where target_id=#{userId}
     and status=#{status}
   </select>
 
-    <select id="selectUnloadBroadcastMsg" parameterType="map">
+    <select id="selectUnloadBroadcastMsg" parameterType="map" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from MESSAGE
