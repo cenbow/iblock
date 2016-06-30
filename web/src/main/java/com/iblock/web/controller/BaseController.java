@@ -26,13 +26,13 @@ public class BaseController {
     long mockUserId;
 
     public UserInfo getUserInfo() {
-        UserInfo info;
+        UserInfo info = null;
         if (mockUser) {
             info = new UserInfo();
             info.setRole(mockRole);
             info.setUserName("坂田银时");
             info.setUserId(mockUserId);
-        } else {
+        } else if (session != null) {
             info = (UserInfo) session.getAttribute(CommonProperties.USER_INFO);
         }
         return info;
