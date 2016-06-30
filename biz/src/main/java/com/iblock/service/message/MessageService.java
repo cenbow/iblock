@@ -14,10 +14,12 @@ import com.iblock.dao.UserDao;
 import com.iblock.dao.po.Message;
 import com.iblock.dao.po.Project;
 import com.iblock.dao.po.User;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Date;
@@ -37,9 +39,10 @@ public class MessageService {
     @Autowired
     private UserDao userDao;
 
-    public Page<Message> getMsgs(long userId, int pageNo, int pageSize, boolean read) {
+    public Page<Message> getMsgs(long userId, int pageNo, int pageSize, boolean read, Integer role) {
+        syncBroadCast(userId, role);
         List<Message> messages = messageDao.selectByUserAndStatus(userId, read ? MessageStatus.READ.getCode() :
-                MessageStatus.UNREAD.getCode(), pageNo, pageSize);
+                MessageStatus.UNREAD.getCode(), (pageNo -1)*pageSize, pageSize);
         int count = messageDao.countByUserAndStatus(userId, read ? MessageStatus.READ.getCode() :
                 MessageStatus.UNREAD.getCode());
         return new Page<Message>(messages, pageNo, pageSize, count, "sendTime", "desc");
@@ -79,6 +82,36 @@ public class MessageService {
         }
         Message msg = buildMessage(sourceId, targetId, action, manager, agent, designer, project, params);
         return messageDao.insertSelective(msg) > 0;
+    }
+
+    @Transactional
+    public boolean syncBroadCast(Long userId, Integer role) {
+        User user = userDao.selectByPrimaryKey(userId);
+        List<Message> messages = messageDao.selectUnloadBroadcastMsg(user.getLastMsgTime(), role);
+        user.setLastMsgTime(new Date());
+        userDao.updateByPrimaryKey(user);
+        if (CollectionUtils.isNotEmpty(messages)) {
+            for (Message message : messages) {
+                message.setTargetId(userId);
+                messageDao.insertSelective(message);
+            }
+        }
+        return true;
+    }
+
+    public boolean broadCast(String content, Integer role) {
+        Message message = new Message();
+        message.setTargetId(-1L);
+        message.setSourceId(-1L);
+        message.setAction(-1);
+        message.setDetail(content);
+        if (role != null) {
+            message.setRole(role.byteValue());
+        }
+        message.setAddTime(new Date());
+        message.setStatus((byte) MessageStatus.UNREAD.getCode());
+        message.setType((byte) 0);
+        return messageDao.insertSelective(message) > 0;
     }
 
     private void sendSMS(String code) {
@@ -147,6 +180,8 @@ public class MessageService {
         }
         return message;
     }
+
+
 
 
 }

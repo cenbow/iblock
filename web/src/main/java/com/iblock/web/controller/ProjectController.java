@@ -104,7 +104,7 @@ public class ProjectController extends BaseController {
             JobInterest interest = jobInterestService.get(getUserInfo().getUserId());
             ProjectSearchBean bean = new ProjectSearchBean();
             bean.setPageSize(request.getPageSize());
-            bean.setPageNo(request.getPageNo());
+            bean.setOffset((request.getPageNo() - 1) * request.getPageSize());
             bean.setFreeze(false);
             bean.setStatus(ProjectStatus.RECRUITING.getCode());
             if (interest != null) {
@@ -138,7 +138,7 @@ public class ProjectController extends BaseController {
     public CommonResponse<Page<Project>> latest(@RequestBody PageRequest request) {
         try {
             ProjectSearchBean bean = new ProjectSearchBean();
-            bean.setPageNo(request.getPageNo());
+            bean.setOffset((request.getPageNo() - 1) * request.getPageSize());
             bean.setPageSize(request.getPageSize());
             bean.setFreeze(false);
             bean.setStatus(ProjectStatus.RECRUITING.getCode());

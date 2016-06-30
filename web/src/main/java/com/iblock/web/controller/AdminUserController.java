@@ -89,6 +89,9 @@ public class AdminUserController extends BaseController {
             if (user == null) {
                 return new CommonResponse<Boolean>(ResponseStatus.PARAM_ERROR, "用户不存在");
             }
+            if (user.getStatus().intValue() == UserStatus.DELETE.getCode()) {
+                return new CommonResponse<Boolean>(ResponseStatus.PARAM_ERROR, "用户已处删除状态");
+            }
             if (user.getStatus().intValue() == UserStatus.FREEZE.getCode()) {
                 return new CommonResponse<Boolean>(ResponseStatus.PARAM_ERROR, "用户已处冻结状态");
             }

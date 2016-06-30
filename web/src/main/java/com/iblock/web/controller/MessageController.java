@@ -3,7 +3,9 @@ package com.iblock.web.controller;
 import com.iblock.common.advice.Auth;
 import com.iblock.common.bean.Page;
 import com.iblock.dao.po.Message;
+import com.iblock.dao.po.User;
 import com.iblock.service.message.MessageService;
+import com.iblock.service.user.UserService;
 import com.iblock.web.enums.ResponseStatus;
 import com.iblock.web.info.MessageInfo;
 import com.iblock.web.info.PageInfo;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -31,6 +34,8 @@ public class MessageController extends BaseController {
 
     @Autowired
     protected MessageService messageService;
+    @Autowired
+    protected UserService userService;
 
     @RequestMapping(value = "/message/update/{id}", method = RequestMethod.GET)
     @Auth
@@ -53,7 +58,10 @@ public class MessageController extends BaseController {
     public PageResponse<MessageInfo> messages(@RequestBody MessagesRequest request) {
         try {
             Page<Message> page = messageService.getMsgs(getUserInfo().getUserId(), request.getPageNo(), request
-                    .getPageSize(), !request.isUnprocessed());
+                    .getPageSize(), !request.isUnprocessed(), getUserInfo().getRole());
+            User user = userService.getUser(getUserInfo().getUserId());
+            user.setLastMsgTime(new Date());
+            userService.update(user);
             List<MessageInfo> list = new ArrayList<MessageInfo>();
             if (page.getResult() != null) {
                 for (Message message : page.getResult()) {

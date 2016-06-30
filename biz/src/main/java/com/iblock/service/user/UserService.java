@@ -73,6 +73,8 @@ public class UserService {
     }
 
     public boolean simpleAdd(User user) {
+        user.setAddTime(new Date());
+        user.setLastMsgTime(new Date());
         return userDao.insertSelective(user) > 0;
     }
 

@@ -11,6 +11,7 @@ import com.iblock.web.constant.RoleConstant;
 import com.iblock.web.enums.ResponseStatus;
 import com.iblock.web.info.KVInfo;
 import com.iblock.web.request.PageRequest;
+import com.iblock.web.request.admin.BroadCastRequest;
 import com.iblock.web.request.admin.NameRequest;
 import com.iblock.web.response.CommonResponse;
 import lombok.extern.log4j.Log4j;
@@ -31,7 +32,7 @@ import java.util.List;
 @Controller
 @Log4j
 @RequestMapping("/admin/meta")
-public class AdminMetaController {
+public class AdminMetaController extends BaseController {
 
     @Autowired
     private UserService userService;
@@ -115,4 +116,6 @@ public class AdminMetaController {
         }
         return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
     }
+
+
 }

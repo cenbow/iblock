@@ -3,6 +3,7 @@ package com.iblock.dao;
 import com.iblock.dao.po.Message;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface MessageDao {
@@ -46,8 +47,10 @@ public interface MessageDao {
      */
     int updateByPrimaryKey(Message record);
 
-    List<Message> selectByUserAndStatus(@Param("userId") long userId, @Param("status") int status, @Param("pageNo")
-    int pageNo, @Param("pageSize") int pageSize);
+    List<Message> selectByUserAndStatus(@Param("userId") long userId, @Param("status") int status, @Param("offset")
+    int offset, @Param("pageSize") int pageSize);
 
     int countByUserAndStatus(@Param("userId") long userId, @Param("status") int status);
+
+    List<Message> selectUnloadBroadcastMsg(@Param("time") Date time, @Param("role") Integer role);
 }

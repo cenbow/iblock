@@ -191,8 +191,8 @@ public class ProjectService {
     public Page<Project> search(ProjectSearchBean search) {
         List<Project> list = projectDao.list(search);
         int size = projectDao.size(search);
-        return new Page<Project>(list, search.getPageNo(), search.getPageSize(), size, search.getOrder(), search
-                .getOrderBy());
+        return new Page<Project>(list, search.getOffset() / search.getPageSize() - 1, search.getPageSize(), size, search
+                .getOrder(), search.getOrderBy());
     }
 
     @Transactional

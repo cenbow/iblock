@@ -24,7 +24,7 @@ public class ProjectSearchRequest {
 
     public ProjectSearchBean toBean() {
         ProjectSearchBean bean = new ProjectSearchBean();
-        bean.setPageNo(pageNo);
+        bean.setOffset((pageNo - 1) * pageSize);
         bean.setPageSize(pageSize);
         bean.setStatus(ProjectStatus.RECRUITING.getCode());
         if (city != null) {

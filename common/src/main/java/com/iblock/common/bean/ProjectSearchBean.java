@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 public class ProjectSearchBean {
 
-    private int pageNo;
+    private int offset;
     private int pageSize;
     private String order;
     private String orderBy;

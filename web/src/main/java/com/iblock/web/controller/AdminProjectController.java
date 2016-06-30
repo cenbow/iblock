@@ -44,7 +44,7 @@ public class AdminProjectController extends BaseController {
         try {
             ProjectSearchBean bean = new ProjectSearchBean();
             bean.setPageSize(request.getPageSize());
-            bean.setPageNo(request.getPageNo());
+            bean.setOffset((request.getPageNo() - 1) * request.getPageSize());
             return new CommonResponse<Page<Project>>(projectService.search(bean));
         } catch (Exception e) {
             log.error("admin search project error!", e);
@@ -67,7 +67,7 @@ public class AdminProjectController extends BaseController {
             }
             project.setStatus((byte) ProjectStatus.RECRUITING.getCode());
             project.setAgentId(request.getBroker());
-            if (!projectService.update(project)) {
+            if (projectService.update(project)) {
                 return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);
             }
         } catch (Exception e) {
@@ -83,7 +83,7 @@ public class AdminProjectController extends BaseController {
         try {
             ProjectSearchBean bean = new ProjectSearchBean();
             bean.setPageSize(request.getPageSize());
-            bean.setPageNo(request.getPageNo());
+            bean.setOffset((request.getPageNo() - 1) * request.getPageSize());
             bean.setFreeze(true);
             return new CommonResponse<Page<Project>>(projectService.search(bean));
         } catch (Exception e) {

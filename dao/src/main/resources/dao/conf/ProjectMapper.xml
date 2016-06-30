@@ -395,27 +395,39 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <select id="size" parameterType="map" resultType="java.lang.Integer">
+    <select id="size" parameterType="com.iblock.common.bean.ProjectSearchBean" resultType="java.lang.Integer">
         select count(*)
         from PROJECT
         <where>
-            <if test="search.status != null">
-                status = #{search.status}
+            <if test="status != null">
+                status = #{status}
             </if>
-            <if test="search.status == null">
-                status &gt; 0
+            <if test="keyword != null">
+                and `name` like CONCAT("%", #{keyword}, "%")
             </if>
-            <if test="search.role == 2">
-                agent_id = #{search.userId}
+            <if test="status != null">
+                and status = #{status}
             </if>
-            <if test="search.role == 3">
-                manager_id = #{search.userId}
+            <if test="minPay != null and maxPay == null">
+                and min_pay &lt; #{minPay} and max_pay &gt; #{minPay}
             </if>
-            <if test="search.keyword != null">
-                and `name` like CONCAT("%", #{search.keyword}, "%")
+            <if test="minPay == null and maxPay != null">
+                and min_pay &lt; #{maxPay} and max_pay &gt; #{maxPay}
             </if>
-            <if test="search.status != null">
-                and status = #{search.status}
+            <if test="minPay != null and maxPay != null">
+                and (min_pay &lt; #{minPay} or max_pay &gt; #{maxPay})
+            </if>
+            <if test="city != null">
+                and city in
+                <foreach close=")" collection="city" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="industry != null">
+                and industry in
+                <foreach close=")" collection="industry" index="index" item="item" open="(" separator=",">
+                    #{item}
+                </foreach>
             </if>
             <if test="resident != null">
                 and resident = #{resident}
@@ -423,54 +435,43 @@
             <if test="freeze != null">
                 and freeze = #{freeze}
             </if>
-            <if test="search.city != null">
-                and city in
-                <foreach close=")" collection="search.city" index="index" item="item" open="(" separator=",">
-                    #{item}
-                </foreach>
-            </if>
-            <if test="search.industry != null">
-                and industry in
-                <foreach close=")" collection="search.industry" index="index" item="item" open="(" separator=",">
-                    #{item}
-                </foreach>
-            </if>
         </where>
-        order by #{search.orderBy} #{search.order}
-        limit (#{search.pageNo} - 1) * #{pageSize}, #{pageSize}
     </select>
 
-    <select id="list" parameterType="map" resultMap="ResultMapWithBLOBs">
+    <select id="list" parameterType="com.iblock.common.bean.ProjectSearchBean" resultMap="ResultMapWithBLOBs">
         select
         <include refid="Base_Column_List"/>
         ,
         <include refid="Blob_Column_List"/>
         from PROJECT
-        where status &gt; 0
-        <if test="search.keyword != null">
-            and `name` like CONCAT("%", #{search.keyword}, "%")
+        <where>
+        <if test="status != null">
+            status = #{status}
         </if>
-        <if test="search.status != null">
-            and status = #{search.status}
+        <if test="keyword != null">
+            and `name` like CONCAT("%", #{keyword}, "%")
         </if>
-        <if test="search.minPay != null and search.maxPay == null">
+        <if test="status != null">
+            and status = #{status}
+        </if>
+        <if test="minPay != null and maxPay == null">
             and min_pay &lt; #{minPay} and max_pay &gt; #{minPay}
         </if>
-        <if test="search.minPay == null and search.maxPay != null">
+        <if test="minPay == null and maxPay != null">
             and min_pay &lt; #{maxPay} and max_pay &gt; #{maxPay}
         </if>
-        <if test="search.minPay != null and search.maxPay != null">
+        <if test="minPay != null and maxPay != null">
             and (min_pay &lt; #{minPay} or max_pay &gt; #{maxPay})
         </if>
-        <if test="search.city != null">
+        <if test="city != null">
             and city in
-            <foreach close=")" collection="search.city" index="index" item="item" open="(" separator=",">
+            <foreach close=")" collection="city" index="index" item="item" open="(" separator=",">
                 #{item}
             </foreach>
         </if>
-        <if test="search.industry != null">
+        <if test="industry != null">
             and industry in
-            <foreach close=")" collection="search.industry" index="index" item="item" open="(" separator=",">
+            <foreach close=")" collection="industry" index="index" item="item" open="(" separator=",">
                 #{item}
             </foreach>
         </if>
@@ -480,7 +481,8 @@
         <if test="freeze != null">
             and freeze = #{freeze}
         </if>
+        </where>
         order by update_time desc
-        limit (search.pageNo - 1) * pageSize, pageSize
+        limit #{offset}, #{pageSize}
     </select>
 </mapper>
