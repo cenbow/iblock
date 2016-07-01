@@ -2,7 +2,6 @@ package com.iblock.web.controller;
 
 import com.iblock.common.advice.Auth;
 import com.iblock.common.enums.Education;
-import com.iblock.common.enums.UserRole;
 import com.iblock.dao.po.JobInterest;
 import com.iblock.dao.po.Manager;
 import com.iblock.dao.po.Skill;
@@ -30,15 +29,13 @@ import com.iblock.web.info.UserUpdateInfo;
 import com.iblock.web.info.WorkExperienceInfo;
 import com.iblock.web.info.WorkExperienceResultInfo;
 import com.iblock.web.request.user.LoginRequest;
+import com.iblock.web.request.user.ModifyPasswordRequest;
 import com.iblock.web.request.user.SendValidateCodeRequest;
 import com.iblock.web.request.user.SignUpRequest;
 import com.iblock.web.response.CommonResponse;
-import com.iblock.web.session.RedisSessionFactory;
 import lombok.extern.log4j.Log4j;
-import nl.captcha.Captcha;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,16 +46,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -429,5 +422,22 @@ public class UserController extends BaseController {
             log.error("updateWorkExperience error!", e);
         }
         return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/modifyPassword", method = RequestMethod.POST)
+    @Auth
+    @ResponseBody
+    public CommonResponse<Void> modifyPassword(@RequestBody ModifyPasswordRequest request) {
+        try {
+            User user = userService.getUser(getUserInfo().getUserId());
+            if (!request.getOldPasswd().equals(user.getPassword())) {
+                return new CommonResponse<Void>(ResponseStatus.PARAM_ERROR, "旧密码输入错误");
+            }
+            user.setPassword(request.getNewPasswd());
+            return new CommonResponse<Void>(ResponseStatus.SUCCESS);
+        } catch (Exception e) {
+            log.error("modifyPassword error!", e);
+        }
+        return new CommonResponse<Void>(ResponseStatus.SYSTEM_ERROR);
     }
 }

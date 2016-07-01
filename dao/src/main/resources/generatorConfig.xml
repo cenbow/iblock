@@ -106,11 +106,18 @@
                <!--enableCountByExample="false" enableUpdateByExample="false">-->
         <!--</table>-->
 
-        <table schema="MS-USER" tableName="INDUSTRY" domainObjectName="Industry"
-        enableInsert="true" enableSelectByPrimaryKey="true"
-        enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
-        enableSelectByExample="false" enableDeleteByExample="false"
-        enableCountByExample="false" enableUpdateByExample="false">
+        <!--<table schema="MS-USER" tableName="INDUSTRY" domainObjectName="Industry"-->
+        <!--enableInsert="true" enableSelectByPrimaryKey="true"-->
+        <!--enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"-->
+        <!--enableSelectByExample="false" enableDeleteByExample="false"-->
+        <!--enableCountByExample="false" enableUpdateByExample="false">-->
+        <!--</table>-->
+
+        <table schema="MS-USER" tableName="CITY" domainObjectName="City"
+               enableInsert="true" enableSelectByPrimaryKey="true"
+               enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
+               enableSelectByExample="false" enableDeleteByExample="false"
+               enableCountByExample="false" enableUpdateByExample="false">
         </table>
 
         <!--<table schema="MS-USER" tableName="SUB_PROCESS" domainObjectName="SubProcess"-->
