@@ -46,29 +46,28 @@
     - [修改项目 /project/update/:id](#修改项目-projectupdateid)
     - [评分 /project/rate](#评分-projectrate)
     - [项目状态](#项目状态)
-        - [审批项目 /project/approve](#审批项目-projectapprove)
-        - [审批项目 /project/addbroker](#审批项目-projectaddbroker)
-        - [提交项目 /project/resubmit](#提交项目-projectresubmit)
-        - [启动项目 /project/start](#启动项目-projectstart)
-        - [结束项目 /project/end](#结束项目-projectend)
-        - [终止项目 /project/terminate](#终止项目-projectterminate)
-        - [审批项目 /project/approve](#审批项目-projectapprove-1)
+        - [分配经纪人 /project/addbroker](#分配经纪人-projectaddbroker)
+        - [审批项目  /project/approve](#审批项目--projectapprove)
+        - [提交项目  /project/resubmit](#提交项目--projectresubmit)
+        - [启动项目  /project/start](#启动项目--projectstart)
+        - [结束项目  /project/end](#结束项目--projectend)
+        - [终止项目  /project/terminate](#终止项目--projectterminate)
 - [项目列表 /projects/](#项目列表-projects)
     - [搜索项目 /projects/search](#搜索项目-projectssearch)
     - [推荐项目 /projects/recommended](#推荐项目-projectsrecommended)
     - [最新项目 /projects/latest](#最新项目-projectslatest)
-    - [我的项目 /projects/mine/](#我的项目-projectsmine)
-    - [我的项目 /projects/terminated](#我的项目-projectsterminated)
+    - [我的项目 /projects/mine](#我的项目-projectsmine)
+    - [已终止项目 /projects/terminated \(Admin only\)](#已终止项目-projectsterminated-admin-only)
 - [作品列表 /works](#作品列表-works)
     - [获取作品 /works/:userid  \(GET\) \(权限:所有已登陆用户\)](#获取作品-worksuserid--get-权限所有已登陆用户)
 - [作品 /work](#作品-work)
-    - [删除作品 /work/delete/:wordid](#删除作品-workdeletewordid)
+    - [删除作品 /work/delete/:workid](#删除作品-workdeleteworkid)
     - [添加作品 /work/add](#添加作品-workadd)
 - [文件 /file](#文件-file)
     - [上传图片 /file/image/new](#上传图片-fileimagenew)
     - [删除图片 /file/image/delete](#删除图片-fileimagedelete)
 - [消息列表 /messages/](#消息列表-messages)
-    - [消息未读数 /messages/unreada](#消息未读数-messagesunreada)
+    - [消息未读数 /messages/unread](#消息未读数-messagesunread)
     - [未处理消息 /messages/unprocessed](#未处理消息-messagesunprocessed)
     - [历史消息 /messages/history](#历史消息-messageshistory)
 - [消息 /message/](#消息-message)
@@ -97,7 +96,7 @@ Response
 
 ```json
 {
-    "status":""
+    "status":"",
     "msg":"",
       "data":{
         "role":1,
@@ -191,7 +190,7 @@ Response
 ### 项目经理注册 /user/signup/manager
 ```json
 {
-    "username":""
+    "username":"",
     "password":"",
     "mobile":"",
     "gender":"f",
@@ -214,11 +213,11 @@ Request:
 
 ```json
 {
-    "username":""
+    "username":"",
     "password":"",
     "mobile":"",
     "gender":"f",
-    "verifyCode":"",//手机验证码
+    "verifyCode":"",
     "geo": {
       "city":{"id":202,"name":"上海市"},
       "district": "杨浦区",
@@ -325,20 +324,19 @@ Failures: 403:密码或用户名不正确
 ## 评分 /project/rate
 
 ## 项目状态
-### 审批项目 /project/approve
-### 审批项目 /project/addbroker
-### 提交项目 /project/resubmit
-### 启动项目 /project/start
-### 结束项目 /project/end
-### 终止项目 /project/terminate 
-### 审批项目 /project/approve
+### 分配经纪人 /project/addbroker
+### 审批项目  /project/approve
+### 提交项目  /project/resubmit
+### 启动项目  /project/start
+### 结束项目  /project/end
+### 终止项目  /project/terminate 
 
 # 项目列表 /projects/
 ## 搜索项目 /projects/search
 ## 推荐项目 /projects/recommended
 ## 最新项目 /projects/latest
-## 我的项目 /projects/mine/
-## 我的项目 /projects/terminated
+## 我的项目 /projects/mine
+## 已终止项目 /projects/terminated (Admin only)
 
 
 # 作品列表 /works
@@ -370,7 +368,7 @@ RESPONSE:
 ```
 
 # 作品 /work
-## 删除作品 /work/delete/:wordid
+## 删除作品 /work/delete/:workid
 Response:
 ```json
 {
@@ -432,7 +430,7 @@ Failures: 403:没有权限, 500:内部错误
 
 # 消息列表 /messages/
 
-## 消息未读数 /messages/unreada
+## 消息未读数 /messages/unread
 
 Response
 ```json
