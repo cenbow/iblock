@@ -283,8 +283,37 @@ Failures: 403:密码或用户名不正确
 ## 账户/user/account
 
 ### 修改手机号 /user/account/resetMobile
+
+Request:
+```json
+
+{
+    "mobile":"",
+    'verifyCode':"",
+    "password":""
+}
+
+```
+
+Response:
+1) 403:验证码不正确 2) 密码不正确 
+
 ### 修改密码 /user/account/resetPassword
+Request:
+```json
+{
+    "oldpassword":"",
+    "newpassword":""
+}
+```
+
 ### 修改头像 /user/account/changeAvatar
+
+```json
+{
+    "avatar":"/img/head2.jpg"
+}
+```
 
 # 用户列表 /users
 
