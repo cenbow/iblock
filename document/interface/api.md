@@ -193,7 +193,7 @@ Response
     "username":"",
     "password":"",
     "mobile":"",
-    "gender":"f",
+    "gender":0,  // 0为女，1为男
     "verifyCode":"",
     "geo": {
       "city":{"id":202,"name":"上海市"},
@@ -216,7 +216,7 @@ Request:
     "username":"",
     "password":"",
     "mobile":"",
-    "gender":"f",
+    "gender":1， // 0为女，1为男
     "verifyCode":"",
     "geo": {
       "city":{"id":202,"name":"上海市"},
