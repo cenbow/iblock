@@ -368,8 +368,8 @@ Request:
 ## 已终止项目 /projects/terminated (Admin only)
 
 
-# 作品列表 /works
-## 获取作品 /works/:userid  (GET) (权限:所有已登陆用户)
+# 作品列表 /work
+## 获取作品 /work/:userid  (GET) (权限:所有已登陆用户)
 
 RESPONSE:
 ```json
