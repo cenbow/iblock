@@ -27,6 +27,8 @@ public class SMSService {
     private String accountToken;
     @Value("${sms.app.id}")
     private String appID;
+    @Value("${sms.validate.time}")
+    private Long time;
     @Autowired
     private RedisUtils redisUtils;
 
@@ -36,8 +38,9 @@ public class SMSService {
         restAPI.setAccount(accountSID, accountToken);
         restAPI.setAppId(appID);
         String code = getRandomString(6);
-        redisUtils.put("verify_" + mobile, code, 300000);
-        HashMap<String, Object> result = restAPI.sendTemplateSMS(mobile, "1", new String[]{"code", code});
+        redisUtils.put("verify_" + mobile, code, time);
+        HashMap<String, Object> result = restAPI.sendTemplateSMS(mobile, "1", new String[]{code, String.valueOf
+                (time / 60000)});
         if (!"000000".equals(result.get("statusCode"))) {
             log.error("verify code send error, 错误码=" + result.get("statusCode") + " 错误信息= " + result.get("statusMsg"));
         }

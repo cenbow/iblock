@@ -42,7 +42,7 @@ public class AchievementController extends BaseController {
             achievement.setUserId(getUserInfo().getId());
             achievement.setDesc(request.getDesc());
             achievement.setName(request.getTitle());
-            achievement.setDesc(request.getDesc());
+            achievement.setUrl(request.getImgUrl());
             if (achievementService.add(achievement)) {
                 return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);
             }
