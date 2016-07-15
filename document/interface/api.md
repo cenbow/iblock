@@ -472,7 +472,7 @@ Response
 }
 ```
 
-## 未处理消息 /messages/unprocessed
+## 未处理消息 /messages/unprocessed (已有，用/user/messages即可)
 
 Response
 ```json
