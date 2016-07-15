@@ -40,7 +40,7 @@ public class SMSService {
         String code = getRandomString(6);
         redisUtils.put("verify_" + mobile, code, time);
         HashMap<String, Object> result = restAPI.sendTemplateSMS(mobile, "1", new String[]{code, String.valueOf
-                (time / 60000)});
+                (time / 60)});
         if (!"000000".equals(result.get("statusCode"))) {
             log.error("verify code send error, 错误码=" + result.get("statusCode") + " 错误信息= " + result.get("statusMsg"));
         }
