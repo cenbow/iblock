@@ -19,13 +19,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 @Log4j
-@RequestMapping("/admin/message")
+@RequestMapping("/message/admin")
 public class AdminMessageController extends BaseController {
 
     @Autowired
     private MessageService messageService;
 
-    @RequestMapping(value = "/message/announce", method = RequestMethod.POST, consumes = "application/json")
+    @RequestMapping(value = "/new", method = RequestMethod.POST, consumes = "application/json")
     @Auth(role = RoleConstant.ADMINISTRATOR)
     @ResponseBody
     public CommonResponse<Boolean> announce(@RequestBody BroadCastRequest request) {

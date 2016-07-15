@@ -13,8 +13,8 @@ import javax.validation.constraints.Min;
 public class LoginRequest {
 
     @NotBlank
-    private String userName;
+    private String mobile;
     @NotBlank
-    private String passwd;
+    private String password;
 
 }

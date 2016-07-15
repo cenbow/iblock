@@ -26,9 +26,13 @@ public class FileService {
             f.mkdirs();
         }
         String[] originName = file.getOriginalFilename().split("\\.");
-        String name = UUID.randomUUID() + originName[originName.length - 1];
+        String name = UUID.randomUUID() + "."+ originName[originName.length - 1];
         FileOutputStream fos = new FileOutputStream(filePath + name);
         fos.write(file.getBytes());
-        return filePath + name;
+        return "/data/" + name;
+    }
+
+    public File get(String name) throws IOException {
+        return new File(filePath + name);
     }
 }

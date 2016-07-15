@@ -10,7 +10,7 @@ import org.hibernate.validator.constraints.NotBlank;
 public class ModifyPasswordRequest {
 
     @NotBlank
-    private String oldPasswd;
+    private String oldpassword;
     @NotBlank
-    private String newPasswd;
+    private String newpassword;
 }

@@ -115,28 +115,6 @@ public class MessageService {
         return messageDao.insertSelective(message) > 0;
     }
 
-    private void sendSMS(String code) {
-        HashMap<String, Object> result = null;
-        CCPRestSmsSDK restAPI = new CCPRestSmsSDK();
-        restAPI.init("sandboxapp.cloopen.com", "8883");
-        restAPI.setAccount("8a48b55153cb69470153da0f39dc13f5", "b322d8844b444babad188ccaff172f0a");
-        restAPI.setAppId("aaf98f8953cadc690153da0f9ca53d56");
-        result = restAPI.sendTemplateSMS("13311625852", "1", new String[]{"code", "5"});
-        if ("000000".equals(result.get("statusCode"))) {
-            //正常返回输出data包体信息（map）
-            HashMap<String, Object> data = (HashMap<String, Object>) result.get("data");
-            Set<String> keySet = data.keySet();
-            for (String key : keySet) {
-                Object object = data.get(key);
-                System.out.println(key + " = " + object);
-            }
-        } else {
-            //异常返回输出错误码和错误信息
-            System.out.println("错误码=" + result.get("statusCode") + " 错误信息= " + result.get("statusMsg"));
-        }
-
-    }
-
     private Message buildMessage(Long sourceId, Long targetId, MessageAction action, User manager, User agent, User
             designer, Project project, Map<String, String> params) throws InnerLogicException, IOException {
         Message message = new Message();

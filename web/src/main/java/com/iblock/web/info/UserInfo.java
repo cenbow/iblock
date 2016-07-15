@@ -11,16 +11,16 @@ import java.io.Serializable;
 @Data
 public class UserInfo implements Serializable {
 
-    private Long userId;
-    private String userName;
+    private Long id;
+    private String username;
     private int role;
 
     public UserInfo() {
     }
 
     public UserInfo (User user) {
-        this.userId = user.getId();
-        this.userName = user.getUserName();
+        this.id = user.getId();
+        this.username = user.getUserName();
         this.role = user.getRole();
     }
 }

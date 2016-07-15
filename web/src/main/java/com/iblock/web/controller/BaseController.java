@@ -30,8 +30,8 @@ public class BaseController {
         if (mockUser) {
             info = new UserInfo();
             info.setRole(mockRole);
-            info.setUserName("坂田银时");
-            info.setUserId(mockUserId);
+            info.setUsername("坂田银时");
+            info.setId(mockUserId);
         } else if (session != null) {
             info = (UserInfo) session.getAttribute(CommonProperties.USER_INFO);
         }

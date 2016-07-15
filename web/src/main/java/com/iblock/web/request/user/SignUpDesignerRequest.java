@@ -16,23 +16,14 @@ import java.util.Date;
  * Created by baidu on 16/2/8.
  */
 @Data
-public class SignUpRequest {
+public class SignUpDesignerRequest {
 
-    // todo geo str?
-    // todo validate
     private String username;
     private String password;
     private String mobile;
-    private String validationCode;
-    private String corporateName;
-    private String corporateBio;
-    private String location;
-    private int role;
+    private String verifyCode;
     private Integer gender;
-    private int province;
-    private int city;
-    private int district;
-    private String street;
+    private GeoInfo geo;
 
     public UserUpdateBo toUserBo() {
         UserUpdateBo bo = new UserUpdateBo();
@@ -44,26 +35,22 @@ public class SignUpRequest {
         if (gender != null) {
             user.setSex(gender.equals(1));
         }
-        user.setRole((byte) role);
+        user.setRole((byte) UserRole.MANAGER.getRole());
         user.setStatus((byte) CommonStatus.NORMAL.getCode());
         user.setAddTime(new Date());
         bo.setUser(user);
 
         UserGeo userGeo = new UserGeo();
-        userGeo.setAddress(street);
-        userGeo.setCityId(city);
+        userGeo.setAddress(geo.getAddress());
+        userGeo.setCityId(geo.getCity().getId());
+        userGeo.setDistrict(geo.getDistrict());
+        userGeo.setLatitude(geo.getLat());
+        userGeo.setLongitude(geo.getLng());
+        userGeo.setCity(geo.getCity().getName());
         userGeo.setAddTime(new Date());
         userGeo.setStatus((byte) CommonStatus.NORMAL.getCode());
         bo.setUserGeo(userGeo);
 
-        if (role == UserRole.MANAGER.getRole()) {
-            Manager manager = new Manager();
-            manager.setCompanyName(corporateName);
-            manager.setDesc(corporateBio);
-            manager.setStatus((byte) CommonStatus.NORMAL.getCode());
-            manager.setAddTime(new Date());
-            bo.setManager(manager);
-        }
         return bo;
     }
 

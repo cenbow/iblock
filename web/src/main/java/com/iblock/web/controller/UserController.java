@@ -13,6 +13,7 @@ import com.iblock.service.experience.WorkExperienceService;
 import com.iblock.service.file.FileService;
 import com.iblock.service.interest.JobInterestService;
 import com.iblock.service.message.MessageService;
+import com.iblock.service.message.SMSService;
 import com.iblock.service.user.UserService;
 import com.iblock.web.constant.CommonProperties;
 import com.iblock.web.constant.RoleConstant;
@@ -30,8 +31,10 @@ import com.iblock.web.info.WorkExperienceInfo;
 import com.iblock.web.info.WorkExperienceResultInfo;
 import com.iblock.web.request.user.LoginRequest;
 import com.iblock.web.request.user.ModifyPasswordRequest;
+import com.iblock.web.request.user.ResetMobileRequest;
 import com.iblock.web.request.user.SendValidateCodeRequest;
-import com.iblock.web.request.user.SignUpRequest;
+import com.iblock.web.request.user.SignUpDesignerRequest;
+import com.iblock.web.request.user.SignUpManagerRequest;
 import com.iblock.web.response.CommonResponse;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -78,11 +81,14 @@ public class UserController extends BaseController {
     @Autowired
     protected WorkExperienceService workExperienceService;
 
+    @Autowired
+    protected SMSService smsService;
+
     @RequestMapping(value = "/login", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
     public CommonResponse<UserInfo> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         try {
-            User user = userService.login(request.getUserName(), request.getPasswd());
+            User user = userService.login(request.getMobile(), request.getPassword());
             if (user != null) {
                 UserInfo info = new UserInfo(user);
                 httpRequest.getSession().setAttribute(CommonProperties.USER_INFO, info);
@@ -111,22 +117,36 @@ public class UserController extends BaseController {
     @ResponseBody
     public CommonResponse<Boolean> sendValidateCode(@RequestBody SendValidateCodeRequest request) {
         try {
-            User user = userService.getUser(getUserInfo().getUserId());
-            if (!request.getPhone().equals(user.getMobile())) {
-                return new CommonResponse<Boolean>(ResponseStatus.VALIDATE_ERROR);
+            if (smsService.sendVerifyCode(request.getPhone())) {
+                return new CommonResponse<Boolean>(true);
             }
-            // todo send code
-            return new CommonResponse<Boolean>(true);
         } catch (Exception e) {
             log.error("sendValidateCode error!", e);
         }
         return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
     }
 
-    @RequestMapping(value = "/signup", method = RequestMethod.POST, consumes = "application/json")
+    @RequestMapping(value = "/signup/manager", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
-    public CommonResponse<Boolean> signUp(@RequestBody SignUpRequest request) {
+    public CommonResponse<Boolean> signUpManager(@RequestBody SignUpManagerRequest request) {
         try {
+            if (!smsService.checkVerifyCode(request.getMobile(), request.getVerifyCode())) {
+                return new CommonResponse<Boolean>(ResponseStatus.PARAM_ERROR, "验证码校验失败");
+            }
+            return new CommonResponse<Boolean>(userService.signUp(request.toUserBo()));
+        } catch (Exception e) {
+            log.error("sendValidateCode error!", e);
+        }
+        return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/signup/designer", method = RequestMethod.POST, consumes = "application/json")
+    @ResponseBody
+    public CommonResponse<Boolean> signUpDesigner(@RequestBody SignUpDesignerRequest request) {
+        try {
+            if (!smsService.checkVerifyCode(request.getMobile(), request.getVerifyCode())) {
+                return new CommonResponse<Boolean>(ResponseStatus.PARAM_ERROR, "验证码校验失败");
+            }
             return new CommonResponse<Boolean>(userService.signUp(request.toUserBo()));
         } catch (Exception e) {
             log.error("sendValidateCode error!", e);
@@ -217,7 +237,7 @@ public class UserController extends BaseController {
     public CommonResponse<Boolean> updateUserInfo(@RequestBody UserUpdateInfo info) {
 
         try {
-            User user = userService.getUser(getUserInfo().getUserId());
+            User user = userService.getUser(getUserInfo().getId());
             if (user == null) {
                 return new CommonResponse<Boolean>(false, ResponseStatus.NOT_FOUND);
             }
@@ -248,8 +268,8 @@ public class UserController extends BaseController {
                 userGeo.setCity(info.getGeo().getCity().getName());
                 userGeo.setCityId(info.getGeo().getCity().getId());
                 userGeo.setAddress(info.getGeo().getAddress());
-                userGeo.setLongitude(info.getGeo().getLongitude());
-                userGeo.setLatitude(info.getGeo().getLatitude());
+                userGeo.setLongitude(info.getGeo().getLng());
+                userGeo.setLatitude(info.getGeo().getLat());
                 bo.setUserGeo(userGeo);
             }
 
@@ -279,7 +299,7 @@ public class UserController extends BaseController {
     public CommonResponse<Boolean> updateUserFavicon(@RequestParam(value = "file") CommonsMultipartFile file) {
 
         try {
-            User user = userService.getUser(getUserInfo().getUserId());
+            User user = userService.getUser(getUserInfo().getId());
             if (user == null) {
                 return new CommonResponse<Boolean>(false, ResponseStatus.NOT_FOUND);
             }
@@ -315,10 +335,10 @@ public class UserController extends BaseController {
     public CommonResponse<Boolean> updateWorkPrefs(@RequestBody JobInterestInfo info) {
 
         try {
-            JobInterest interest = jobInterestService.get(getUserInfo().getUserId());
+            JobInterest interest = jobInterestService.get(getUserInfo().getId());
             if (interest == null) {
                 interest = new JobInterest();
-                interest.setUserId(getUserInfo().getUserId());
+                interest.setUserId(getUserInfo().getId());
             }
             if (info.getIsLongTerm() != null) {
                 interest.setResident(info.getIsLongTerm());
@@ -384,7 +404,7 @@ public class UserController extends BaseController {
             WorkExperience experience = new WorkExperience();
             experience.setYear(info.getTime());
             experience.setDesc(info.getDesc());
-            experience.setUserId(getUserInfo().getUserId());
+            experience.setUserId(getUserInfo().getId());
             experience.setIndustry(info.getIndustry().getId());
             return new CommonResponse<Long>(workExperienceService.addOrUpdate(experience));
         } catch (Exception e) {
@@ -399,7 +419,7 @@ public class UserController extends BaseController {
     public CommonResponse<Boolean> deleteWorkExperience(@RequestBody IdRequestInfo info) {
 
         try {
-            return new CommonResponse<Boolean>(workExperienceService.remove(info.getId(), getUserInfo().getUserId()));
+            return new CommonResponse<Boolean>(workExperienceService.remove(info.getId(), getUserInfo().getId()));
         } catch (Exception e) {
             log.error("deleteWorkExperience error!", e);
         }
@@ -413,7 +433,7 @@ public class UserController extends BaseController {
         try {
             WorkExperience experience = new WorkExperience();
             experience.setId(info.getId());
-            experience.setUserId(getUserInfo().getUserId());
+            experience.setUserId(getUserInfo().getId());
             experience.setYear(info.getTime());
             experience.setDesc(info.getDesc());
             experience.setIndustry(info.getIndustry().getId());
@@ -424,19 +444,41 @@ public class UserController extends BaseController {
         return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
     }
 
-    @RequestMapping(value = "/modifyPassword", method = RequestMethod.POST)
+    @RequestMapping(value = "/account/resetPassword", method = RequestMethod.POST)
     @Auth
     @ResponseBody
     public CommonResponse<Void> modifyPassword(@RequestBody ModifyPasswordRequest request) {
         try {
-            User user = userService.getUser(getUserInfo().getUserId());
-            if (!request.getOldPasswd().equals(user.getPassword())) {
+            User user = userService.getUser(getUserInfo().getId());
+            if (!request.getOldpassword().equals(user.getPassword())) {
                 return new CommonResponse<Void>(ResponseStatus.PARAM_ERROR, "旧密码输入错误");
             }
-            user.setPassword(request.getNewPasswd());
+            user.setPassword(request.getNewpassword());
+            userService.update(user);
             return new CommonResponse<Void>(ResponseStatus.SUCCESS);
         } catch (Exception e) {
             log.error("modifyPassword error!", e);
+        }
+        return new CommonResponse<Void>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/account/resetMobile", method = RequestMethod.POST)
+    @Auth
+    @ResponseBody
+    public CommonResponse<Void> resetMobile(@RequestBody ResetMobileRequest request) {
+        try {
+            if (!smsService.checkVerifyCode(request.getMobile(), request.getVerifyCode())) {
+                return new CommonResponse<Void>(ResponseStatus.PARAM_ERROR, "验证码校验失败");
+            }
+            User user = userService.getUser(getUserInfo().getId());
+            if (!user.getPassword().equals(request.getPassword())) {
+                return new CommonResponse<Void>(ResponseStatus.PARAM_ERROR, "密码校验失败");
+            }
+            user.setMobile(request.getMobile());
+            userService.update(user);
+            return new CommonResponse<Void>(ResponseStatus.SUCCESS);
+        } catch (Exception e) {
+            log.error("resetMobile error!", e);
         }
         return new CommonResponse<Void>(ResponseStatus.SYSTEM_ERROR);
     }

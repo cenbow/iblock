@@ -13,8 +13,8 @@ public class GeoInfo {
     private KVInfo city;
     private String district;
     private String address;
-    private Float longitude;
-    private Float latitude;
+    private Float lng;
+    private Float lat;
 
     public GeoInfo() {}
 
@@ -23,8 +23,8 @@ public class GeoInfo {
         info.setAddress(geo.getAddress());
         info.setCity(new KVInfo(geo.getCityId(), geo.getCity()));
         info.setDistrict(geo.getDistrict());
-        info.setLatitude(geo.getLatitude());
-        info.setLongitude(geo.getLongitude());
+        info.setLat(geo.getLatitude());
+        info.setLng(geo.getLongitude());
         return info;
     }
 

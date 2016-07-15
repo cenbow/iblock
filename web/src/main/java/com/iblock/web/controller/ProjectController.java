@@ -52,7 +52,7 @@ public class ProjectController extends BaseController {
     @ResponseBody
     public CommonResponse<Long> save(@RequestBody ProjectCreateRequest project) {
         try {
-            long id = projectService.save(project.toProject(), getUserInfo().getUserId());
+            long id = projectService.save(project.toProject(), getUserInfo().getId());
             if (id > 0) {
                 return new CommonResponse<Long>(id);
             }
@@ -70,7 +70,7 @@ public class ProjectController extends BaseController {
             Project p = projectService.get(projectId);
             project.updateProject(p);
             p.setStatus((byte) ProjectStatus.AUDIT.getCode());
-            long id = projectService.save(p, getUserInfo().getUserId());
+            long id = projectService.save(p, getUserInfo().getId());
             if (id > 0) {
                 return new CommonResponse<Long>(id);
             }
@@ -101,7 +101,7 @@ public class ProjectController extends BaseController {
     @ResponseBody
     public CommonResponse<Page<Project>> recommended(@RequestBody PageRequest request) {
         try {
-            JobInterest interest = jobInterestService.get(getUserInfo().getUserId());
+            JobInterest interest = jobInterestService.get(getUserInfo().getId());
             ProjectSearchBean bean = new ProjectSearchBean();
             bean.setPageSize(request.getPageSize());
             bean.setOffset((request.getPageNo() - 1) * request.getPageSize());
@@ -180,7 +180,7 @@ public class ProjectController extends BaseController {
     @ResponseBody
     public CommonResponse<Boolean> terminate(@RequestBody ProjectIdRequest request) {
         try {
-            if (!projectService.terminate(request.getId(), getUserInfo().getUserId())) {
+            if (!projectService.terminate(request.getId(), getUserInfo().getId())) {
                 return new CommonResponse<Boolean>(ResponseStatus.VALIDATE_ERROR);
             }
             return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);
@@ -195,7 +195,7 @@ public class ProjectController extends BaseController {
     @ResponseBody
     public CommonResponse<Boolean> completeHire(@RequestBody ProjectIdRequest request) {
         try {
-            if (!projectService.completeHire(request.getId(), getUserInfo().getUserId())) {
+            if (!projectService.completeHire(request.getId(), getUserInfo().getId())) {
                 return new CommonResponse<Boolean>(ResponseStatus.VALIDATE_ERROR);
             }
             return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);
@@ -210,7 +210,7 @@ public class ProjectController extends BaseController {
     @ResponseBody
     public CommonResponse<Boolean> start(@RequestBody ProjectIdRequest request) {
         try {
-            if (!projectService.start(request.getId(), getUserInfo().getUserId())) {
+            if (!projectService.start(request.getId(), getUserInfo().getId())) {
                 return new CommonResponse<Boolean>(ResponseStatus.VALIDATE_ERROR);
             }
             return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);
@@ -225,7 +225,7 @@ public class ProjectController extends BaseController {
     @ResponseBody
     public CommonResponse<Boolean> end(@RequestBody ProjectIdRequest request) {
         try {
-            if (!projectService.end(request.getId(), getUserInfo().getUserId())) {
+            if (!projectService.end(request.getId(), getUserInfo().getId())) {
                 return new CommonResponse<Boolean>(ResponseStatus.VALIDATE_ERROR);
             }
             return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);
@@ -240,7 +240,7 @@ public class ProjectController extends BaseController {
     @ResponseBody
     public CommonResponse<Boolean> hire(@RequestBody HireRequest request) {
         try {
-            if (!projectService.hire(request.getId(), request.getUserid(), getUserInfo().getUserId())) {
+            if (!projectService.hire(request.getId(), request.getUserid(), getUserInfo().getId())) {
                 return new CommonResponse<Boolean>(ResponseStatus.VALIDATE_ERROR);
             }
             return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);
@@ -255,7 +255,7 @@ public class ProjectController extends BaseController {
     @ResponseBody
     public CommonResponse<Boolean> acceptHiring(@RequestBody AcceptHiringRequest request) {
         try {
-            if (!projectService.acceptHiring(request.getHireid(), getUserInfo().getUserId(), request.isAccept())) {
+            if (!projectService.acceptHiring(request.getHireid(), getUserInfo().getId(), request.isAccept())) {
                 return new CommonResponse<Boolean>(ResponseStatus.VALIDATE_ERROR);
             }
             return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);

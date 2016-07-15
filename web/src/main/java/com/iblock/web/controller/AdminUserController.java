@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @Log4j
-@RequestMapping("/admin/user")
+@RequestMapping("/user/admin")
 public class AdminUserController extends BaseController {
 
     @Autowired

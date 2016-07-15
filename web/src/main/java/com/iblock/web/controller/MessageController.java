@@ -8,6 +8,7 @@ import com.iblock.service.message.MessageService;
 import com.iblock.service.user.UserService;
 import com.iblock.web.enums.ResponseStatus;
 import com.iblock.web.info.MessageInfo;
+import com.iblock.web.info.MessageUnreadInfo;
 import com.iblock.web.info.PageInfo;
 import com.iblock.web.request.message.MessagesRequest;
 import com.iblock.web.response.CommonResponse;
@@ -37,12 +38,12 @@ public class MessageController extends BaseController {
     @Autowired
     protected UserService userService;
 
-    @RequestMapping(value = "/message/update/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/message/markasread/{id}", method = RequestMethod.GET)
     @Auth
     @ResponseBody
     public CommonResponse<Boolean> read(@PathVariable("id") Long id) {
         try {
-            if (!messageService.read(id, getUserInfo().getUserId())) {
+            if (!messageService.read(id, getUserInfo().getId())) {
                 return new CommonResponse<Boolean>(ResponseStatus.VALIDATE_ERROR);
             }
             return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);
@@ -57,9 +58,9 @@ public class MessageController extends BaseController {
     @ResponseBody
     public PageResponse<MessageInfo> messages(@RequestBody MessagesRequest request) {
         try {
-            Page<Message> page = messageService.getMsgs(getUserInfo().getUserId(), request.getPageNo(), request
+            Page<Message> page = messageService.getMsgs(getUserInfo().getId(), request.getPageNo(), request
                     .getPageSize(), !request.isUnprocessed(), getUserInfo().getRole());
-            User user = userService.getUser(getUserInfo().getUserId());
+            User user = userService.getUser(getUserInfo().getId());
             user.setLastMsgTime(new Date());
             userService.update(user);
             List<MessageInfo> list = new ArrayList<MessageInfo>();
@@ -74,5 +75,20 @@ public class MessageController extends BaseController {
             log.error("messages error!", e);
         }
         return new PageResponse<MessageInfo>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/messages/unread", method = RequestMethod.POST, consumes = "application/json")
+    @Auth
+    @ResponseBody
+    public CommonResponse<MessageUnreadInfo> unread() {
+        try {
+            Page<Message> page = messageService.getMsgs(getUserInfo().getId(), 1, 1, false, getUserInfo().getRole());
+            MessageUnreadInfo info = new MessageUnreadInfo();
+            info.setCount(page.getTotalCount());
+            return new CommonResponse<MessageUnreadInfo>(info);
+        } catch (Exception e) {
+            log.error("messages unread error!", e);
+        }
+        return new CommonResponse<MessageUnreadInfo>(ResponseStatus.SYSTEM_ERROR);
     }
 }
