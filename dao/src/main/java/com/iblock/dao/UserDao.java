@@ -48,4 +48,6 @@ public interface UserDao {
     User selectUser(@Param("userName") String userName, @Param("password") String password);
 
     UserDetail selectDetailById(Long id);
+
+    User selectByMobile(String mobile);
 }

@@ -35,7 +35,7 @@ public class SignUpDesignerRequest {
         if (gender != null) {
             user.setSex(gender.equals(1));
         }
-        user.setRole((byte) UserRole.MANAGER.getRole());
+        user.setRole((byte) UserRole.DESIGNER.getRole());
         user.setStatus((byte) CommonStatus.NORMAL.getCode());
         user.setAddTime(new Date());
         bo.setUser(user);

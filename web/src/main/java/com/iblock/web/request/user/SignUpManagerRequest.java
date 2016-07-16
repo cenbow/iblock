@@ -38,7 +38,7 @@ public class SignUpManagerRequest {
         }
         user.setStatus((byte) CommonStatus.NORMAL.getCode());
         user.setAddTime(new Date());
-        user.setRole((byte) UserRole.DESIGNER.getRole());
+        user.setRole((byte) UserRole.MANAGER.getRole());
         bo.setUser(user);
 
         UserGeo userGeo = new UserGeo();

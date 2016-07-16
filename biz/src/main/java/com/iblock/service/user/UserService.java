@@ -154,6 +154,10 @@ public class UserService {
         return industryDao.insertSelective(industry) > 0;
     }
 
+    public User getByMobile(String mobile) {
+        return userDao.selectByMobile(mobile);
+    }
+
     public boolean deleteIndustry(Integer id) {
         Industry industry = industryDao.selectByPrimaryKey(id);
         industry.setStatus((byte) CommonStatus.DELETE.getCode());

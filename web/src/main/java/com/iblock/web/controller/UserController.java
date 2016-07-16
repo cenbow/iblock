@@ -133,6 +133,9 @@ public class UserController extends BaseController {
             if (!smsService.checkVerifyCode(request.getMobile(), request.getVerifyCode())) {
                 return new CommonResponse<Boolean>(ResponseStatus.PARAM_ERROR, "验证码校验失败");
             }
+            if (userService.getByMobile(request.getMobile()) != null) {
+                return new CommonResponse<Boolean>(ResponseStatus.PARAM_ERROR, "该手机已被注册");
+            }
             return new CommonResponse<Boolean>(userService.signUp(request.toUserBo()));
         } catch (Exception e) {
             log.error("sendValidateCode error!", e);
@@ -146,6 +149,9 @@ public class UserController extends BaseController {
         try {
             if (!smsService.checkVerifyCode(request.getMobile(), request.getVerifyCode())) {
                 return new CommonResponse<Boolean>(ResponseStatus.PARAM_ERROR, "验证码校验失败");
+            }
+            if (userService.getByMobile(request.getMobile()) != null) {
+                return new CommonResponse<Boolean>(ResponseStatus.PARAM_ERROR, "该手机已被注册");
             }
             return new CommonResponse<Boolean>(userService.signUp(request.toUserBo()));
         } catch (Exception e) {
@@ -180,7 +186,9 @@ public class UserController extends BaseController {
             info.setUsername(user.getUserName());
             info.setAvatar(user.getHeadFigure());
             info.setRole(user.getRole().intValue());
-            info.setEducation(new KVInfo(user.getEducation(), Education.getByCode(user.getEducation()).getMsg()));
+            if (user.getEducation() != null) {
+                info.setEducation(new KVInfo(user.getEducation(), Education.getByCode(user.getEducation()).getMsg()));
+            }
             info.setRating(5);
             info.setContactPhone(user.getMobile());
             info.setOnline(user.getOnline());
