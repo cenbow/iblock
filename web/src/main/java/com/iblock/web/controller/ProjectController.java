@@ -255,7 +255,8 @@ public class ProjectController extends BaseController {
                 }
                 bean.setIds(ids);
             }
-
+            bean.setPageSize(request.getPageSize());
+            bean.setOffset((request.getPageNo() - 1) * request.getPageSize());
             if (CollectionUtils.isNotEmpty(request.getStatus())) {
                 bean.setStatus(request.getStatus());
             }

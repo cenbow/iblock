@@ -77,7 +77,7 @@ public class MessageController extends BaseController {
         return new PageResponse<MessageInfo>(ResponseStatus.SYSTEM_ERROR);
     }
 
-    @RequestMapping(value = "/messages/unread", method = RequestMethod.POST, consumes = "application/json")
+    @RequestMapping(value = "/messages/unread", method = RequestMethod.GET)
     @Auth
     @ResponseBody
     public CommonResponse<MessageUnreadInfo> unread() {
