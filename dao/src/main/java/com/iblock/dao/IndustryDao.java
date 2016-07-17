@@ -48,9 +48,7 @@ public interface IndustryDao {
 
     List<Industry> selectAll();
 
-    List<Industry> selectByIds(List<Integer> ids);
+    List<Industry> selectByIds(@Param("list") List<Integer> list);
 
     Industry selectByName(@Param("name") String name);
-
-    List<Industry> selectByIdStr(@Param("ids") String ids);
 }

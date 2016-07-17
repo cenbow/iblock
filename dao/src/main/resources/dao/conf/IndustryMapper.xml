@@ -148,13 +148,4 @@
     and name = #{name}
   </select>
 
-  <select id="selectByIdStr" resultMap="BaseResultMap" parameterType="map" >
-    select
-    <include refid="Base_Column_List" />
-    from INDUSTRY
-    where status=1
-    <if test="ids != null">
-      and id in (#{ids})
-    </if>
-  </select>
 </mapper>

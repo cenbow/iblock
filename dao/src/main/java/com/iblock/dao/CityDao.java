@@ -48,5 +48,5 @@ public interface CityDao {
 
     List<City> selectByName(@Param("name") String name);
 
-    List<City> selectByIds(@Param("ids") String ids);
+    List<City> selectByIds(@Param("list") List<Integer> list);
 }
