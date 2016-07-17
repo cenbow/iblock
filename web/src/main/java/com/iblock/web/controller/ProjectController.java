@@ -84,7 +84,7 @@ public class ProjectController extends BaseController {
         return new CommonResponse<Long>(ResponseStatus.SYSTEM_ERROR);
     }
 
-    @RequestMapping(value = "/details/{projectid}", method = RequestMethod.GET, consumes = "application/json")
+    @RequestMapping(value = "/details/{projectid}", method = RequestMethod.GET)
     @ResponseBody
     public CommonResponse<ProjectDetailInfo> detail(@PathVariable("projectid") Long projectId) {
         try {
