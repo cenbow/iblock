@@ -241,9 +241,8 @@ public class ProjectService {
         }
         p.setId(bo.getId());
         p.setStatus((byte) (bo.getAccept() ? ProjectStatus.RECRUITING.getCode() : ProjectStatus.AUDIT_DENY.getCode()));
-        p.setAgentId(bo.getBrokerId());
         messageService.send(-1L, p.getManagerId(), bo.getAccept() ? MessageAction.AUDIT_SUCCESS : MessageAction
-                .AUDIT_FAIL, null, bo.getBrokerId(), null, p, null);
+                .AUDIT_FAIL, null, p.getAgentId(), null, p, null);
         return projectDao.updateByPrimaryKeySelective(p) > 0;
     }
 

@@ -8,6 +8,5 @@ import lombok.Data;
 @Data
 public class ProjectAcceptBo {
     private Long id;
-    private Long brokerId;
     private Boolean accept;
 }

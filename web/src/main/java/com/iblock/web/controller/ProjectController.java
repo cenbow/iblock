@@ -276,7 +276,7 @@ public class ProjectController extends BaseController {
     }
 
     @RequestMapping(value = "/accept", method = RequestMethod.POST, consumes = "application/json")
-    @Auth(role = RoleConstant.ADMINISTRATOR)
+    @Auth(role = RoleConstant.AGENT)
     @ResponseBody
     public CommonResponse<Boolean> accept(@RequestBody ProjectAcceptBo acceptBo) {
         try {
