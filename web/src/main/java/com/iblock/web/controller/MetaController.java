@@ -91,13 +91,17 @@ public class MetaController extends BaseController {
 
     @RequestMapping(value = "/industry/all", method = RequestMethod.GET)
     @ResponseBody
-    public CommonResponse<List<Industry>> allIndustries() {
+    public CommonResponse<List<KVInfo>> allIndustries() {
         try {
-            return new CommonResponse<List<Industry>>(userService.getIndustries());
+            List<KVInfo> result = new ArrayList<KVInfo>();
+            for (Industry industry : userService.getIndustries()) {
+                result.add(new KVInfo(industry.getId(), industry.getName()));
+            }
+            return new CommonResponse<List<KVInfo>>(result);
         } catch (Exception e) {
             log.error("get industries error!", e);
         }
-        return new CommonResponse<List<Industry>>(ResponseStatus.SYSTEM_ERROR);
+        return new CommonResponse<List<KVInfo>>(ResponseStatus.SYSTEM_ERROR);
     }
 }
 
