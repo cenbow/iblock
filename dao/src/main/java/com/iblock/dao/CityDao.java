@@ -47,4 +47,6 @@ public interface CityDao {
     int updateByPrimaryKey(City record);
 
     List<City> selectByName(@Param("name") String name);
+
+    List<City> selectByIds(String ids);
 }

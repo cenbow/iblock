@@ -149,4 +149,14 @@
       and city_name like CONCAT("%",#{name},"%")
     </if>
   </select>
+
+  <select id="selectByIds" resultMap="BaseResultMap" parameterType="map" >
+    select
+    <include refid="Base_Column_List" />
+    from CITY
+    where status=1
+    <if test="ids != null">
+      and city_id in CONCAT("(",#{ids},")")
+    </if>
+  </select>
 </mapper>

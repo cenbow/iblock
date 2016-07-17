@@ -147,4 +147,14 @@
     where status = 1
     and name = #{name}
   </select>
+
+  <select id="selectByIds" resultMap="BaseResultMap" parameterType="map" >
+    select
+    <include refid="Base_Column_List" />
+    from INDUSTRY
+    where status=1
+    <if test="ids != null">
+      and id in CONCAT("(",#{ids},")")
+    </if>
+  </select>
 </mapper>

@@ -2,6 +2,8 @@ package com.iblock.web.controller;
 
 import com.iblock.common.advice.Auth;
 import com.iblock.common.enums.Education;
+import com.iblock.dao.po.City;
+import com.iblock.dao.po.Industry;
 import com.iblock.dao.po.JobInterest;
 import com.iblock.dao.po.Manager;
 import com.iblock.dao.po.Skill;
@@ -315,7 +317,25 @@ public class UserController extends BaseController {
             if (interest == null) {
                 return new CommonResponse<JobInterestInfo>(null, ResponseStatus.SUCCESS);
             }
-            return new CommonResponse<JobInterestInfo>(JobInterestInfo.parse(interest));
+            JobInterestInfo info = JobInterestInfo.parse(interest);
+            List<KVInfo> cities = new ArrayList<KVInfo>();
+            List<KVInfo> industries = new ArrayList<KVInfo>();
+            if (StringUtils.isNotBlank(interest.getCityList())) {
+                for (City city : jobInterestService.getCities(interest.getCityList())) {
+                    cities.add(new KVInfo(city.getCityId(), city.getCityName()));
+                }
+
+            }
+
+            if (StringUtils.isNotBlank(interest.getJobTypeList())) {
+                for (Industry industry : jobInterestService.getIndusties(interest.getJobTypeList())) {
+                    industries.add(new KVInfo(industry.getId(), industry.getName()));
+                }
+
+            }
+            info.setCities(cities);
+            info.setIndustries(industries);
+            return new CommonResponse<JobInterestInfo>(info);
         } catch (Exception e) {
             log.error("getWorkPrefs error!", e);
         }

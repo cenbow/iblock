@@ -50,4 +50,6 @@ public interface IndustryDao {
     List<Industry> selectByIds(List<Integer> ids);
 
     Industry selectByName(String name);
+
+    List<Industry> selectByIds(String ids);
 }
