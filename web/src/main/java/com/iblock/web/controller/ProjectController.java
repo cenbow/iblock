@@ -125,10 +125,10 @@ public class ProjectController extends BaseController {
             Industry industry = metaService.getIndustry(Arrays.asList(p.getIndustry())).get(0);
             info.setIndustry(new KVInfo(industry.getId(), industry.getName()));
 
-            if (p.getManagerId() != null) {
+            if (p.getManagerId() != null && !p.getManagerId().equals(0L)) {
                 info.setManager(getUser(p.getManagerId()));
             }
-            if (p.getAgentId() != null) {
+            if (p.getAgentId() != null && !p.getAgentId().equals(0L)) {
                 info.setBroker(getUser(p.getAgentId()));
             }
             List<User> designers = projectService.getDesigners(p.getId());
