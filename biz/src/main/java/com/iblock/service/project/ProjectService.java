@@ -221,6 +221,12 @@ public class ProjectService {
         if (CollectionUtils.isEmpty(search.getSkill())) {
             search.setSkill(null);
         }
+        if (CollectionUtils.isEmpty(search.getCity())) {
+            search.setCity(null);
+        }
+        if (CollectionUtils.isEmpty(search.getIndustry())) {
+            search.setIndustry(null);
+        }
         List<Project> list = projectDao.list(search);
         int size = projectDao.size(search);
         return new Page<Project>(list, search.getOffset() / search.getPageSize() - 1, search.getPageSize(), size, search
