@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 public class AddUserRequest {
 
     @NotBlank
-    private String userid;
+    private String mobile;
     @NotBlank
     private String username;
     @NotBlank
@@ -24,7 +24,7 @@ public class AddUserRequest {
     public User toUser() {
         User user = new User();
         user.setRole(role.byteValue());
-        user.setMobile(userid);
+        user.setMobile(mobile);
         user.setUserName(username);
         user.setPassword(password);
         return user;
