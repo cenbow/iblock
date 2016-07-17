@@ -289,7 +289,7 @@
         and status=1
     </select>
 
-    <select id="batchSelect" parameterMap="map" resultMap="BaseResultMap">
+    <select id="batchSelect" parameterType="map" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from USER
