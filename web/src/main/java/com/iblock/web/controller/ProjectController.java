@@ -21,6 +21,7 @@ import com.iblock.web.enums.ResponseStatus;
 import com.iblock.web.info.GeoInfo;
 import com.iblock.web.info.KVInfo;
 import com.iblock.web.info.ProjectDetailInfo;
+import com.iblock.web.info.ProjectSimpleInfo;
 import com.iblock.web.info.UserSimpleInfo;
 import com.iblock.web.request.PageRequest;
 import com.iblock.web.request.project.AcceptHiringRequest;
@@ -43,7 +44,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by baidu on 16/4/3.
@@ -105,7 +108,6 @@ public class ProjectController extends BaseController {
                 return new CommonResponse<ProjectDetailInfo>(ResponseStatus.NOT_FOUND);
             }
             ProjectDetailInfo info = ProjectDetailInfo.parse(p);
-            // todo
             List<ProjectSkillDetail> skills = projectService.getSkills(projectId);
             if (CollectionUtils.isNotEmpty(skills)) {
                 List<KVInfo> list = new ArrayList<KVInfo>();
@@ -150,12 +152,14 @@ public class ProjectController extends BaseController {
     }
 
     private UserSimpleInfo getUser(Long userId) {
-        User manager = userService.getUser(userId);
+        User user = userService.getUser(userId);
         UserSimpleInfo u = new UserSimpleInfo();
-        u.setUsername(manager.getUserName());
-        u.setAvatar(manager.getHeadFigure());
-        u.setId(manager.getId());
-        u.setRating(5);
+        if (user != null) {
+            u.setUsername(user.getUserName());
+            u.setAvatar(user.getHeadFigure());
+            u.setId(user.getId());
+            u.setRating(5);
+        }
         return u;
     }
 
@@ -213,13 +217,41 @@ public class ProjectController extends BaseController {
 
     @RequestMapping(value = "/search", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
-    public CommonResponse<Page<Project>> search(@RequestBody ProjectSearchRequest request) {
+    public CommonResponse<Page<ProjectSimpleInfo>> search(@RequestBody ProjectSearchRequest request) {
         try {
-            return new CommonResponse<Page<Project>>(projectService.search(request.toBean()));
+            Page<Project> page = projectService.search(request.toBean());
+            List<Project> tmp = page.getResult();
+            Map<Integer, String> cityMap = new HashMap<Integer, String>();
+            Map<Integer, String> industryMap = new HashMap<Integer, String>();
+            List<Integer> cityIds = new ArrayList<Integer>();
+            List<Integer> industryIds = new ArrayList<Integer>();
+            if (CollectionUtils.isNotEmpty(tmp)) {
+                for (Project p : tmp) {
+                    cityIds.add(p.getCity());
+                    industryIds.add(p.getIndustry());
+                }
+                for (City city : metaService.getCity(cityIds)) {
+                    cityMap.put(city.getCityId(), city.getCityName());
+                }
+                for (Industry industry : metaService.getIndustry(industryIds)) {
+                    industryMap.put(industry.getId(), industry.getName());
+                }
+            }
+            List<ProjectSimpleInfo> list = new ArrayList<ProjectSimpleInfo>();
+            for (Project p : tmp) {
+                ProjectSimpleInfo info = ProjectSimpleInfo.parse(p);
+                info.setCity(new KVInfo(p.getCity(), cityMap.get(p.getCity())));
+                info.setIndustry(new KVInfo(p.getIndustry(), industryMap.get(p.getIndustry())));
+                list.add(info);
+            }
+            Page<ProjectSimpleInfo> result = new Page<ProjectSimpleInfo>(list, page.getPageNo(), page.getPageSize(),
+                    page.getTotalCount());
+
+            return new CommonResponse<Page<ProjectSimpleInfo>>(result);
         } catch (Exception e) {
             log.error("search project error!", e);
         }
-        return new CommonResponse<Page<Project>>(ResponseStatus.SYSTEM_ERROR);
+        return new CommonResponse<Page<ProjectSimpleInfo>>(ResponseStatus.SYSTEM_ERROR);
     }
 
     @RequestMapping(value = "/accept", method = RequestMethod.POST, consumes = "application/json")

@@ -229,7 +229,7 @@ public class ProjectService {
         }
         List<Project> list = projectDao.list(search);
         int size = projectDao.size(search);
-        return new Page<Project>(list, search.getOffset() / search.getPageSize() - 1, search.getPageSize(), size, search
+        return new Page<Project>(list, search.getOffset() / search.getPageSize() + 1, search.getPageSize(), size, search
                 .getOrder(), search.getOrderBy());
     }
 
