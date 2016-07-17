@@ -20,6 +20,7 @@ public class ProjectSearchBean {
     private Integer status;
     private List<Integer> city;
     private List<Integer> industry;
+    private List<Integer> skill;
     private Boolean resident;
     private Boolean freeze;
 }

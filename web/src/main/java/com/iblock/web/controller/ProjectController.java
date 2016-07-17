@@ -6,11 +6,14 @@ import com.iblock.common.bean.ProjectSearchBean;
 import com.iblock.common.enums.ProjectStatus;
 import com.iblock.dao.po.JobInterest;
 import com.iblock.dao.po.Project;
+import com.iblock.dao.po.ProjectSkill;
+import com.iblock.dao.po.ProjectSkillDetail;
 import com.iblock.service.bo.ProjectAcceptBo;
 import com.iblock.service.interest.JobInterestService;
 import com.iblock.service.project.ProjectService;
 import com.iblock.web.constant.RoleConstant;
 import com.iblock.web.enums.ResponseStatus;
+import com.iblock.web.info.KVInfo;
 import com.iblock.web.info.ProjectDetailInfo;
 import com.iblock.web.request.PageRequest;
 import com.iblock.web.request.project.AcceptHiringRequest;
@@ -21,6 +24,7 @@ import com.iblock.web.request.project.ProjectSearchRequest;
 import com.iblock.web.request.project.ProjectUpdateRequest;
 import com.iblock.web.response.CommonResponse;
 import lombok.extern.log4j.Log4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -52,7 +56,7 @@ public class ProjectController extends BaseController {
     @ResponseBody
     public CommonResponse<Long> save(@RequestBody ProjectCreateRequest project) {
         try {
-            long id = projectService.save(project.toProject(), getUserInfo().getId());
+            long id = projectService.save(project.toProject(), project.toSkills(), getUserInfo().getId());
             if (id > 0) {
                 return new CommonResponse<Long>(id);
             }
@@ -70,7 +74,7 @@ public class ProjectController extends BaseController {
             Project p = projectService.get(projectId);
             project.updateProject(p);
             p.setStatus((byte) ProjectStatus.AUDIT.getCode());
-            long id = projectService.save(p, getUserInfo().getId());
+            long id = projectService.save(p, project.toSkills(), getUserInfo().getId());
             if (id > 0) {
                 return new CommonResponse<Long>(id);
             }
@@ -90,6 +94,14 @@ public class ProjectController extends BaseController {
             }
             ProjectDetailInfo info = ProjectDetailInfo.parse(p);
             // todo
+            List<ProjectSkillDetail> skills = projectService.getSkills(projectId);
+            if (CollectionUtils.isNotEmpty(skills)) {
+                List<KVInfo> list = new ArrayList<KVInfo>();
+                for (ProjectSkillDetail skill : skills) {
+                    list.add(new KVInfo(skill.getSkillId(), skill.getSkillName()));
+                }
+                info.setSkills(list);
+            }
             return new CommonResponse<ProjectDetailInfo>(info);
         } catch (Exception e) {
             log.error("get project error!", e);

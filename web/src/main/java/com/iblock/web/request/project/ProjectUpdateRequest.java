@@ -1,12 +1,16 @@
 package com.iblock.web.request.project;
 
+import com.iblock.common.enums.CommonStatus;
 import com.iblock.common.utils.DateUtils;
 import com.iblock.dao.po.Project;
+import com.iblock.dao.po.ProjectSkill;
 import com.iblock.web.info.KVInfo;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -70,14 +74,19 @@ public class ProjectUpdateRequest {
         if (industry != null) {
             project.setIndustry(industry.getId());
         }
-        if (skills != null) {
-            if (CollectionUtils.isNotEmpty(skills)) {
-                StringBuffer sb = new StringBuffer();
-                for (KVInfo kv : skills) {
-                    sb.append(kv.getId()).append(",");
-                }
-                project.setSkills(sb.toString());
+    }
+
+    public List<ProjectSkill> toSkills() {
+        List<ProjectSkill> list = new ArrayList<ProjectSkill>();
+        if (CollectionUtils.isNotEmpty(skills)) {
+            for (KVInfo kv : skills) {
+                ProjectSkill skill = new ProjectSkill();
+                skill.setAddTime(new Date());
+                skill.setStatus((byte) CommonStatus.NORMAL.getCode());
+                skill.setSkillId(kv.getId());
+                list.add(skill);
             }
         }
+        return list;
     }
 }

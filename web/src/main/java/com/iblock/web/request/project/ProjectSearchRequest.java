@@ -17,6 +17,7 @@ public class ProjectSearchRequest {
     private String keyword;
     private Integer minPay;
     private Integer maxPay;
+    private List<KVInfo> skill;
     private List<KVInfo> city;
     private List<KVInfo> industry;
     private Integer pageNo;
@@ -27,6 +28,14 @@ public class ProjectSearchRequest {
         bean.setOffset((pageNo - 1) * pageSize);
         bean.setPageSize(pageSize);
         bean.setStatus(ProjectStatus.RECRUITING.getCode());
+        if (skill != null) {
+            List<Integer> list = new ArrayList<Integer>();
+            for (KVInfo kv : skill) {
+                list.add(kv.getId());
+            }
+            bean.setSkill(list);
+        }
+
         if (city != null) {
             List<Integer> list = new ArrayList<Integer>();
             for (KVInfo kv : city) {

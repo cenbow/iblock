@@ -12,14 +12,18 @@ import com.iblock.common.exception.InnerLogicException;
 import com.iblock.common.exception.InvalidRequestException;
 import com.iblock.dao.ProjectDao;
 import com.iblock.dao.ProjectDesignerDao;
+import com.iblock.dao.ProjectSkillDao;
 import com.iblock.dao.UserDao;
 import com.iblock.dao.WorkflowLogDao;
 import com.iblock.dao.po.Project;
 import com.iblock.dao.po.ProjectDesigner;
+import com.iblock.dao.po.ProjectSkill;
+import com.iblock.dao.po.ProjectSkillDetail;
 import com.iblock.dao.po.User;
 import com.iblock.dao.po.WorkflowLog;
 import com.iblock.service.bo.ProjectAcceptBo;
 import com.iblock.service.message.MessageService;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,15 +48,23 @@ public class ProjectService {
     private UserDao userDao;
     @Autowired
     private MessageService messageService;
+    @Autowired
+    private ProjectSkillDao projectSkillDao;
+
+    public List<ProjectSkillDetail> getSkills(Long projectId) {
+        return projectSkillDao.selectByProject(projectId);
+    }
 
     @Transactional
-    public long save(Project p, Long managerId) throws InvalidRequestException {
+    public long save(Project p, List<ProjectSkill> skills, Long managerId) throws InvalidRequestException {
         if (p.getId() == null) {
             p.setAddTime(new Date());
             p.setManagerId(managerId);
             p.setStatus((byte) ProjectStatus.AUDIT.getCode());
             p.setFreeze(false);
             projectDao.insertSelective(p);
+
+
         } else {
             Project tmp = projectDao.selectByPrimaryKey(p.getId());
             if (!tmp.getManagerId().equals(managerId) || (tmp.getStatus().intValue() != ProjectStatus.AUDIT.getCode()
@@ -60,6 +72,14 @@ public class ProjectService {
                 throw new InvalidRequestException();
             }
             projectDao.updateByPrimaryKeySelective(p);
+
+        }
+        projectSkillDao.disable(p.getId());
+        if (CollectionUtils.isNotEmpty(skills)) {
+            for (ProjectSkill skill : skills) {
+                skill.setId(p.getId());
+                projectSkillDao.insertSelective(skill);
+            }
         }
         return p.getId();
     }

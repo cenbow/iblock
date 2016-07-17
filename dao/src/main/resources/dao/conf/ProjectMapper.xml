@@ -26,7 +26,6 @@
         <result column="max_pay" jdbcType="INTEGER" property="maxPay"/>
         <result column="district" jdbcType="VARCHAR" property="district"/>
         <result column="industry_age" jdbcType="INTEGER" property="industryAge"/>
-        <result column="skills" jdbcType="VARCHAR" property="skills"/>
         <result column="image" jdbcType="VARCHAR" property="image"/>
         <result column="start_time" jdbcType="TIMESTAMP" property="startTime"/>
         <result column="end_time" jdbcType="TIMESTAMP" property="endTime"/>
@@ -47,7 +46,7 @@
         -->
         id, industry, name, manager_id, agent_id, status, resident, city, min_pay, address,
         head_count, achievement_visable, add_time, update_time, hired, max_pay,
-        district, industry_age, skills, image, start_time, end_time, freeze
+        district, industry_age, image, start_time, end_time, freeze
     </sql>
     <sql id="Blob_Column_List">
         <!--
@@ -82,7 +81,7 @@
         address, head_count, achievement_visable,
         add_time, update_time, hired,
         max_pay, district,
-        industry_age, skills,
+        industry_age,
         image, start_time, end_time,
         `desc`, freeze)
         values (#{id,jdbcType=BIGINT}, #{industry,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR},
@@ -91,7 +90,7 @@
         #{address,jdbcType=VARCHAR}, #{headCount,jdbcType=INTEGER}, #{achievementVisable,jdbcType=BIT},
         #{addTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{hired,jdbcType=INTEGER},
         #{maxPay,jdbcType=INTEGER}, #{district,jdbcType=VARCHAR},
-        #{industryAge,jdbcType=INTEGER}, #{skills,jdbcType=VARCHAR},
+        #{industryAge,jdbcType=INTEGER},
         #{image,jdbcType=VARCHAR}, #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP},
         #{desc,jdbcType=LONGVARCHAR}, #{freeze,jdbcType=BIT})
     </insert>
@@ -159,9 +158,6 @@
             </if>
             <if test="industryAge != null">
                 industry_age,
-            </if>
-            <if test="skills != null">
-                skills,
             </if>
             <if test="image != null">
                 image,
@@ -233,9 +229,6 @@
             </if>
             <if test="industryAge != null">
                 #{industryAge,jdbcType=INTEGER},
-            </if>
-            <if test="skills != null">
-                #{skills,jdbcType=VARCHAR},
             </if>
             <if test="image != null">
                 #{image,jdbcType=VARCHAR},
@@ -313,9 +306,6 @@
             <if test="industryAge != null">
                 industry_age = #{industryAge,jdbcType=INTEGER},
             </if>
-            <if test="skills != null">
-                skills = #{skills,jdbcType=VARCHAR},
-            </if>
             <if test="image != null">
                 image = #{image,jdbcType=VARCHAR},
             </if>
@@ -356,7 +346,6 @@
         max_pay = #{maxPay,jdbcType=INTEGER},
         district = #{district,jdbcType=VARCHAR},
         industry_age = #{industryAge,jdbcType=INTEGER},
-        skills = #{skills,jdbcType=VARCHAR},
         image = #{image,jdbcType=VARCHAR},
         start_time = #{startTime,jdbcType=TIMESTAMP},
         end_time = #{endTime,jdbcType=TIMESTAMP},
@@ -388,7 +377,6 @@
         max_pay = #{maxPay,jdbcType=INTEGER},
         district = #{district,jdbcType=VARCHAR},
         industry_age = #{industryAge,jdbcType=INTEGER},
-        skills = #{skills,jdbcType=VARCHAR},
         image = #{image,jdbcType=VARCHAR},
         start_time = #{startTime,jdbcType=TIMESTAMP},
         end_time = #{endTime,jdbcType=TIMESTAMP}
@@ -407,6 +395,13 @@
             </if>
             <if test="status != null">
                 and status = #{status}
+            </if>
+            <if test="skill != null">
+                and id in (select DISTINCT project_id from PROJECT_SKILL where skill_id in
+                <foreach collection="skill" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+                )
             </if>
             <if test="minPay != null and maxPay == null">
                 and min_pay &lt; #{minPay} and max_pay &gt; #{minPay}
@@ -450,6 +445,13 @@
         </if>
         <if test="keyword != null">
             and `name` like CONCAT("%", #{keyword}, "%")
+        </if>
+        <if test="skill != null">
+            and id in (select DISTINCT project_id from PROJECT_SKILL where skill_id in
+            <foreach collection="skill" index="index" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+            )
         </if>
         <if test="status != null">
             and status = #{status}
