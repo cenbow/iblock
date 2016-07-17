@@ -4,6 +4,7 @@ import com.iblock.common.enums.CommonStatus;
 import com.iblock.common.utils.DateUtils;
 import com.iblock.dao.po.Project;
 import com.iblock.dao.po.ProjectSkill;
+import com.iblock.web.info.GeoInfo;
 import com.iblock.web.info.KVInfo;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
@@ -20,8 +21,7 @@ import java.util.List;
 public class ProjectCreateRequest {
 
     private String title;
-    private KVInfo city;
-    private String district;
+    private GeoInfo geo;
     private String description;
     private Integer headCount;
     private String image;
@@ -39,9 +39,10 @@ public class ProjectCreateRequest {
         project.setMaxPay(maxPay);
         project.setMinPay(minPay);
         project.setResident(isLongTerm);
-        project.setCity(city.getId());
+        project.setCity(geo.getCity().getId());
         project.setDesc(description);
-        project.setDistrict(district);
+        project.setAddress(geo.getAddress());
+        project.setDistrict(geo.getDistrict());
         project.setIndustryAge(industryAge);
         project.setEndTime(DateUtils.parse(endDate, "yyyy-MM-dd"));
         project.setStartTime(DateUtils.parse(startDate, "yyyy-MM-dd"));
