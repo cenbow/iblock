@@ -19,6 +19,7 @@ import java.util.List;
 @Data
 public class ProjectUpdateRequest {
 
+    private Long id;
     private String title;
     private KVInfo city;
     private String district;

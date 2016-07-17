@@ -84,12 +84,12 @@ public class ProjectController extends BaseController {
         return new CommonResponse<Long>(ResponseStatus.SYSTEM_ERROR);
     }
 
-    @RequestMapping(value = "/update/{projectid}", method = RequestMethod.POST, consumes = "application/json")
+    @RequestMapping(value = "/update", method = RequestMethod.POST, consumes = "application/json")
     @Auth(role = RoleConstant.MANAGER)
     @ResponseBody
-    public CommonResponse<Long> save(@RequestBody ProjectUpdateRequest project, @PathVariable("projectid") Long projectId) {
+    public CommonResponse<Long> save(@RequestBody ProjectUpdateRequest project) {
         try {
-            Project p = projectService.get(projectId);
+            Project p = projectService.get(project.getId());
             project.updateProject(p);
             p.setStatus((byte) ProjectStatus.AUDIT.getCode());
             long id = projectService.save(p, project.toSkills(), getUserInfo().getId());
