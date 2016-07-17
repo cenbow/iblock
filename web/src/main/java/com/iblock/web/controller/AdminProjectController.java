@@ -40,11 +40,11 @@ public class AdminProjectController extends BaseController {
     @RequestMapping(value = "/allnew", method = RequestMethod.POST, consumes = "application/json")
     @Auth(role = RoleConstant.ADMINISTRATOR)
     @ResponseBody
-    public CommonResponse<Page<Project>> search(@RequestBody PageRequest request) {
+    public CommonResponse<Page<Project>> search() {
         try {
             ProjectSearchBean bean = new ProjectSearchBean();
-            bean.setPageSize(request.getPageSize());
-            bean.setOffset((request.getPageNo() - 1) * request.getPageSize());
+            bean.setPageSize(9999);
+            bean.setOffset(0);
             return new CommonResponse<Page<Project>>(projectService.search(bean));
         } catch (Exception e) {
             log.error("admin search project error!", e);
