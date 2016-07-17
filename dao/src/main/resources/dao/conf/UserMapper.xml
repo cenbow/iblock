@@ -288,4 +288,15 @@
         where mobile=#{mobile}
         and status=1
     </select>
+
+    <select id="batchSelect" parameterMap="map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from USER
+        where id in
+        <foreach close=")" collection="ids" index="index" item="item" open="(" separator=",">
+            #{item}
+        </foreach>
+        and status=1
+    </select>
 </mapper>

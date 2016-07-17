@@ -4,17 +4,24 @@ import com.iblock.common.advice.Auth;
 import com.iblock.common.bean.Page;
 import com.iblock.common.bean.ProjectSearchBean;
 import com.iblock.common.enums.ProjectStatus;
+import com.iblock.dao.po.City;
+import com.iblock.dao.po.Industry;
 import com.iblock.dao.po.JobInterest;
 import com.iblock.dao.po.Project;
 import com.iblock.dao.po.ProjectSkill;
 import com.iblock.dao.po.ProjectSkillDetail;
+import com.iblock.dao.po.User;
 import com.iblock.service.bo.ProjectAcceptBo;
 import com.iblock.service.interest.JobInterestService;
+import com.iblock.service.meta.MetaService;
 import com.iblock.service.project.ProjectService;
+import com.iblock.service.user.UserService;
 import com.iblock.web.constant.RoleConstant;
 import com.iblock.web.enums.ResponseStatus;
+import com.iblock.web.info.GeoInfo;
 import com.iblock.web.info.KVInfo;
 import com.iblock.web.info.ProjectDetailInfo;
+import com.iblock.web.info.UserSimpleInfo;
 import com.iblock.web.request.PageRequest;
 import com.iblock.web.request.project.AcceptHiringRequest;
 import com.iblock.web.request.project.HireRequest;
@@ -35,6 +42,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -49,6 +57,10 @@ public class ProjectController extends BaseController {
     private ProjectService projectService;
     @Autowired
     private JobInterestService jobInterestService;
+    @Autowired
+    private MetaService metaService;
+    @Autowired
+    private UserService userService;
 
 
     @RequestMapping(value = "/new", method = RequestMethod.POST, consumes = "application/json")
@@ -102,11 +114,49 @@ public class ProjectController extends BaseController {
                 }
                 info.setSkills(list);
             }
+
+            City city = metaService.getCity(Arrays.asList(p.getCity())).get(0);
+            GeoInfo geo = new GeoInfo();
+            geo.setCity(new KVInfo(city.getCityId(), city.getCityName()));
+            info.setGeo(geo);
+
+            Industry industry = metaService.getIndustry(Arrays.asList(p.getIndustry())).get(0);
+            info.setIndustry(new KVInfo(industry.getId(), industry.getName()));
+
+            if (p.getManagerId() != null) {
+                info.setManager(getUser(p.getManagerId()));
+            }
+            if (p.getAgentId() != null) {
+                info.setBroker(getUser(p.getAgentId()));
+            }
+            List<User> designers = projectService.getDesigners(p.getId());
+            if (CollectionUtils.isNotEmpty(designers)) {
+                List<UserSimpleInfo> d = new ArrayList<UserSimpleInfo>();
+                for (User user : designers) {
+                    UserSimpleInfo u = new UserSimpleInfo();
+                    u.setUsername(user.getUserName());
+                    u.setAvatar(user.getHeadFigure());
+                    u.setId(user.getId());
+                    u.setRating(5);
+                    d.add(u);
+                }
+                info.setDesigner(d);
+            }
             return new CommonResponse<ProjectDetailInfo>(info);
         } catch (Exception e) {
             log.error("get project error!", e);
         }
         return new CommonResponse<ProjectDetailInfo>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    private UserSimpleInfo getUser(Long userId) {
+        User manager = userService.getUser(userId);
+        UserSimpleInfo u = new UserSimpleInfo();
+        u.setUsername(manager.getUserName());
+        u.setAvatar(manager.getHeadFigure());
+        u.setId(manager.getId());
+        u.setRating(5);
+        return u;
     }
 
     @RequestMapping(value = "/recommended", method = RequestMethod.POST, consumes = "application/json")

@@ -14,8 +14,6 @@ public class ProjectDetailInfo {
 
     private Long id;
     private String title;
-    private KVInfo city;
-    private String district;
     private String desc;
     private Integer headCount;
     private String image;
@@ -48,7 +46,6 @@ public class ProjectDetailInfo {
         info.setIndustryAge(p.getIndustryAge());
         info.setStatus(p.getStatus().intValue());
         info.setIsLongTerm(p.getResident());
-        info.setDistrict(p.getDistrict());
         info.setCreationDate(DateUtils.format(p.getAddTime(), "yyyy-MM-dd"));
         return info;
     }

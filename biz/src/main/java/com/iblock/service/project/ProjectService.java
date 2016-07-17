@@ -7,20 +7,17 @@ import com.iblock.common.enums.HireStatus;
 import com.iblock.common.enums.MessageAction;
 import com.iblock.common.enums.ProjectStatus;
 import com.iblock.common.enums.UserRole;
-import com.iblock.common.enums.WorkflowType;
 import com.iblock.common.exception.InnerLogicException;
 import com.iblock.common.exception.InvalidRequestException;
 import com.iblock.dao.ProjectDao;
 import com.iblock.dao.ProjectDesignerDao;
 import com.iblock.dao.ProjectSkillDao;
 import com.iblock.dao.UserDao;
-import com.iblock.dao.WorkflowLogDao;
 import com.iblock.dao.po.Project;
 import com.iblock.dao.po.ProjectDesigner;
 import com.iblock.dao.po.ProjectSkill;
 import com.iblock.dao.po.ProjectSkillDetail;
 import com.iblock.dao.po.User;
-import com.iblock.dao.po.WorkflowLog;
 import com.iblock.service.bo.ProjectAcceptBo;
 import com.iblock.service.message.MessageService;
 import org.apache.commons.collections.CollectionUtils;
@@ -29,6 +26,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +53,19 @@ public class ProjectService {
         return projectSkillDao.selectByProject(projectId);
     }
 
+
+    public List<User> getDesigners(Long project) {
+        List<ProjectDesigner> designers = projectDesignerDao.selectByProject(project);
+        List<User> list = new ArrayList<User>();
+        if (CollectionUtils.isEmpty(designers)) {
+            return list;
+        }
+        List<Long> ids = new ArrayList<Long>();
+        for (ProjectDesigner designer : designers) {
+            ids.add(designer.getDesignerId());
+        }
+        return userDao.batchSelect(ids);
+    }
     @Transactional
     public long save(Project p, List<ProjectSkill> skills, Long managerId) throws InvalidRequestException {
         if (p.getId() == null) {
@@ -207,6 +218,9 @@ public class ProjectService {
     }
 
     public Page<Project> search(ProjectSearchBean search) {
+        if (CollectionUtils.isEmpty(search.getSkill())) {
+            search.setSkill(null);
+        }
         List<Project> list = projectDao.list(search);
         int size = projectDao.size(search);
         return new Page<Project>(list, search.getOffset() / search.getPageSize() - 1, search.getPageSize(), size, search

@@ -23,10 +23,6 @@ public class JobInterestService {
 
     @Autowired
     private JobInterestDao jobInterestDao;
-    @Autowired
-    private CityDao cityDao;
-    @Autowired
-    private IndustryDao industryDao;
 
     public boolean addOrUpdate(JobInterest interest) {
         if (interest.getId() == null) {
@@ -40,33 +36,5 @@ public class JobInterestService {
 
     public JobInterest get(Long userId) {
         return jobInterestDao.selectByUser(userId);
-    }
-
-    public List<City> getCities(String ids) {
-        List<Integer> ii = new ArrayList<Integer>();
-        for (String s : ids.split(",")) {
-            if (StringUtils.isNotBlank(s)) {
-                ii.add(Integer.parseInt(s));
-            }
-        }
-        if (CollectionUtils.isEmpty(ii)) {
-            return new ArrayList<City>();
-        }
-        List<City> list = cityDao.selectByIds(ii);
-        return list == null ? new ArrayList<City>() : list;
-    }
-
-    public List<Industry> getIndusties(String ids) {
-        List<Integer> ii = new ArrayList<Integer>();
-        for (String s : ids.split(",")) {
-            if (StringUtils.isNotBlank(s)) {
-                ii.add(Integer.parseInt(s));
-            }
-        }
-        if (CollectionUtils.isEmpty(ii)) {
-            return new ArrayList<Industry>();
-        }
-        List<Industry> list = industryDao.selectByIds(ii);
-        return list == null ? new ArrayList<Industry>() : list;
     }
 }

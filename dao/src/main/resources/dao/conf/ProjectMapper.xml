@@ -453,9 +453,6 @@
             </foreach>
             )
         </if>
-        <if test="status != null">
-            and status = #{status}
-        </if>
         <if test="minPay != null and maxPay == null">
             and min_pay &lt; #{minPay} and max_pay &gt; #{minPay}
         </if>

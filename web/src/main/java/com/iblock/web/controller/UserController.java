@@ -16,6 +16,7 @@ import com.iblock.service.file.FileService;
 import com.iblock.service.interest.JobInterestService;
 import com.iblock.service.message.MessageService;
 import com.iblock.service.message.SMSService;
+import com.iblock.service.meta.MetaService;
 import com.iblock.service.user.UserService;
 import com.iblock.web.constant.CommonProperties;
 import com.iblock.web.constant.RoleConstant;
@@ -86,6 +87,8 @@ public class UserController extends BaseController {
 
     @Autowired
     protected SMSService smsService;
+    @Autowired
+    protected MetaService metaService;
 
     @RequestMapping(value = "/login", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
@@ -322,14 +325,26 @@ public class UserController extends BaseController {
             List<KVInfo> cities = new ArrayList<KVInfo>();
             List<KVInfo> industries = new ArrayList<KVInfo>();
             if (StringUtils.isNotBlank(interest.getCityList())) {
-                for (City city : jobInterestService.getCities(interest.getCityList())) {
+                List<Integer> list = new ArrayList<Integer>();
+                for (String s : interest.getCityList().split(",")) {
+                    if (StringUtils.isNotBlank(s)) {
+                        list.add(Integer.parseInt(s));
+                    }
+                }
+                for (City city : metaService.getCity(list)) {
                     cities.add(new KVInfo(city.getCityId(), city.getCityName()));
                 }
 
             }
 
             if (StringUtils.isNotBlank(interest.getJobTypeList())) {
-                for (Industry industry : jobInterestService.getIndusties(interest.getJobTypeList())) {
+                List<Integer> list = new ArrayList<Integer>();
+                for (String s : interest.getJobTypeList().split(",")) {
+                    if (StringUtils.isNotBlank(s)) {
+                        list.add(Integer.parseInt(s));
+                    }
+                }
+                for (Industry industry : metaService.getIndustry(list)) {
                     industries.add(new KVInfo(industry.getId(), industry.getName()));
                 }
 
