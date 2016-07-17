@@ -1,6 +1,7 @@
 package com.iblock.dao;
 
 import com.iblock.dao.po.Industry;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -49,7 +50,7 @@ public interface IndustryDao {
 
     List<Industry> selectByIds(List<Integer> ids);
 
-    Industry selectByName(String name);
+    Industry selectByName(@Param("name") String name);
 
-    List<Industry> selectByIdStr(String ids);
+    List<Industry> selectByIdStr(@Param("ids") String ids);
 }
