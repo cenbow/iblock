@@ -113,9 +113,9 @@ public class ProjectService {
     }
 
     @Transactional
-    public boolean start(long id, long agentId) throws InvalidRequestException {
+    public boolean start(long id, long managerId) throws InvalidRequestException {
         Project pro = projectDao.selectByPrimaryKey(id);
-        if (!pro.getAgentId().equals(agentId)) {
+        if (!pro.getManagerId().equals(managerId)) {
             throw new InvalidRequestException();
         }
         pro.setStatus((byte) ProjectStatus.ONGOING.getCode());
@@ -123,9 +123,9 @@ public class ProjectService {
     }
 
     @Transactional
-    public boolean end(long id, long agentId) throws InvalidRequestException, InnerLogicException, IOException {
+    public boolean end(long id, long managerId) throws InvalidRequestException, InnerLogicException, IOException {
         Project pro = projectDao.selectByPrimaryKey(id);
-        if (!pro.getAgentId().equals(agentId)) {
+        if (!pro.getManagerId().equals(managerId)) {
             throw new InvalidRequestException();
         }
         pro.setStatus((byte) ProjectStatus.FINISH.getCode());
