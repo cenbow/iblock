@@ -160,21 +160,6 @@ public class UserController extends BaseController {
         return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
     }
 
-    @RequestMapping(value = "/skills", method = RequestMethod.GET)
-    @ResponseBody
-    public CommonResponse<List<KVInfo>> skills() {
-        try {
-            List<KVInfo> result = new ArrayList<KVInfo>();
-            for (Skill skill : userService.getSkills()) {
-                result.add(new KVInfo(skill.getId(), skill.getName()));
-            }
-            return new CommonResponse<List<KVInfo>>(result);
-        } catch (Exception e) {
-            log.error("skills error!", e);
-        }
-        return new CommonResponse<List<KVInfo>>(ResponseStatus.SYSTEM_ERROR);
-    }
-
     @RequestMapping(value = "/info/{userId}", method = RequestMethod.GET)
     @Auth(role = RoleConstant.LOGIN)
     @ResponseBody

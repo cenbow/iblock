@@ -48,7 +48,11 @@ public class SMSService {
     }
 
     public boolean checkVerifyCode(String mobile, String code) {
-        return code.equals(redisUtils.fetch("verify_" + mobile));
+        boolean result = code.equals(redisUtils.fetch("verify_" + mobile));
+        if (result) {
+            redisUtils.rm("verify_" + mobile);
+        }
+        return result;
     }
 
     public String getRandomString(int length) {

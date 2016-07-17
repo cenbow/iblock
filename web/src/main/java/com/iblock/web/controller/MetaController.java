@@ -3,7 +3,11 @@ package com.iblock.web.controller;
 import com.iblock.common.advice.Auth;
 import com.iblock.dao.po.City;
 import com.iblock.dao.po.District;
+import com.iblock.dao.po.Industry;
+import com.iblock.dao.po.Skill;
 import com.iblock.service.meta.MetaService;
+import com.iblock.service.user.UserService;
+import com.iblock.web.constant.RoleConstant;
 import com.iblock.web.enums.ResponseStatus;
 import com.iblock.web.info.KVInfo;
 import com.iblock.web.response.CommonResponse;
@@ -30,6 +34,9 @@ public class MetaController extends BaseController {
 
     @Autowired
     private MetaService metaService;
+
+    @Autowired
+    private UserService userService;
 
     @RequestMapping(value = "/city/search", method = RequestMethod.GET)
     @ResponseBody
@@ -65,6 +72,32 @@ public class MetaController extends BaseController {
             log.error("search district error!", e);
         }
         return new CommonResponse<List<String>>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/skills/all", method = RequestMethod.GET)
+    @ResponseBody
+    public CommonResponse<List<KVInfo>> skills() {
+        try {
+            List<KVInfo> result = new ArrayList<KVInfo>();
+            for (Skill skill : userService.getSkills()) {
+                result.add(new KVInfo(skill.getId(), skill.getName()));
+            }
+            return new CommonResponse<List<KVInfo>>(result);
+        } catch (Exception e) {
+            log.error("skills error!", e);
+        }
+        return new CommonResponse<List<KVInfo>>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/industry/all", method = RequestMethod.GET)
+    @ResponseBody
+    public CommonResponse<List<Industry>> allIndustries() {
+        try {
+            return new CommonResponse<List<Industry>>(userService.getIndustries());
+        } catch (Exception e) {
+            log.error("get industries error!", e);
+        }
+        return new CommonResponse<List<Industry>>(ResponseStatus.SYSTEM_ERROR);
     }
 }
 
