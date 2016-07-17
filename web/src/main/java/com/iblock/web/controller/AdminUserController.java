@@ -6,10 +6,13 @@ import com.iblock.dao.po.User;
 import com.iblock.service.user.UserService;
 import com.iblock.web.constant.RoleConstant;
 import com.iblock.web.enums.ResponseStatus;
+import com.iblock.web.info.KVInfo;
+import com.iblock.web.info.KVLongInfo;
 import com.iblock.web.info.UserStatusInfo;
 import com.iblock.web.request.admin.AddUserRequest;
 import com.iblock.web.response.CommonResponse;
 import lombok.extern.log4j.Log4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,13 +21,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by baidu on 16/6/26.
  */
 
 @Controller
 @Log4j
-@RequestMapping("/user/admin")
+@RequestMapping("/admin/user")
 public class AdminUserController extends BaseController {
 
     @Autowired
@@ -125,5 +131,24 @@ public class AdminUserController extends BaseController {
             log.error("unfreeze error!", e);
         }
         return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/list/{role}", method = RequestMethod.GET)
+    @Auth(role = RoleConstant.ADMINISTRATOR)
+    @ResponseBody
+    public CommonResponse<List<KVLongInfo>> getRole(@PathVariable("role") Integer role) {
+        try {
+            List<User> users = userService.getUsersByRole(role);
+            List<KVLongInfo> result = new ArrayList<KVLongInfo>();
+            if(CollectionUtils.isNotEmpty(users)) {
+                for (User user : users) {
+                    result.add(new KVLongInfo(user.getId(), user.getUserName()));
+                }
+            }
+            return new CommonResponse<List<KVLongInfo>>(result);
+        } catch (Exception e) {
+            log.error("unfreeze error!", e);
+        }
+        return new CommonResponse<List<KVLongInfo>>(ResponseStatus.SYSTEM_ERROR);
     }
 }

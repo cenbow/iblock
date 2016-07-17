@@ -48,6 +48,10 @@ public class UserService {
         return userDao.selectByPrimaryKey(userId);
     }
 
+    public List<User> getUsersByRole(Integer role) {
+        return userDao.selectByRole(role);
+    }
+
     public UserDetail getUserDetail(Long userId) {
         return userDao.selectDetailById(userId);
     }

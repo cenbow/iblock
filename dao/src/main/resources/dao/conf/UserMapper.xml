@@ -289,6 +289,14 @@
         and status=1
     </select>
 
+    <select id="selectByRole" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from USER
+        where role=#{role}
+        and status=1
+    </select>
+
     <select id="batchSelect" parameterType="map" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
