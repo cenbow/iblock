@@ -74,7 +74,7 @@ public class MetaController extends BaseController {
         return new CommonResponse<List<String>>(ResponseStatus.SYSTEM_ERROR);
     }
 
-    @RequestMapping(value = "/skills/all", method = RequestMethod.GET)
+    @RequestMapping(value = "/skill/all", method = RequestMethod.GET)
     @ResponseBody
     public CommonResponse<List<KVInfo>> skills() {
         try {
