@@ -66,7 +66,6 @@ public class AdminProjectController extends BaseController {
             if (project == null || project.getStatus().intValue() != ProjectStatus.AUDIT.getCode()) {
                 return new CommonResponse<Boolean>(ResponseStatus.PARAM_ERROR, "不存在项目或者项目状态不正确");
             }
-            project.setStatus((byte) ProjectStatus.RECRUITING.getCode());
             project.setAgentId(request.getBroker());
             if (projectService.update(project)) {
                 return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);
