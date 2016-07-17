@@ -154,7 +154,7 @@
     from INDUSTRY
     where status=1
     <if test="ids != null">
-      and id in CONCAT("(",#{ids},")")
+      and id in (#{ids})
     </if>
   </select>
 </mapper>

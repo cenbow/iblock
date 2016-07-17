@@ -156,7 +156,7 @@
     from CITY
     where status=1
     <if test="ids != null">
-      and city_id in CONCAT("(",#{ids},")")
+      and city_id in (#{ids})
     </if>
   </select>
 </mapper>
