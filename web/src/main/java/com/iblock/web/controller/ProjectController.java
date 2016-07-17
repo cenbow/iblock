@@ -20,6 +20,7 @@ import com.iblock.web.constant.RoleConstant;
 import com.iblock.web.enums.ResponseStatus;
 import com.iblock.web.info.GeoInfo;
 import com.iblock.web.info.KVInfo;
+import com.iblock.web.info.KVLongInfo;
 import com.iblock.web.info.ProjectDetailInfo;
 import com.iblock.web.info.ProjectSimpleInfo;
 import com.iblock.web.info.UserSimpleInfo;
@@ -45,8 +46,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by baidu on 16/4/3.
@@ -223,18 +226,30 @@ public class ProjectController extends BaseController {
             List<Project> tmp = page.getResult();
             Map<Integer, String> cityMap = new HashMap<Integer, String>();
             Map<Integer, String> industryMap = new HashMap<Integer, String>();
-            List<Integer> cityIds = new ArrayList<Integer>();
-            List<Integer> industryIds = new ArrayList<Integer>();
+            Map<Long, String> userMap = new HashMap<Long, String>();
+            Set<Long> userIds = new HashSet<Long>();
+            Set<Integer> cityIds = new HashSet<Integer>();
+            Set<Integer> industryIds = new HashSet<Integer>();
             if (CollectionUtils.isNotEmpty(tmp)) {
                 for (Project p : tmp) {
                     cityIds.add(p.getCity());
                     industryIds.add(p.getIndustry());
+                    if (p.getManagerId() != null && !p.getManagerId().equals(0L)) {
+                        userIds.add(p.getManagerId());
+                    }
+                    if (p.getAgentId() != null && !p.getAgentId().equals(0L)) {
+                        userIds.add(p.getAgentId());
+                    }
                 }
-                for (City city : metaService.getCity(cityIds)) {
+                for (City city : metaService.getCity(new ArrayList<Integer>(cityIds))) {
                     cityMap.put(city.getCityId(), city.getCityName());
                 }
-                for (Industry industry : metaService.getIndustry(industryIds)) {
+                for (Industry industry : metaService.getIndustry(new ArrayList<Integer>(industryIds))) {
                     industryMap.put(industry.getId(), industry.getName());
+                }
+
+                for (User user : userService.batchGet(new ArrayList<Long>(userIds))) {
+                    userMap.put(user.getId(), user.getUserName());
                 }
             }
             List<ProjectSimpleInfo> list = new ArrayList<ProjectSimpleInfo>();
@@ -242,6 +257,12 @@ public class ProjectController extends BaseController {
                 ProjectSimpleInfo info = ProjectSimpleInfo.parse(p);
                 info.setCity(new KVInfo(p.getCity(), cityMap.get(p.getCity())));
                 info.setIndustry(new KVInfo(p.getIndustry(), industryMap.get(p.getIndustry())));
+                if (p.getManagerId() != null && !p.getManagerId().equals(0L)) {
+                    info.setManager(new KVLongInfo(p.getManagerId(), userMap.get(p.getManagerId())));
+                }
+                if (p.getAgentId() != null && !p.getAgentId().equals(0L)) {
+                    info.setManager(new KVLongInfo(p.getAgentId(), userMap.get(p.getAgentId())));
+                }
                 list.add(info);
             }
             Page<ProjectSimpleInfo> result = new Page<ProjectSimpleInfo>(list, page.getPageNo(), page.getPageSize(),

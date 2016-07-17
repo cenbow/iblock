@@ -6,6 +6,7 @@ import com.iblock.dao.po.User;
 import com.iblock.service.user.UserService;
 import com.iblock.web.constant.RoleConstant;
 import com.iblock.web.enums.ResponseStatus;
+import com.iblock.web.info.AdminUserInfo;
 import com.iblock.web.info.KVInfo;
 import com.iblock.web.info.KVLongInfo;
 import com.iblock.web.info.UserStatusInfo;
@@ -136,19 +137,23 @@ public class AdminUserController extends BaseController {
     @RequestMapping(value = "/list/{role}", method = RequestMethod.GET)
     @Auth(role = RoleConstant.ADMINISTRATOR)
     @ResponseBody
-    public CommonResponse<List<KVLongInfo>> getRole(@PathVariable("role") Integer role) {
+    public CommonResponse<List<AdminUserInfo>> getRole(@PathVariable("role") Integer role) {
         try {
             List<User> users = userService.getUsersByRole(role);
-            List<KVLongInfo> result = new ArrayList<KVLongInfo>();
+            List<AdminUserInfo> result = new ArrayList<AdminUserInfo>();
             if(CollectionUtils.isNotEmpty(users)) {
                 for (User user : users) {
-                    result.add(new KVLongInfo(user.getId(), user.getUserName()));
+                    AdminUserInfo info = new AdminUserInfo();
+                    info.setId(user.getId());
+                    info.setName(user.getUserName());
+                    info.setMobile(user.getMobile());
+                    result.add(info);
                 }
             }
-            return new CommonResponse<List<KVLongInfo>>(result);
+            return new CommonResponse<List<AdminUserInfo>>(result);
         } catch (Exception e) {
-            log.error("unfreeze error!", e);
+            log.error("admin list user error!", e);
         }
-        return new CommonResponse<List<KVLongInfo>>(ResponseStatus.SYSTEM_ERROR);
+        return new CommonResponse<List<AdminUserInfo>>(ResponseStatus.SYSTEM_ERROR);
     }
 }

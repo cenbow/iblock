@@ -13,6 +13,8 @@ public class ProjectSimpleInfo {
     private Long id;
     private String name;
     private String desc;
+    private KVLongInfo manager;
+    private KVLongInfo broker;
     private Integer status;
     private String startDate;
     private KVInfo city;

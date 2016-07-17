@@ -167,4 +167,8 @@ public class UserService {
         industry.setStatus((byte) CommonStatus.DELETE.getCode());
         return industryDao.updateByPrimaryKeySelective(industry) > 0;
     }
+
+    public List<User> batchGet(List<Long> ids) {
+        return userDao.batchSelect(ids);
+    }
 }
