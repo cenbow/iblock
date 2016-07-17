@@ -63,8 +63,6 @@ public class ProjectService {
             p.setStatus((byte) ProjectStatus.AUDIT.getCode());
             p.setFreeze(false);
             projectDao.insertSelective(p);
-
-
         } else {
             Project tmp = projectDao.selectByPrimaryKey(p.getId());
             if (!tmp.getManagerId().equals(managerId) || (tmp.getStatus().intValue() != ProjectStatus.AUDIT.getCode()
@@ -77,7 +75,7 @@ public class ProjectService {
         projectSkillDao.disable(p.getId());
         if (CollectionUtils.isNotEmpty(skills)) {
             for (ProjectSkill skill : skills) {
-                skill.setId(p.getId());
+                skill.setProjectId(p.getId());
                 projectSkillDao.insertSelective(skill);
             }
         }
