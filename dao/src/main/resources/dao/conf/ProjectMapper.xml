@@ -441,11 +441,26 @@
         from PROJECT
         <where>
         <if test="status != null">
-            status = #{status}
+            status in
+            <foreach collection="status" index="index" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
         </if>
+            <if test="managerId != null">
+                and manager_id=#{managerId}
+            </if>
+            <if test="agentId != null">
+                and agent_id=#{agentId}
+            </if>
         <if test="keyword != null">
             and `name` like CONCAT("%", #{keyword}, "%")
         </if>
+            <if test="ids != null">
+                and id in
+                <foreach collection="ids" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
         <if test="skill != null">
             and id in (select DISTINCT project_id from PROJECT_SKILL where skill_id in
             <foreach collection="skill" index="index" item="item" open="(" close=")" separator=",">

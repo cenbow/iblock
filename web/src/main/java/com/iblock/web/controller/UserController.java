@@ -22,6 +22,7 @@ import com.iblock.web.constant.CommonProperties;
 import com.iblock.web.constant.RoleConstant;
 import com.iblock.web.enums.ResponseStatus;
 import com.iblock.web.info.AddWorkExperienceInfo;
+import com.iblock.web.info.AdminUserInfo;
 import com.iblock.web.info.GeoInfo;
 import com.iblock.web.info.IdRequestInfo;
 import com.iblock.web.info.JobInterestInfo;
@@ -513,5 +514,28 @@ public class UserController extends BaseController {
             log.error("resetMobile error!", e);
         }
         return new CommonResponse<Void>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/list/{role}", method = RequestMethod.GET)
+    @Auth(role = RoleConstant.ADMINISTRATOR)
+    @ResponseBody
+    public CommonResponse<List<AdminUserInfo>> getRole(@PathVariable("role") Integer role) {
+        try {
+            List<User> users = userService.getUsersByRole(role);
+            List<AdminUserInfo> result = new ArrayList<AdminUserInfo>();
+            if(CollectionUtils.isNotEmpty(users)) {
+                for (User user : users) {
+                    AdminUserInfo info = new AdminUserInfo();
+                    info.setId(user.getId());
+                    info.setName(user.getUserName());
+                    info.setMobile(user.getMobile());
+                    result.add(info);
+                }
+            }
+            return new CommonResponse<List<AdminUserInfo>>(result);
+        } catch (Exception e) {
+            log.error("admin list user error!", e);
+        }
+        return new CommonResponse<List<AdminUserInfo>>(ResponseStatus.SYSTEM_ERROR);
     }
 }

@@ -53,6 +53,10 @@ public class ProjectService {
         return projectSkillDao.selectByProject(projectId);
     }
 
+    public List<ProjectDesigner> getProjectDesigner(Long userId) {
+        return projectDesignerDao.selectByDesigner(userId);
+    }
+
 
     public List<User> getDesigners(Long project) {
         List<ProjectDesigner> designers = projectDesignerDao.selectByProject(project);
@@ -146,9 +150,9 @@ public class ProjectService {
     }
 
     @Transactional
-    public boolean completeHire(long id, long agentId) throws InvalidRequestException {
+    public boolean completeHire(long id, long manager) throws InvalidRequestException {
         Project pro = projectDao.selectByPrimaryKey(id);
-        if (!pro.getAgentId().equals(agentId)) {
+        if (!pro.getManagerId().equals(manager)) {
             throw new InvalidRequestException();
         }
         pro.setStatus((byte) ProjectStatus.READY.getCode());
@@ -156,10 +160,11 @@ public class ProjectService {
     }
 
     @Transactional
-    public boolean hire(long id, long userId, long agentId) throws InvalidRequestException, InnerLogicException, IOException {
+    public boolean hire(long id, long userId, long opId) throws InvalidRequestException, InnerLogicException,
+            IOException {
         Project pro = projectDao.selectByPrimaryKey(id);
-        if (!pro.getAgentId().equals(agentId)) {
-            throw new InvalidRequestException("you have no auth, agent id is wrong");
+        if (!pro.getAgentId().equals(opId) || !pro.getManagerId().equals(opId)) {
+            throw new InvalidRequestException("you have no auth, agent id or manager id is wrong");
         }
         if (pro.getStatus().intValue() != ProjectStatus.RECRUITING.getCode()) {
             throw new InvalidRequestException("project status is wrong, hire is not allowed");

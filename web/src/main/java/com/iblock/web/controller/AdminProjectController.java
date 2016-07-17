@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -61,7 +62,7 @@ public class AdminProjectController extends BaseController {
             ProjectSearchBean bean = new ProjectSearchBean();
             bean.setPageSize(9999);
             bean.setOffset(0);
-            bean.setStatus(ProjectStatus.AUDIT.getCode());
+            bean.setStatus(Arrays.asList(ProjectStatus.AUDIT.getCode()));
             Page<Project> page = projectService.search(bean);
 
             List<Project> tmp = page.getResult();

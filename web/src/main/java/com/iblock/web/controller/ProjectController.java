@@ -4,10 +4,12 @@ import com.iblock.common.advice.Auth;
 import com.iblock.common.bean.Page;
 import com.iblock.common.bean.ProjectSearchBean;
 import com.iblock.common.enums.ProjectStatus;
+import com.iblock.common.enums.UserRole;
 import com.iblock.dao.po.City;
 import com.iblock.dao.po.Industry;
 import com.iblock.dao.po.JobInterest;
 import com.iblock.dao.po.Project;
+import com.iblock.dao.po.ProjectDesigner;
 import com.iblock.dao.po.ProjectSkill;
 import com.iblock.dao.po.ProjectSkillDetail;
 import com.iblock.dao.po.User;
@@ -27,6 +29,7 @@ import com.iblock.web.info.UserSimpleInfo;
 import com.iblock.web.request.PageRequest;
 import com.iblock.web.request.project.AcceptHiringRequest;
 import com.iblock.web.request.project.HireRequest;
+import com.iblock.web.request.project.MyProjectSearchRequest;
 import com.iblock.web.request.project.ProjectCreateRequest;
 import com.iblock.web.request.project.ProjectIdRequest;
 import com.iblock.web.request.project.ProjectSearchRequest;
@@ -175,7 +178,7 @@ public class ProjectController extends BaseController {
             bean.setPageSize(request.getPageSize());
             bean.setOffset((request.getPageNo() - 1) * request.getPageSize());
             bean.setFreeze(false);
-            bean.setStatus(ProjectStatus.RECRUITING.getCode());
+            bean.setStatus(Arrays.asList(ProjectStatus.RECRUITING.getCode()));
             if (interest != null) {
                 bean.setResident(interest.getResident());
                 bean.setMinPay(interest.getStartPay());
@@ -210,7 +213,7 @@ public class ProjectController extends BaseController {
             bean.setOffset((request.getPageNo() - 1) * request.getPageSize());
             bean.setPageSize(request.getPageSize());
             bean.setFreeze(false);
-            bean.setStatus(ProjectStatus.RECRUITING.getCode());
+            bean.setStatus(Arrays.asList(ProjectStatus.RECRUITING.getCode()));
             return new CommonResponse<Page<Project>>(projectService.search(bean));
         } catch (Exception e) {
             log.error("latest project error!", e);
@@ -223,52 +226,41 @@ public class ProjectController extends BaseController {
     public CommonResponse<Page<ProjectSimpleInfo>> search(@RequestBody ProjectSearchRequest request) {
         try {
             Page<Project> page = projectService.search(request.toBean());
-            List<Project> tmp = page.getResult();
-            Map<Integer, String> cityMap = new HashMap<Integer, String>();
-            Map<Integer, String> industryMap = new HashMap<Integer, String>();
-            Map<Long, String> userMap = new HashMap<Long, String>();
-            Set<Long> userIds = new HashSet<Long>();
-            Set<Integer> cityIds = new HashSet<Integer>();
-            Set<Integer> industryIds = new HashSet<Integer>();
-            if (CollectionUtils.isNotEmpty(tmp)) {
-                for (Project p : tmp) {
-                    cityIds.add(p.getCity());
-                    industryIds.add(p.getIndustry());
-                    if (p.getManagerId() != null && !p.getManagerId().equals(0L)) {
-                        userIds.add(p.getManagerId());
-                    }
-                    if (p.getAgentId() != null && !p.getAgentId().equals(0L)) {
-                        userIds.add(p.getAgentId());
-                    }
-                }
-                for (City city : metaService.getCity(new ArrayList<Integer>(cityIds))) {
-                    cityMap.put(city.getCityId(), city.getCityName());
-                }
-                for (Industry industry : metaService.getIndustry(new ArrayList<Integer>(industryIds))) {
-                    industryMap.put(industry.getId(), industry.getName());
-                }
+            return new CommonResponse<Page<ProjectSimpleInfo>>(buildProjects(page));
+        } catch (Exception e) {
+            log.error("search project error!", e);
+        }
+        return new CommonResponse<Page<ProjectSimpleInfo>>(ResponseStatus.SYSTEM_ERROR);
+    }
 
-                for (User user : userService.batchGet(new ArrayList<Long>(userIds))) {
-                    userMap.put(user.getId(), user.getUserName());
+    @RequestMapping(value = "/myproject", method = RequestMethod.POST, consumes = "application/json")
+    @Auth
+    @ResponseBody
+    public CommonResponse<Page<ProjectSimpleInfo>> myProject(@RequestBody MyProjectSearchRequest request) {
+        try {
+            ProjectSearchBean bean = new ProjectSearchBean();
+            if (getUserInfo().getRole() == UserRole.MANAGER.getRole()) {
+                bean.setManagerId(getUserInfo().getId());
+            }else if (getUserInfo().getRole() == UserRole.AGENT.getRole()) {
+                bean.setAgentId(getUserInfo().getId());
+            } else if (getUserInfo().getRole() == UserRole.DESIGNER.getRole()) {
+                List<ProjectDesigner> projectDesigners = projectService.getProjectDesigner(getUserInfo().getId());
+                if (CollectionUtils.isEmpty(projectDesigners)) {
+                    return new CommonResponse<Page<ProjectSimpleInfo>>(new Page<ProjectSimpleInfo>(new
+                            ArrayList<ProjectSimpleInfo>(), request.getPageNo(), request.getPageSize(), 0));
                 }
+                List<Long> ids = new ArrayList<Long>();
+                for (ProjectDesigner pd : projectDesigners) {
+                    ids.add(pd.getProjectId());
+                }
+                bean.setIds(ids);
             }
-            List<ProjectSimpleInfo> list = new ArrayList<ProjectSimpleInfo>();
-            for (Project p : tmp) {
-                ProjectSimpleInfo info = ProjectSimpleInfo.parse(p);
-                info.setCity(new KVInfo(p.getCity(), cityMap.get(p.getCity())));
-                info.setIndustry(new KVInfo(p.getIndustry(), industryMap.get(p.getIndustry())));
-                if (p.getManagerId() != null && !p.getManagerId().equals(0L)) {
-                    info.setManager(new KVLongInfo(p.getManagerId(), userMap.get(p.getManagerId())));
-                }
-                if (p.getAgentId() != null && !p.getAgentId().equals(0L)) {
-                    info.setManager(new KVLongInfo(p.getAgentId(), userMap.get(p.getAgentId())));
-                }
-                list.add(info);
-            }
-            Page<ProjectSimpleInfo> result = new Page<ProjectSimpleInfo>(list, page.getPageNo(), page.getPageSize(),
-                    page.getTotalCount());
 
-            return new CommonResponse<Page<ProjectSimpleInfo>>(result);
+            if (CollectionUtils.isNotEmpty(request.getStatus())) {
+                bean.setStatus(request.getStatus());
+            }
+            Page<Project> page = projectService.search(bean);
+            return new CommonResponse<Page<ProjectSimpleInfo>>(buildProjects(page));
         } catch (Exception e) {
             log.error("search project error!", e);
         }
@@ -351,7 +343,7 @@ public class ProjectController extends BaseController {
     }
 
     @RequestMapping(value = "/hire", method = RequestMethod.POST, consumes = "application/json")
-    @Auth(role = RoleConstant.AGENT)
+    @Auth(role = RoleConstant.AGENT + "," + RoleConstant.MANAGER)
     @ResponseBody
     public CommonResponse<Boolean> hire(@RequestBody HireRequest request) {
         try {
@@ -380,5 +372,50 @@ public class ProjectController extends BaseController {
         return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
     }
 
+    private Page<ProjectSimpleInfo> buildProjects(Page<Project> page) {
+        List<Project> tmp = page.getResult();
+        Map<Integer, String> cityMap = new HashMap<Integer, String>();
+        Map<Integer, String> industryMap = new HashMap<Integer, String>();
+        Map<Long, String> userMap = new HashMap<Long, String>();
+        Set<Long> userIds = new HashSet<Long>();
+        Set<Integer> cityIds = new HashSet<Integer>();
+        Set<Integer> industryIds = new HashSet<Integer>();
+        if (CollectionUtils.isNotEmpty(tmp)) {
+            for (Project p : tmp) {
+                cityIds.add(p.getCity());
+                industryIds.add(p.getIndustry());
+                if (p.getManagerId() != null && !p.getManagerId().equals(0L)) {
+                    userIds.add(p.getManagerId());
+                }
+                if (p.getAgentId() != null && !p.getAgentId().equals(0L)) {
+                    userIds.add(p.getAgentId());
+                }
+            }
+            for (City city : metaService.getCity(new ArrayList<Integer>(cityIds))) {
+                cityMap.put(city.getCityId(), city.getCityName());
+            }
+            for (Industry industry : metaService.getIndustry(new ArrayList<Integer>(industryIds))) {
+                industryMap.put(industry.getId(), industry.getName());
+            }
 
+            for (User user : userService.batchGet(new ArrayList<Long>(userIds))) {
+                userMap.put(user.getId(), user.getUserName());
+            }
+        }
+        List<ProjectSimpleInfo> list = new ArrayList<ProjectSimpleInfo>();
+        for (Project p : tmp) {
+            ProjectSimpleInfo info = ProjectSimpleInfo.parse(p);
+            info.setCity(new KVInfo(p.getCity(), cityMap.get(p.getCity())));
+            info.setIndustry(new KVInfo(p.getIndustry(), industryMap.get(p.getIndustry())));
+            if (p.getManagerId() != null && !p.getManagerId().equals(0L)) {
+                info.setManager(new KVLongInfo(p.getManagerId(), userMap.get(p.getManagerId())));
+            }
+            if (p.getAgentId() != null && !p.getAgentId().equals(0L)) {
+                info.setManager(new KVLongInfo(p.getAgentId(), userMap.get(p.getAgentId())));
+            }
+            list.add(info);
+        }
+        return new Page<ProjectSimpleInfo>(list, page.getPageNo(), page.getPageSize(),
+                page.getTotalCount());
+    }
 }

@@ -6,6 +6,7 @@ import com.iblock.web.info.KVInfo;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -27,7 +28,7 @@ public class ProjectSearchRequest {
         ProjectSearchBean bean = new ProjectSearchBean();
         bean.setOffset((pageNo - 1) * pageSize);
         bean.setPageSize(pageSize);
-        bean.setStatus(ProjectStatus.RECRUITING.getCode());
+        bean.setStatus(Arrays.asList(ProjectStatus.RECRUITING.getCode()));
         if (skill != null) {
             List<Integer> list = new ArrayList<Integer>();
             for (KVInfo kv : skill) {

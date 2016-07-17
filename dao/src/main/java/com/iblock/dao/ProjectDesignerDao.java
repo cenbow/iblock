@@ -49,4 +49,6 @@ public interface ProjectDesignerDao {
     ProjectDesigner selectByProjectAndDesigner(@Param("project") Long project, @Param("designer") Long designer);
 
     List<ProjectDesigner> selectByProject(@Param("project") Long project);
+
+    List<ProjectDesigner> selectByDesigner(@Param("designer") Long designer);
 }

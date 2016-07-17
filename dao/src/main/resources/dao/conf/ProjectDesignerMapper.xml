@@ -152,4 +152,12 @@
     where project_id=#{project}
     and status = 2
   </select>
+
+  <select id="selectByDesigner" resultMap="BaseResultMap" parameterType="map">
+    select
+    <include refid="Base_Column_List" />
+    from PROJECT_DESIGNER
+    where designer_id=#{designer}
+    and status=2
+  </select>
 </mapper>
