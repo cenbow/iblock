@@ -47,7 +47,7 @@ public class JobInterestService {
     }
 
     public List<Industry> getIndusties(String ids) {
-        List<Industry> list = industryDao.selectByIds(ids);
+        List<Industry> list = industryDao.selectByIdStr(ids);
         return list == null ? new ArrayList<Industry>() : list;
     }
 }

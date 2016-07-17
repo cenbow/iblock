@@ -51,5 +51,5 @@ public interface IndustryDao {
 
     Industry selectByName(String name);
 
-    List<Industry> selectByIds(String ids);
+    List<Industry> selectByIdStr(String ids);
 }

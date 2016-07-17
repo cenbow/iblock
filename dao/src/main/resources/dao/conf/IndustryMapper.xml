@@ -148,7 +148,7 @@
     and name = #{name}
   </select>
 
-  <select id="selectByIds" resultMap="BaseResultMap" parameterType="map" >
+  <select id="selectByIdStr" resultMap="BaseResultMap" parameterType="map" >
     select
     <include refid="Base_Column_List" />
     from INDUSTRY
