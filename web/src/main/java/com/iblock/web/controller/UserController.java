@@ -57,6 +57,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -398,7 +399,10 @@ public class UserController extends BaseController {
             }
             List<WorkExperienceInfo> list = new ArrayList<WorkExperienceInfo>();
             for (WorkExperience experience : experiences) {
-                list.add(WorkExperienceInfo.parse(experience));
+                WorkExperienceInfo i = WorkExperienceInfo.parse(experience);
+                Industry industry = userService.getIndustryByIds(experience.getIndustry().toString()).get(0);
+                i.setIndustry(new KVInfo(industry.getId(), industry.getName()));
+                list.add(i);
             }
             info.setExperiences(list);
             return new CommonResponse<WorkExperienceResultInfo>(info);

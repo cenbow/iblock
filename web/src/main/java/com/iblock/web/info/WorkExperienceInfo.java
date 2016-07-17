@@ -19,8 +19,6 @@ public class WorkExperienceInfo {
         info.setDesc(experience.getDesc());
         info.setTime(experience.getYear());
         info.setId(experience.getId());
-        // todo industry name
-        info.setIndustry(new KVInfo(experience.getIndustry(), "行业"));
         return info;
     }
 }
