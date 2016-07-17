@@ -37,7 +37,7 @@ public class AdminProjectController extends BaseController {
     @Autowired
     private UserService userService;
 
-    @RequestMapping(value = "/allnew", method = RequestMethod.POST, consumes = "application/json")
+    @RequestMapping(value = "/allnew", method = RequestMethod.GET)
     @Auth(role = RoleConstant.ADMINISTRATOR)
     @ResponseBody
     public CommonResponse<Page<Project>> search() {
@@ -45,6 +45,7 @@ public class AdminProjectController extends BaseController {
             ProjectSearchBean bean = new ProjectSearchBean();
             bean.setPageSize(9999);
             bean.setOffset(0);
+            bean.setStatus(ProjectStatus.AUDIT.getCode());
             return new CommonResponse<Page<Project>>(projectService.search(bean));
         } catch (Exception e) {
             log.error("admin search project error!", e);
