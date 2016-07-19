@@ -313,6 +313,19 @@ public class ProjectController extends BaseController {
         return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
     }
 
+    @RequestMapping(value = "/applyJob", method = RequestMethod.POST, consumes = "application/json")
+    @Auth(role = RoleConstant.DESIGNER)
+    @ResponseBody
+    public CommonResponse<Boolean> applyJob(@RequestBody ProjectIdRequest request) {
+        try {
+            projectService.applyJob(request.getId(), getUserInfo().getId());
+            return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);
+        } catch (Exception e) {
+            log.error("applyJob error!", e);
+        }
+        return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
+    }
+
     @RequestMapping(value = "/start", method = RequestMethod.POST, consumes = "application/json")
     @Auth(role = RoleConstant.MANAGER)
     @ResponseBody

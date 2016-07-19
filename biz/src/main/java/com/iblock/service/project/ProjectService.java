@@ -160,6 +160,16 @@ public class ProjectService {
     }
 
     @Transactional
+    public void applyJob(long id, long designer) throws InvalidRequestException, InnerLogicException, IOException {
+        Map<String, String> params = new HashMap<String, String>();
+        Project p = projectDao.selectByPrimaryKey(id);
+        messageService.send(-1L, p.getManagerId(), MessageAction.APPLY_JOB, null, null, designer, p, params);
+        if (p.getAgentId() != null) {
+            messageService.send(-1L, p.getAgentId(), MessageAction.APPLY_JOB, null, null, designer, p, params);
+        }
+    }
+
+    @Transactional
     public boolean hire(long id, long userId, long opId) throws InvalidRequestException, InnerLogicException,
             IOException {
         Project pro = projectDao.selectByPrimaryKey(id);
