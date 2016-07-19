@@ -21,5 +21,7 @@ public class UserDisplayInfo implements Serializable {
     private GeoInfo geo;
     private List<SkillInfo> skills;
     private String avatar;
+    private String corporateName;
+    private String corporateBio;
 
 }

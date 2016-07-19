@@ -2,6 +2,7 @@ package com.iblock.web.controller;
 
 import com.iblock.common.advice.Auth;
 import com.iblock.common.enums.Education;
+import com.iblock.common.enums.UserRole;
 import com.iblock.dao.po.City;
 import com.iblock.dao.po.Industry;
 import com.iblock.dao.po.JobInterest;
@@ -194,6 +195,11 @@ public class UserController extends BaseController {
             UserGeo geo = userService.getUserGeo(userId);
             if (geo != null) {
                 info.setGeo(GeoInfo.parse(userService.getUserGeo(userId)));
+            }
+            if (user.getRole().intValue() == UserRole.MANAGER.getRole()) {
+                Manager manager = userService.getManager(userId);
+                info.setCorporateBio(manager.getDesc());
+                info.setCorporateName(manager.getCompanyName());
             }
             return new CommonResponse<UserDisplayInfo>(info);
         } catch (Exception e) {
