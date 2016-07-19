@@ -11,10 +11,12 @@ import com.iblock.common.exception.InnerLogicException;
 import com.iblock.common.exception.InvalidRequestException;
 import com.iblock.dao.ProjectDao;
 import com.iblock.dao.ProjectDesignerDao;
+import com.iblock.dao.ProjectRatingDao;
 import com.iblock.dao.ProjectSkillDao;
 import com.iblock.dao.UserDao;
 import com.iblock.dao.po.Project;
 import com.iblock.dao.po.ProjectDesigner;
+import com.iblock.dao.po.ProjectRating;
 import com.iblock.dao.po.ProjectSkill;
 import com.iblock.dao.po.ProjectSkillDetail;
 import com.iblock.dao.po.User;
@@ -48,6 +50,33 @@ public class ProjectService {
     private MessageService messageService;
     @Autowired
     private ProjectSkillDao projectSkillDao;
+    @Autowired
+    private ProjectRatingDao projectRatingDao;
+
+    public boolean rate(Long projectId, Integer rating, Long userId) {
+        Project p = projectDao.selectByPrimaryKey(projectId);
+        if (p.getStatus().intValue() != ProjectStatus.FINISH.getCode()) {
+            return false;
+        }
+        if (CollectionUtils.isNotEmpty(projectRatingDao.selectByProjectAndUser(projectId, userId))) {
+            return false;
+        }
+        ProjectRating projectRating = new ProjectRating();
+        projectRating.setOperator(userId);
+        projectRating.setProjectId(projectId);
+        projectRating.setStatus((byte) CommonStatus.NORMAL.getCode());
+        projectRating.setRating(rating);
+        projectRating.setAddTime(new Date());
+        return projectRatingDao.insertSelective(projectRating) > 0;
+    }
+
+    public double getRating(Long projectId) {
+        Double d = projectRatingDao.selectAVG(projectId);
+        if (d == null) {
+            return 5;
+        }
+        return d;
+    }
 
     public List<ProjectSkillDetail> getSkills(Long projectId) {
         return projectSkillDao.selectByProject(projectId);

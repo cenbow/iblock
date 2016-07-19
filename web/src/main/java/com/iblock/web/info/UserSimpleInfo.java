@@ -10,5 +10,5 @@ public class UserSimpleInfo {
     private Long id;
     private String username;
     private String avatar;
-    private float rating;
+    private double rating;
 }

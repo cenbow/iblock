@@ -7,13 +7,16 @@ import com.iblock.dao.ManagerDao;
 import com.iblock.dao.SkillDao;
 import com.iblock.dao.UserDao;
 import com.iblock.dao.UserGeoDao;
+import com.iblock.dao.UserRatingDao;
 import com.iblock.dao.po.Industry;
 import com.iblock.dao.po.Manager;
 import com.iblock.dao.po.Skill;
 import com.iblock.dao.po.User;
 import com.iblock.dao.po.UserDetail;
 import com.iblock.dao.po.UserGeo;
+import com.iblock.dao.po.UserRating;
 import com.iblock.service.bo.UserUpdateBo;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,6 +42,26 @@ public class UserService {
     private SkillDao skillDao;
     @Autowired
     private IndustryDao industryDao;
+    @Autowired
+    private UserRatingDao userRatingDao;
+
+    public boolean rate(Long userId, Integer rating, Long operator) {
+        UserRating userRating = new UserRating();
+        userRating.setOperator(operator);
+        userRating.setUserId(userId);
+        userRating.setStatus((byte) CommonStatus.NORMAL.getCode());
+        userRating.setRating(rating);
+        userRating.setAddTime(new Date());
+        return userRatingDao.insertSelective(userRating) > 0;
+    }
+
+    public double getRating(Long userId) {
+        Double d = userRatingDao.selectAVG(userId);
+        if (d == null) {
+            return 5;
+        }
+        return d;
+    }
 
     public User login(String userName, String password) {
         return userDao.selectUser(userName, password);

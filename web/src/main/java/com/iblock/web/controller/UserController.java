@@ -182,7 +182,7 @@ public class UserController extends BaseController {
             if (user.getEducation() != null) {
                 info.setEducation(new KVInfo(user.getEducation(), Education.getByCode(user.getEducation()).getMsg()));
             }
-            info.setRating(5);
+            info.setRating(userService.getRating(userId));
             info.setContactPhone(user.getMobile());
             info.setOnline(user.getOnline());
             if (StringUtils.isNotBlank(user.getSkills())) {

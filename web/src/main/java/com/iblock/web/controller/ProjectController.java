@@ -32,6 +32,7 @@ import com.iblock.web.request.project.HireRequest;
 import com.iblock.web.request.project.MyProjectSearchRequest;
 import com.iblock.web.request.project.ProjectCreateRequest;
 import com.iblock.web.request.project.ProjectIdRequest;
+import com.iblock.web.request.project.ProjectRatingRequest;
 import com.iblock.web.request.project.ProjectSearchRequest;
 import com.iblock.web.request.project.ProjectUpdateRequest;
 import com.iblock.web.response.CommonResponse;
@@ -48,6 +49,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -71,6 +73,32 @@ public class ProjectController extends BaseController {
     @Autowired
     private UserService userService;
 
+    @RequestMapping(value = "/rate", method = RequestMethod.POST, consumes = "application/json")
+    @Auth(role = RoleConstant.MANAGER)
+    @ResponseBody
+    public CommonResponse<Void> rate(@RequestBody ProjectRatingRequest request) {
+        try {
+            if (projectService.rate(request.getId(), request.getRating(), getUserInfo().getId())) {
+                return new CommonResponse<Void>(ResponseStatus.SUCCESS);
+            } else {
+                return new CommonResponse<Void>(ResponseStatus.PARAM_ERROR, "评分失败，项目未完结");
+            }
+        } catch (Exception e) {
+            log.error("rate project error!", e);
+        }
+        return new CommonResponse<Void>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/score", method = RequestMethod.GET)
+    @ResponseBody
+    public CommonResponse<Double> score() {
+        try {
+            return new CommonResponse<Double>(projectService.getRating(1L));
+        } catch (Exception e) {
+            log.error("get rating error!", e);
+        }
+        return new CommonResponse<Double>(ResponseStatus.SYSTEM_ERROR);
+    }
 
     @RequestMapping(value = "/new", method = RequestMethod.POST, consumes = "application/json")
     @Auth(role = RoleConstant.MANAGER)
@@ -145,7 +173,7 @@ public class ProjectController extends BaseController {
                     u.setUsername(user.getUserName());
                     u.setAvatar(user.getHeadFigure());
                     u.setId(user.getId());
-                    u.setRating(5);
+                    u.setRating(userService.getRating(user.getId()));
                     d.add(u);
                 }
                 info.setDesigner(d);
@@ -164,7 +192,7 @@ public class ProjectController extends BaseController {
             u.setUsername(user.getUserName());
             u.setAvatar(user.getHeadFigure());
             u.setId(user.getId());
-            u.setRating(5);
+            u.setRating(userService.getRating(user.getId()));
         }
         return u;
     }

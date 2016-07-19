@@ -15,12 +15,25 @@
         <javaClientGenerator targetPackage="com.iblock.dao"
                              targetProject="dao/src/main/java" type="XMLMAPPER"/>
 
-        <table schema="MS-USER" tableName="PROJECT_SKILL" domainObjectName="ProjectSkill"
+        <table schema="MS-USER" tableName="PROJECT_RATING" domainObjectName="ProjectRating"
                enableInsert="true" enableSelectByPrimaryKey="true"
                enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
                enableSelectByExample="false" enableDeleteByExample="false"
                enableCountByExample="false" enableUpdateByExample="false">
         </table>
+
+        <table schema="MS-USER" tableName="USER_RATING" domainObjectName="UserRating"
+               enableInsert="true" enableSelectByPrimaryKey="true"
+               enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"
+               enableSelectByExample="false" enableDeleteByExample="false"
+               enableCountByExample="false" enableUpdateByExample="false">
+        </table>
+        <!--<table schema="MS-USER" tableName="PROJECT_SKILL" domainObjectName="ProjectSkill"-->
+               <!--enableInsert="true" enableSelectByPrimaryKey="true"-->
+               <!--enableUpdateByPrimaryKey="true" enableDeleteByPrimaryKey="false"-->
+               <!--enableSelectByExample="false" enableDeleteByExample="false"-->
+               <!--enableCountByExample="false" enableUpdateByExample="false">-->
+        <!--</table>-->
 
         <!--<table schema="MS-USER" tableName="ACHIEVEMENT" domainObjectName="Achievement"-->
         <!--enableInsert="true" enableSelectByPrimaryKey="true"-->
