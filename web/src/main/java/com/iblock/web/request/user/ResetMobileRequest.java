@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class ResetMobileRequest {
 
-    private String mobile;
+    private String phone;
     private String verifyCode;
     private String password;
 }

@@ -477,45 +477,6 @@ public class UserController extends BaseController {
         return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
     }
 
-    @RequestMapping(value = "/account/resetPassword", method = RequestMethod.POST)
-    @Auth
-    @ResponseBody
-    public CommonResponse<Void> modifyPassword(@RequestBody ModifyPasswordRequest request) {
-        try {
-            User user = userService.getUser(getUserInfo().getId());
-            if (!request.getOldpassword().equals(user.getPassword())) {
-                return new CommonResponse<Void>(ResponseStatus.PARAM_ERROR, "旧密码输入错误");
-            }
-            user.setPassword(request.getNewpassword());
-            userService.update(user);
-            return new CommonResponse<Void>(ResponseStatus.SUCCESS);
-        } catch (Exception e) {
-            log.error("modifyPassword error!", e);
-        }
-        return new CommonResponse<Void>(ResponseStatus.SYSTEM_ERROR);
-    }
-
-    @RequestMapping(value = "/account/resetMobile", method = RequestMethod.POST)
-    @Auth
-    @ResponseBody
-    public CommonResponse<Void> resetMobile(@RequestBody ResetMobileRequest request) {
-        try {
-            if (!smsService.checkVerifyCode(request.getMobile(), request.getVerifyCode())) {
-                return new CommonResponse<Void>(ResponseStatus.PARAM_ERROR, "验证码校验失败");
-            }
-            User user = userService.getUser(getUserInfo().getId());
-            if (!user.getPassword().equals(request.getPassword())) {
-                return new CommonResponse<Void>(ResponseStatus.PARAM_ERROR, "密码校验失败");
-            }
-            user.setMobile(request.getMobile());
-            userService.update(user);
-            return new CommonResponse<Void>(ResponseStatus.SUCCESS);
-        } catch (Exception e) {
-            log.error("resetMobile error!", e);
-        }
-        return new CommonResponse<Void>(ResponseStatus.SYSTEM_ERROR);
-    }
-
     @RequestMapping(value = "/list/{role}", method = RequestMethod.GET)
     @Auth(role = RoleConstant.ADMINISTRATOR)
     @ResponseBody
