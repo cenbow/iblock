@@ -13,6 +13,7 @@ public class UserDisplayInfo implements Serializable {
 
     private Long userId;
     private String username;
+    private Integer gender;
     private Double rating;
     private KVInfo education;
     private Boolean online;

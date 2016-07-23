@@ -33,7 +33,7 @@ public class MultiSearchTest {
     }
 
     private static void search(StandardAnalyzer analyzer, String s, Directory index) throws ParseException, IOException {
-        BooleanClause.Occur[] clauses = { BooleanClause.Occur.MUST, BooleanClause.Occur.MUST};
+        BooleanClause.Occur[] clauses = { BooleanClause.Occur.SHOULD, BooleanClause.Occur.SHOULD};
         Query query = MultiFieldQueryParser.parse(new String[]{"Lucene", "Gigabytes"}, new String[]{"title", "title"},
                 clauses,
                 analyzer);
@@ -57,7 +57,7 @@ public class MultiSearchTest {
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
 
         IndexWriter w = new IndexWriter(index, config);
-        addDoc(w, "Lucene in Action", "193398817");
+        addDoc(w, "Lucene,in,Action", "193398817");
         addDoc(w, "Lucene for Dummies", "55320055Z");
         addDoc(w, "Managing Gigabytes", "55063554A");
         addDoc(w, "The Art of Computer Science", "9900333X");

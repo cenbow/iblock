@@ -176,6 +176,7 @@ public class UserController extends BaseController {
             UserDisplayInfo info = new UserDisplayInfo();
             User user = userService.getUser(userId);
             info.setUserId(userId);
+            info.setGender(user.getSex() ? 1 : 2);
             info.setUsername(user.getUserName());
             info.setAvatar(user.getHeadFigure());
             info.setRole(user.getRole().intValue());
