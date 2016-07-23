@@ -4,6 +4,7 @@ import com.iblock.common.enums.CommonStatus;
 import com.iblock.common.utils.DateUtils;
 import com.iblock.dao.po.Project;
 import com.iblock.dao.po.ProjectSkill;
+import com.iblock.web.info.GeoInfo;
 import com.iblock.web.info.KVInfo;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
@@ -21,8 +22,7 @@ public class ProjectUpdateRequest {
 
     private Long id;
     private String title;
-    private KVInfo city;
-    private String district;
+    private GeoInfo geo;
     private String description;
     private Integer headCount;
     private String image;
@@ -45,15 +45,21 @@ public class ProjectUpdateRequest {
         if (isLongTerm != null) {
             project.setResident(isLongTerm);
         }
-        if (city != null) {
-            project.setCity(city.getId());
+        if (geo != null) {
+            if (geo.getCity() != null) {
+                project.setCity(geo.getCity().getId());
+            }
+            if (geo.getDistrict() != null) {
+                project.setDistrict(geo.getDistrict());
+            }
+            if (geo.getAddress() != null) {
+                project.setAddress(geo.getAddress());
+            }
         }
         if (description != null) {
             project.setDesc(description);
         }
-        if (district != null) {
-            project.setDistrict(district);
-        }
+
         if (industryAge != null) {
             project.setIndustryAge(industryAge);
         }

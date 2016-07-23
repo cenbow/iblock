@@ -40,6 +40,7 @@ public class ProjectSearch implements Search<ProjectSimpleInfo> {
         bean.setOffset(0);
         bean.setPageSize(100000000);
         Page<Project> page = projectService.search(bean);
+//        projectService.getSkills()
         if (CollectionUtils.isNotEmpty(page.getResult())) {
             return;
         }
