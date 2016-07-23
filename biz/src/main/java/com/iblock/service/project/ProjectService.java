@@ -202,7 +202,7 @@ public class ProjectService {
     public boolean hire(long id, long userId, long opId) throws InvalidRequestException, InnerLogicException,
             IOException {
         Project pro = projectDao.selectByPrimaryKey(id);
-        if (!pro.getAgentId().equals(opId) || !pro.getManagerId().equals(opId)) {
+        if (!pro.getAgentId().equals(opId) && !pro.getManagerId().equals(opId)) {
             throw new InvalidRequestException("you have no auth, agent id or manager id is wrong");
         }
         if (pro.getStatus().intValue() != ProjectStatus.RECRUITING.getCode()) {

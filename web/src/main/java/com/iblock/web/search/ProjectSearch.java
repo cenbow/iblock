@@ -8,8 +8,11 @@ import com.iblock.web.info.ProjectSimpleInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.TextField;
+//import org.apache.lucene.document.Field;
+//import org.apache.lucene.document.IntPoint;
+//import org.apache.lucene.document.LongPoint;
+//import org.apache.lucene.document.StringField;
+//import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
@@ -62,15 +65,15 @@ public class ProjectSearch implements Search<ProjectSimpleInfo> {
 
     private void addDoc(IndexWriter w, Project p) throws IOException {
         Document doc = new Document();
-        doc.add(new TextField("name", p.getName(), Field.Store.YES));
+//        doc.add(new StringField("name", p.getName(), Field.Store.YES));
 //        doc.add(new LongPoint("managerId", p.getManagerId()));
 //        doc.add(new LongPoint("agentId", p.getAgentId()));
 //        doc.add(new IntPoint("minPay", p.getMinPay()));
-//        doc.add(new IntPoint("maxPay", isbn, Field.Store.YES));
-//        doc.add(new IntPoint("resident", isbn, Field.Store.YES));
-//        doc.add(new StringField("status", isbn, Field.Store.YES));
-//        doc.add(new StringField("city", isbn, Field.Store.YES));
-//        doc.add(new StringField("industry", isbn, Field.Store.YES));
+//        doc.add(new IntPoint("maxPay", p.getMaxPay()));
+//        doc.add(new IntPoint("resident", p.getResident() ? 1 : 0));
+//        doc.add(new IntPoint("status", isbn, Field.Store.YES));
+//        doc.add(new IntPoint("city", isbn, Field.Store.YES));
+//        doc.add(new IntPoint("industry", isbn, Field.Store.YES));
 //        doc.add(new StringField("skill", isbn, Field.Store.YES));
 //        doc.add(new StringField("freeze", isbn, Field.Store.YES));
 //        doc.add(new StringField("json", isbn, Field.Store.YES));

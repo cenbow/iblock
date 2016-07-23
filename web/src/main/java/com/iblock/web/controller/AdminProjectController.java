@@ -103,7 +103,7 @@ public class AdminProjectController extends BaseController {
                     info.setManager(new KVLongInfo(p.getManagerId(), userMap.get(p.getManagerId())));
                 }
                 if (p.getAgentId() != null && !p.getAgentId().equals(0L)) {
-                    info.setManager(new KVLongInfo(p.getAgentId(), userMap.get(p.getAgentId())));
+                    info.setBroker(new KVLongInfo(p.getAgentId(), userMap.get(p.getAgentId())));
                 }
                 list.add(info);
             }
