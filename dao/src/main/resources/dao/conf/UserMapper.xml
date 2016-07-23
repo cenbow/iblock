@@ -307,4 +307,12 @@
         </foreach>
         and status=1
     </select>
+
+    <select id="search" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from USER
+        where mobile=#{mobile}
+        and status=1
+    </select>
 </mapper>

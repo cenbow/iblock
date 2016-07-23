@@ -62,6 +62,12 @@ public class AccountController extends BaseController {
             if (!user.getPassword().equals(request.getPassword())) {
                 return new CommonResponse<Void>(ResponseStatus.PARAM_ERROR, "密码校验失败");
             }
+            if (request.getPhone().equals(user.getMobile())) {
+                return new CommonResponse<Void>(ResponseStatus.PARAM_ERROR, "手机号码和原号码相同");
+            }
+            if (userService.getByMobile(request.getPhone()) != null) {
+                return new CommonResponse<Void>(ResponseStatus.PARAM_ERROR, "该手机已被注册");
+            }
             user.setMobile(request.getPhone());
             userService.update(user);
             return new CommonResponse<Void>(ResponseStatus.SUCCESS);
