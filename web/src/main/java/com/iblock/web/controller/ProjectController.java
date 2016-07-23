@@ -152,6 +152,8 @@ public class ProjectController extends BaseController {
             City city = metaService.getCity(Arrays.asList(p.getCity())).get(0);
             GeoInfo geo = new GeoInfo();
             geo.setCity(new KVInfo(city.getCityId(), city.getCityName()));
+            geo.setDistrict(p.getDistrict());
+            geo.setAddress(p.getAddress());
             info.setGeo(geo);
 
             Industry industry = metaService.getIndustry(Arrays.asList(p.getIndustry())).get(0);
