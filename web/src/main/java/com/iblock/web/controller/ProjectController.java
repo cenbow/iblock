@@ -10,7 +10,6 @@ import com.iblock.dao.po.Industry;
 import com.iblock.dao.po.JobInterest;
 import com.iblock.dao.po.Project;
 import com.iblock.dao.po.ProjectDesigner;
-import com.iblock.dao.po.ProjectSkill;
 import com.iblock.dao.po.ProjectSkillDetail;
 import com.iblock.dao.po.User;
 import com.iblock.service.bo.ProjectAcceptBo;
@@ -49,7 +48,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
