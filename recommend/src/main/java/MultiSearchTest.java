@@ -34,7 +34,8 @@ public class MultiSearchTest {
 
     private static void search(StandardAnalyzer analyzer, String s, Directory index) throws ParseException, IOException {
         BooleanClause.Occur[] clauses = { BooleanClause.Occur.MUST, BooleanClause.Occur.MUST};
-        Query query = MultiFieldQueryParser.parse(new String[]{"Lucen", "193398817"}, new String[]{"title", "isbn"}, clauses,
+        Query query = MultiFieldQueryParser.parse(new String[]{"Lucene", "Gigabytes"}, new String[]{"title", "title"},
+                clauses,
                 analyzer);
         int hitsPerPage = 10;
         IndexReader reader = DirectoryReader.open(index);

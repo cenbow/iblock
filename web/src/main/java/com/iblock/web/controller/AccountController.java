@@ -78,14 +78,9 @@ public class AccountController extends BaseController {
     }
 
     @RequestMapping(value = "/validateVerifyCode", method = RequestMethod.POST)
-    @Auth
     @ResponseBody
     public CommonResponse<String> validateVerifyCode(@RequestBody ValidateVerifyCodeRequest request) {
         try {
-            User user = userService.getUser(getUserInfo().getId());
-            if (!request.getPhone().equals(user.getMobile())) {
-                return new CommonResponse<String>(ResponseStatus.PARAM_ERROR, "手机号码不正确");
-            }
             if (smsService.checkVerifyCode(request.getPhone(), request.getVerifyCode())) {
                 String token = smsService.getRandomString(6);
                 set(request.getPhone(), token);
@@ -99,13 +94,12 @@ public class AccountController extends BaseController {
     }
 
     @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
-    @Auth
     @ResponseBody
     public CommonResponse<Void> resetPassword(@RequestBody ResetPasswordRequest request) {
         try {
-            User user = userService.getUser(getUserInfo().getId());
-            if (!request.getPhone().equals(user.getMobile())) {
-                return new CommonResponse<Void>(ResponseStatus.PARAM_ERROR, "手机号码不正确");
+            User user = userService.getByMobile(request.getPhone());
+            if (user == null) {
+                return new CommonResponse<Void>(ResponseStatus.PARAM_ERROR, "用户不存在");
             }
             if (check(request.getPhone(), request.getToken())) {
                 user.setPassword(request.getPassword());
