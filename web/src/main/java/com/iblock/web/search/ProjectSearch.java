@@ -7,12 +7,8 @@ import com.iblock.service.project.ProjectService;
 import com.iblock.web.info.ProjectSimpleInfo;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.document.BinaryPoint;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.IntPoint;
-import org.apache.lucene.document.LongPoint;
-import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -67,9 +63,9 @@ public class ProjectSearch implements Search<ProjectSimpleInfo> {
     private void addDoc(IndexWriter w, Project p) throws IOException {
         Document doc = new Document();
         doc.add(new TextField("name", p.getName(), Field.Store.YES));
-        doc.add(new LongPoint("managerId", p.getManagerId()));
-        doc.add(new LongPoint("agentId", p.getAgentId()));
-        doc.add(new IntPoint("minPay", p.getMinPay()));
+//        doc.add(new LongPoint("managerId", p.getManagerId()));
+//        doc.add(new LongPoint("agentId", p.getAgentId()));
+//        doc.add(new IntPoint("minPay", p.getMinPay()));
 //        doc.add(new IntPoint("maxPay", isbn, Field.Store.YES));
 //        doc.add(new IntPoint("resident", isbn, Field.Store.YES));
 //        doc.add(new StringField("status", isbn, Field.Store.YES));
