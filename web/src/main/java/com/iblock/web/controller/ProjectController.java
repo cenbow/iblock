@@ -266,18 +266,6 @@ public class ProjectController extends BaseController {
         return new CommonResponse<Page<ProjectSimpleInfo>>(ResponseStatus.SYSTEM_ERROR);
     }
 
-    @RequestMapping(value = "/searchtest", method = RequestMethod.POST, consumes = "application/json")
-    @ResponseBody
-    public CommonResponse<Page<ProjectSimpleInfo>> searchtest(@RequestBody ProjectCondition request) {
-        try {
-            Page<ProjectSimpleInfo> page = projectSearch.search(request);
-            return new CommonResponse<Page<ProjectSimpleInfo>>(page);
-        } catch (Exception e) {
-            log.error("search project error!", e);
-        }
-        return new CommonResponse<Page<ProjectSimpleInfo>>(ResponseStatus.SYSTEM_ERROR);
-    }
-
     @RequestMapping(value = "/myproject", method = RequestMethod.POST, consumes = "application/json")
     @Auth
     @ResponseBody
