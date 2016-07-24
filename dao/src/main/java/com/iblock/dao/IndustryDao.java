@@ -48,6 +48,8 @@ public interface IndustryDao {
 
     List<Industry> selectAll();
 
+    List<Industry> selectAllWithDelete();
+
     List<Industry> selectByIds(@Param("list") List<Integer> list);
 
     Industry selectByName(@Param("name") String name);

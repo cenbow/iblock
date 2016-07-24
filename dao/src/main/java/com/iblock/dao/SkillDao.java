@@ -47,6 +47,8 @@ public interface SkillDao {
 
     List<Skill> selectAll();
 
+    List<Skill> selectAllWithDelete();
+
     List<Skill> selectByIds(List<Integer> ids);
 
     Skill selectByName(String name);

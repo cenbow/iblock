@@ -129,12 +129,17 @@
     where status = 1
   </select>
 
+  <select id="selectAllWithDelete" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from INDUSTRY
+  </select>
+
   <select id="selectByIds" resultMap="BaseResultMap" parameterType="map">
     select
     <include refid="Base_Column_List" />
     from INDUSTRY
-    where status = 1
-    and id in
+    where id in
     <foreach collection="list" item="item" index="index" close=")" open="(" separator=",">
       #{item}
     </foreach>

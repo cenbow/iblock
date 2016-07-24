@@ -6,10 +6,12 @@ import com.iblock.common.bean.ProjectSearchBean;
 import com.iblock.dao.po.Industry;
 import com.iblock.dao.po.Project;
 import com.iblock.dao.po.Skill;
+import com.iblock.service.meta.MetaService;
 import com.iblock.service.user.UserService;
 import com.iblock.web.constant.RoleConstant;
 import com.iblock.web.enums.ResponseStatus;
 import com.iblock.web.info.KVInfo;
+import com.iblock.web.request.IntIdRequest;
 import com.iblock.web.request.PageRequest;
 import com.iblock.web.request.admin.BroadCastRequest;
 import com.iblock.web.request.admin.NameRequest;
@@ -37,6 +39,9 @@ public class AdminMetaController extends BaseController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private MetaService metaService;
+
     @RequestMapping(value = "/all/skill", method = RequestMethod.GET)
     @Auth(role = RoleConstant.ADMINISTRATOR)
     @ResponseBody
@@ -47,6 +52,34 @@ public class AdminMetaController extends BaseController {
             log.error("admin search skills error!", e);
         }
         return new CommonResponse<List<Skill>>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/skill/delete", method = RequestMethod.POST, consumes = "application/json")
+    @Auth(role = RoleConstant.ADMINISTRATOR)
+    @ResponseBody
+    public CommonResponse<Void> deleteSkill(IntIdRequest request) {
+        try {
+            if (metaService.deleteSkill(request.getId())) {
+            return new CommonResponse<Void>(ResponseStatus.SUCCESS);
+            }
+        } catch (Exception e) {
+            log.error("admin delete skill error!", e);
+        }
+        return new CommonResponse<Void>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/industry/delete", method = RequestMethod.POST, consumes = "application/json")
+    @Auth(role = RoleConstant.ADMINISTRATOR)
+    @ResponseBody
+    public CommonResponse<Void> deleteIndustry(IntIdRequest request) {
+        try {
+            if (metaService.deleteIndustry(request.getId())) {
+                return new CommonResponse<Void>(ResponseStatus.SUCCESS);
+            }
+        } catch (Exception e) {
+            log.error("admin delete industry error!", e);
+        }
+        return new CommonResponse<Void>(ResponseStatus.SYSTEM_ERROR);
     }
 
     @RequestMapping(value = "/all/industry", method = RequestMethod.GET)
