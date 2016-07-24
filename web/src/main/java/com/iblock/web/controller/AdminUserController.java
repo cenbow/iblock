@@ -112,7 +112,7 @@ public class AdminUserController extends BaseController {
         return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
     }
 
-    @RequestMapping(value = "/freeze/list", method = RequestMethod.GET)
+    @RequestMapping(value = "/freezed", method = RequestMethod.GET)
     @Auth(role = RoleConstant.ADMINISTRATOR)
     @ResponseBody
     public CommonResponse<List<AdminUserInfo>> freeze() {
