@@ -11,4 +11,5 @@ public class AdminUserInfo {
     private Long id;
     private String name;
     private String mobile;
+    private int role;
 }

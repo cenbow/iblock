@@ -1,4 +1,4 @@
-package com.iblock.web.search;
+package com.iblock.service.search;
 
 import com.google.gson.Gson;
 import com.iblock.common.bean.Page;
@@ -11,16 +11,14 @@ import com.iblock.dao.po.ProjectSkill;
 import com.iblock.service.meta.MetaService;
 import com.iblock.service.project.ProjectService;
 import com.iblock.service.user.UserService;
-import com.iblock.web.info.KVInfo;
-import com.iblock.web.info.KVLongInfo;
-import com.iblock.web.info.ProjectSimpleInfo;
+import com.iblock.service.info.KVInfo;
+import com.iblock.service.info.KVLongInfo;
+import com.iblock.service.info.ProjectSimpleInfo;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.IntField;
-import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
@@ -28,28 +26,22 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.queries.TermsQuery;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MultiPhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.store.SimpleFSDirectory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -190,7 +182,6 @@ public class ProjectSearch implements Search<ProjectSimpleInfo> {
         TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, null);
         searcher.search(rootQuery, collector);
         ScoreDoc[] hits = collector.topDocs(condition.getOffset(), condition.getPageSize()).scoreDocs;
-
         System.out.println("Found " + hits.length + " hits.");
         for(int i=0;i<hits.length;++i) {
             int docId = hits[i].doc;
@@ -209,6 +200,13 @@ public class ProjectSearch implements Search<ProjectSimpleInfo> {
         w.close();
     }
 
+    public void update(Project p) throws IOException {
+        IndexWriterConfig config = new IndexWriterConfig(analyzer);
+        IndexWriter w = new IndexWriter(index, config);
+        w.updateDocument(new Term("id", String.valueOf(p.getId())), buildDoc(p));
+        w.close();
+    }
+
     public void add(Project p) throws IOException {
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
         IndexWriter w = new IndexWriter(index, config);
@@ -217,7 +215,14 @@ public class ProjectSearch implements Search<ProjectSimpleInfo> {
     }
 
     private void addDoc(IndexWriter w, Project p) throws IOException {
+
+        log.info("write doc json:" + toJson(p));
+        w.addDocument(buildDoc(p));
+    }
+
+    private Document buildDoc(Project p) {
         Document doc = new Document();
+        doc.add(new StringField("id", String.valueOf(p.getId()), Field.Store.NO));
         doc.add(new TextField("name", p.getName(), Field.Store.NO));
         doc.add(new StringField("managerId", String.valueOf(p.getManagerId()), Field.Store.NO));
         doc.add(new StringField("agentId", String.valueOf(p.getAgentId()), Field.Store.NO));
@@ -237,8 +242,7 @@ public class ProjectSearch implements Search<ProjectSimpleInfo> {
         doc.add(new TextField("skill", sb.toString(), Field.Store.NO));
         doc.add(new StringField("freeze", p.getFreeze() ? "1" : "0", Field.Store.NO));
         doc.add(new StringField("json", toJson(p), Field.Store.YES));
-        log.info("write doc json:" + toJson(p));
-        w.addDocument(doc);
+        return doc;
     }
 
     private String toJson(Project p) {

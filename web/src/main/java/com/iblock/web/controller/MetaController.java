@@ -1,15 +1,13 @@
 package com.iblock.web.controller;
 
-import com.iblock.common.advice.Auth;
 import com.iblock.dao.po.City;
 import com.iblock.dao.po.District;
 import com.iblock.dao.po.Industry;
 import com.iblock.dao.po.Skill;
 import com.iblock.service.meta.MetaService;
 import com.iblock.service.user.UserService;
-import com.iblock.web.constant.RoleConstant;
 import com.iblock.web.enums.ResponseStatus;
-import com.iblock.web.info.KVInfo;
+import com.iblock.service.info.KVInfo;
 import com.iblock.web.response.CommonResponse;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.collections.CollectionUtils;

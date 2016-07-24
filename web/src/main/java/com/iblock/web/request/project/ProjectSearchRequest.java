@@ -2,7 +2,7 @@ package com.iblock.web.request.project;
 
 import com.iblock.common.bean.ProjectSearchBean;
 import com.iblock.common.enums.ProjectStatus;
-import com.iblock.web.info.KVInfo;
+import com.iblock.service.info.KVInfo;
 import lombok.Data;
 
 import java.util.ArrayList;

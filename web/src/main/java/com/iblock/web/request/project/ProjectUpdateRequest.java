@@ -5,7 +5,7 @@ import com.iblock.common.utils.DateUtils;
 import com.iblock.dao.po.Project;
 import com.iblock.dao.po.ProjectSkill;
 import com.iblock.web.info.GeoInfo;
-import com.iblock.web.info.KVInfo;
+import com.iblock.service.info.KVInfo;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
 

@@ -2,6 +2,7 @@ package com.iblock.web.info;
 
 import com.iblock.common.utils.DateUtils;
 import com.iblock.dao.po.Project;
+import com.iblock.service.info.KVInfo;
 import lombok.Data;
 
 import java.util.List;

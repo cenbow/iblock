@@ -27,7 +27,7 @@ import com.iblock.web.info.AdminUserInfo;
 import com.iblock.web.info.GeoInfo;
 import com.iblock.web.info.IdRequestInfo;
 import com.iblock.web.info.JobInterestInfo;
-import com.iblock.web.info.KVInfo;
+import com.iblock.service.info.KVInfo;
 import com.iblock.web.info.SkillInfo;
 import com.iblock.web.info.UserDisplayInfo;
 import com.iblock.web.info.UserInfo;
@@ -35,8 +35,6 @@ import com.iblock.web.info.UserUpdateInfo;
 import com.iblock.web.info.WorkExperienceInfo;
 import com.iblock.web.info.WorkExperienceResultInfo;
 import com.iblock.web.request.user.LoginRequest;
-import com.iblock.web.request.user.ModifyPasswordRequest;
-import com.iblock.web.request.user.ResetMobileRequest;
 import com.iblock.web.request.user.SendValidateCodeRequest;
 import com.iblock.web.request.user.SignUpDesignerRequest;
 import com.iblock.web.request.user.SignUpManagerRequest;
@@ -61,7 +59,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -524,6 +521,7 @@ public class UserController extends BaseController {
                 for (User user : users) {
                     AdminUserInfo info = new AdminUserInfo();
                     info.setId(user.getId());
+                    info.setRole(user.getRole().byteValue());
                     info.setName(user.getUserName());
                     info.setMobile(user.getMobile());
                     result.add(info);

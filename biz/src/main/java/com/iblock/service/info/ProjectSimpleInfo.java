@@ -1,4 +1,4 @@
-package com.iblock.web.info;
+package com.iblock.service.info;
 
 import com.iblock.common.utils.DateUtils;
 import com.iblock.dao.po.Project;

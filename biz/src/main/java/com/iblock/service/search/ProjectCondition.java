@@ -1,4 +1,4 @@
-package com.iblock.web.search;
+package com.iblock.service.search;
 
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package com.iblock.web.info;
+package com.iblock.service.info;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

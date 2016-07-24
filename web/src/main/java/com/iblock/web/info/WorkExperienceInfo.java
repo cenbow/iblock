@@ -1,6 +1,7 @@
 package com.iblock.web.info;
 
 import com.iblock.dao.po.WorkExperience;
+import com.iblock.service.info.KVInfo;
 import lombok.Data;
 
 /**

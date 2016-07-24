@@ -1,6 +1,7 @@
 package com.iblock.web.info;
 
 import com.iblock.dao.po.UserGeo;
+import com.iblock.service.info.KVInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

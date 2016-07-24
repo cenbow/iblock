@@ -1,11 +1,9 @@
 package com.iblock.web.info;
 
 import com.iblock.dao.po.JobInterest;
+import com.iblock.service.info.KVInfo;
 import lombok.Data;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

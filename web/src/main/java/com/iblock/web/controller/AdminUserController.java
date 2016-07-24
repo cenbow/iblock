@@ -7,8 +7,6 @@ import com.iblock.service.user.UserService;
 import com.iblock.web.constant.RoleConstant;
 import com.iblock.web.enums.ResponseStatus;
 import com.iblock.web.info.AdminUserInfo;
-import com.iblock.web.info.KVInfo;
-import com.iblock.web.info.KVLongInfo;
 import com.iblock.web.info.UserStatusInfo;
 import com.iblock.web.request.admin.AddUserRequest;
 import com.iblock.web.response.CommonResponse;
@@ -123,6 +121,7 @@ public class AdminUserController extends BaseController {
                 for (User user : users) {
                     AdminUserInfo info = new AdminUserInfo();
                     info.setId(user.getId());
+                    info.setRole(user.getRole().intValue());
                     info.setName(user.getUserName());
                     info.setMobile(user.getMobile());
                     result.add(info);
@@ -168,6 +167,7 @@ public class AdminUserController extends BaseController {
                 for (User user : users) {
                     AdminUserInfo info = new AdminUserInfo();
                     info.setId(user.getId());
+                    info.setRole(user.getRole());
                     info.setName(user.getUserName());
                     info.setMobile(user.getMobile());
                     result.add(info);
