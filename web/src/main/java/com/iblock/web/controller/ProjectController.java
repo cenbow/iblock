@@ -72,8 +72,6 @@ public class ProjectController extends BaseController {
     private MetaService metaService;
     @Autowired
     private UserService userService;
-    @Autowired
-    private ProjectSearch projectSearch;
 
     @RequestMapping(value = "/rate", method = RequestMethod.POST, consumes = "application/json")
     @Auth(role = RoleConstant.DESIGNER)
