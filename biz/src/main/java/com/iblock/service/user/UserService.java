@@ -21,6 +21,7 @@ import com.iblock.dao.po.UserRating;
 import com.iblock.service.bo.UserUpdateBo;
 import com.iblock.service.info.UserSearchInfo;
 import com.iblock.service.message.MessageService;
+import com.iblock.service.search.ProjectSearch;
 import com.iblock.service.search.UserCondition;
 import com.iblock.service.search.UserSearch;
 import org.apache.commons.collections.CollectionUtils;
@@ -59,6 +60,8 @@ public class UserService {
     private JobInterestDao jobInterestDao;
     @Autowired
     private UserSearch userSearch;
+    @Autowired
+    private ProjectSearch projectSearch;
 
     public Page<UserSearchInfo> search(UserCondition condition) throws IOException, ParseException {
         return userSearch.search(condition);
@@ -177,7 +180,10 @@ public class UserService {
         Skill skill = new Skill();
         skill.setAddTime(new Date());
         skill.setName(name);
-        return skillDao.insertSelective(skill) > 0;
+        skillDao.insertSelective(skill);
+        projectSearch.refreshSkill();
+        userSearch.refreshSkill();
+        return true;
     }
 
     public boolean deleteSkill(Integer id) {
@@ -226,7 +232,10 @@ public class UserService {
         Industry industry = new Industry();
         industry.setAddTime(new Date());
         industry.setName(name);
-        return industryDao.insertSelective(industry) > 0;
+        industryDao.insertSelective(industry);
+        userSearch.refreshIndustry();
+        projectSearch.refreshIndustry();
+        return true;
     }
 
     public User getByMobile(String mobile) {

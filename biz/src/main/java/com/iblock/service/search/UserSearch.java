@@ -3,26 +3,18 @@ package com.iblock.service.search;
 import com.google.gson.Gson;
 import com.iblock.common.bean.Page;
 import com.iblock.common.bean.ProjectSearchBean;
-import com.iblock.common.utils.DateUtils;
 import com.iblock.dao.IndustryDao;
 import com.iblock.dao.JobInterestDao;
-import com.iblock.dao.ProjectDao;
-import com.iblock.dao.ProjectSkillDao;
 import com.iblock.dao.SkillDao;
 import com.iblock.dao.UserDao;
 import com.iblock.dao.po.City;
 import com.iblock.dao.po.Industry;
 import com.iblock.dao.po.JobInterest;
-import com.iblock.dao.po.Project;
-import com.iblock.dao.po.ProjectSkill;
 import com.iblock.dao.po.Skill;
 import com.iblock.dao.po.User;
 import com.iblock.service.info.KVInfo;
-import com.iblock.service.info.KVLongInfo;
-import com.iblock.service.info.ProjectSimpleInfo;
 import com.iblock.service.info.UserSearchInfo;
 import com.iblock.service.meta.MetaService;
-import com.iblock.service.user.UserService;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -88,12 +80,17 @@ public class UserSearch {
     private StandardAnalyzer analyzer = new StandardAnalyzer();
     private Directory index = new RAMDirectory();
 
-    @PostConstruct
-    public void init() throws Exception {
-        ProjectSearchBean bean = new ProjectSearchBean();
-        bean.setOffset(0);
-        bean.setPageSize(100000000);
-        List<User> list = userDao.selectByStatus(null);
+    public void refreshCity() {
+        List<City> cities = metaService.getCities(null);
+        cityMap = new HashMap<Integer, String>();
+        if (CollectionUtils.isNotEmpty(cities)) {
+            for (City city : cities) {
+                cityMap.put(city.getCityId(), city.getCityName());
+            }
+        }
+    }
+
+    public void refreshInterest() {
         List<JobInterest> interests = jobInterestDao.selectAll();
         interestMap = new HashMap<Long, JobInterest>();
         if (CollectionUtils.isNotEmpty(interests)) {
@@ -101,20 +98,9 @@ public class UserSearch {
                 interestMap.put(interest.getUserId(), interest);
             }
         }
-        List<City> cities = metaService.getCities(null);
-        List<Industry> industries = industryDao.selectAll();
-        cityMap = new HashMap<Integer, String>();
-        industryMap = new HashMap<Integer, String>();
-        if (CollectionUtils.isNotEmpty(cities)) {
-            for (City city : cities) {
-                cityMap.put(city.getCityId(), city.getCityName());
-            }
-        }
-        if (CollectionUtils.isNotEmpty(industries)) {
-            for (Industry industry : industries) {
-                industryMap.put(industry.getId(), industry.getName());
-            }
-        }
+    }
+
+    public void refreshSkill() {
         skillMap = new HashMap<Integer, String>();
         List<Skill> skills = skillDao.selectAll();
         if (CollectionUtils.isNotEmpty(skills)) {
@@ -122,6 +108,31 @@ public class UserSearch {
                 skillMap.put(skill.getId(), skill.getName());
             }
         }
+    }
+
+    public void refreshIndustry() {
+        List<Industry> industries = industryDao.selectAll();
+        industryMap = new HashMap<Integer, String>();
+        if (CollectionUtils.isNotEmpty(industries)) {
+            for (Industry industry : industries) {
+                industryMap.put(industry.getId(), industry.getName());
+            }
+        }
+    }
+
+    @PostConstruct
+    public void init() throws Exception {
+        ProjectSearchBean bean = new ProjectSearchBean();
+        bean.setOffset(0);
+        bean.setPageSize(100000000);
+        List<User> list = userDao.selectByStatus(null);
+        refreshCity();
+        refreshIndustry();
+        refreshInterest();
+        refreshSkill();
+
+
+
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
