@@ -172,6 +172,17 @@
     and status=1
   </select>
 
+  <select id="selectByProjects" resultMap="BaseResultMap" parameterType="map" >
+    select
+    <include refid="Base_Column_List" />
+    from PROJECT_SKILL
+    where project_id in
+    <foreach close=")" collection="projects" index="index" item="item" open="(" separator=",">
+      #{item}
+    </foreach>
+    and status=1
+  </select>
+
 
 
   <update id="disable" parameterType="java.lang.Long">

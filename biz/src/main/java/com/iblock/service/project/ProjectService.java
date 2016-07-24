@@ -90,6 +90,10 @@ public class ProjectService {
         return projectSkillDao.selectByProject(projectId);
     }
 
+    public List<ProjectSkill> getSkills(List<Long> projects) {
+        return projectSkillDao.selectByProjects(projects);
+    }
+
     public List<ProjectDesigner> getProjectDesigner(Long userId) {
         return projectDesignerDao.selectByDesigner(userId);
     }

@@ -1,5 +1,6 @@
 package com.iblock.service.user;
 
+import com.iblock.common.bean.Page;
 import com.iblock.common.enums.CommonStatus;
 import com.iblock.common.enums.UserRole;
 import com.iblock.dao.IndustryDao;
@@ -18,13 +19,18 @@ import com.iblock.dao.po.UserDetail;
 import com.iblock.dao.po.UserGeo;
 import com.iblock.dao.po.UserRating;
 import com.iblock.service.bo.UserUpdateBo;
+import com.iblock.service.info.UserSearchInfo;
 import com.iblock.service.message.MessageService;
+import com.iblock.service.search.UserCondition;
+import com.iblock.service.search.UserSearch;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -51,6 +57,12 @@ public class UserService {
     private MessageService messageService;
     @Autowired
     private JobInterestDao jobInterestDao;
+    @Autowired
+    private UserSearch userSearch;
+
+    public Page<UserSearchInfo> search(UserCondition condition) throws IOException, ParseException {
+        return userSearch.search(condition);
+    }
 
     public boolean profileComplete(Long userId) {
         User user = userDao.selectByPrimaryKey(userId);
@@ -122,7 +134,7 @@ public class UserService {
     }
 
     @Transactional
-    public boolean signUp(UserUpdateBo bo) {
+    public boolean signUp(UserUpdateBo bo) throws IOException {
         simpleAdd(bo.getUser());
         bo.getUserGeo().setUserId(bo.getUser().getId());
         if (bo.getUser().getRole().intValue() == UserRole.MANAGER.getRole()) {
@@ -130,6 +142,7 @@ public class UserService {
             managerDao.insertSelective(bo.getManager());
         }
         userGeoDao.insertSelective(bo.getUserGeo());
+        userSearch.add(bo.getUser());
         return true;
     }
 
@@ -140,8 +153,9 @@ public class UserService {
     }
 
     @Transactional
-    public boolean update(UserUpdateBo bo) {
+    public boolean update(UserUpdateBo bo) throws IOException {
         userDao.updateByPrimaryKey(bo.getUser());
+        userSearch.update(bo.getUser());
         if (bo.getUser().getRole().intValue() == UserRole.MANAGER.getRole() && bo.getManager() != null) {
             managerDao.updateByPrimaryKey(bo.getManager());
         }

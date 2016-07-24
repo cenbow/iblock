@@ -1,12 +1,16 @@
 package com.iblock.web.controller;
 
 import com.iblock.common.advice.Auth;
+import com.iblock.common.bean.Page;
 import com.iblock.common.enums.Education;
+import com.iblock.common.enums.ProjectStatus;
 import com.iblock.common.enums.UserRole;
+import com.iblock.common.enums.UserStatus;
 import com.iblock.dao.po.City;
 import com.iblock.dao.po.Industry;
 import com.iblock.dao.po.JobInterest;
 import com.iblock.dao.po.Manager;
+import com.iblock.dao.po.ProjectSkill;
 import com.iblock.dao.po.Skill;
 import com.iblock.dao.po.User;
 import com.iblock.dao.po.UserGeo;
@@ -14,10 +18,15 @@ import com.iblock.dao.po.WorkExperience;
 import com.iblock.service.bo.UserUpdateBo;
 import com.iblock.service.experience.WorkExperienceService;
 import com.iblock.service.file.FileService;
+import com.iblock.service.info.ProjectSimpleInfo;
+import com.iblock.service.info.UserSearchInfo;
 import com.iblock.service.interest.JobInterestService;
 import com.iblock.service.message.MessageService;
 import com.iblock.service.message.SMSService;
 import com.iblock.service.meta.MetaService;
+import com.iblock.service.project.ProjectService;
+import com.iblock.service.search.ProjectCondition;
+import com.iblock.service.search.UserCondition;
 import com.iblock.service.user.UserService;
 import com.iblock.web.constant.CommonProperties;
 import com.iblock.web.constant.RoleConstant;
@@ -34,7 +43,9 @@ import com.iblock.web.info.UserInfo;
 import com.iblock.web.info.UserUpdateInfo;
 import com.iblock.web.info.WorkExperienceInfo;
 import com.iblock.web.info.WorkExperienceResultInfo;
+import com.iblock.web.request.PageRequest;
 import com.iblock.web.request.user.LoginRequest;
+import com.iblock.web.request.user.SearchDesignerRequest;
 import com.iblock.web.request.user.SendValidateCodeRequest;
 import com.iblock.web.request.user.SignUpDesignerRequest;
 import com.iblock.web.request.user.SignUpManagerRequest;
@@ -59,6 +70,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -89,6 +101,8 @@ public class UserController extends BaseController {
     protected SMSService smsService;
     @Autowired
     protected MetaService metaService;
+    @Autowired
+    protected ProjectService projectService;
 
     @RequestMapping(value = "/profilecomplete", method = RequestMethod.GET)
     @Auth
@@ -100,6 +114,87 @@ public class UserController extends BaseController {
             log.error("profileComplete user error!", e);
         }
         return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/recommended", method = RequestMethod.POST, consumes = "application/json")
+    @Auth(role = RoleConstant.MANAGER)
+    @ResponseBody
+    public CommonResponse<Page<UserSearchInfo>> recommended(@RequestBody PageRequest request) {
+        try {
+            ProjectCondition condition = new ProjectCondition();
+            condition.setManagerId(getUserInfo().getId());
+            condition.setStatus(Arrays.asList(ProjectStatus.RECRUITING.getCode()));
+            condition.setOffset(0);
+            condition.setPageSize(100);
+            List<ProjectSimpleInfo> list = projectService.search(condition).getResult();
+            UserCondition uc = new UserCondition();
+            uc.setPageSize(request.getPageSize());
+            uc.setOffset((request.getPageNo() - 1) * request.getPageSize());
+            uc.setStatus(Arrays.asList(UserStatus.NORMAL.getCode()));
+            if (CollectionUtils.isNotEmpty(list)) {
+                List<Integer> industries = new ArrayList<Integer>();
+                List<Integer> cities = new ArrayList<Integer>();
+                List<Long> ids = new ArrayList<Long>();
+                for (ProjectSimpleInfo info : list) {
+                    cities.add(info.getCity().getId());
+                    industries.add(info.getIndustry().getId());
+                    ids.add(info.getId());
+                }
+                uc.setCity(cities);
+                uc.setIndustry(industries);
+                List<ProjectSkill> skills = projectService.getSkills(ids);
+                if (CollectionUtils.isNotEmpty(skills)) {
+                    List<Integer> tmp = new ArrayList<Integer>();
+                    for (ProjectSkill s : skills) {
+                        tmp.add(s.getSkillId());
+                    }
+                    uc.setSkill(tmp);
+                }
+            }
+
+            return new CommonResponse<Page<UserSearchInfo>>(userService.search(uc));
+        } catch (Exception e) {
+            log.error("user recommended error!", e);
+        }
+        return new CommonResponse<Page<UserSearchInfo>>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/search/designer", method = RequestMethod.POST, consumes = "application/json")
+    @ResponseBody
+    public CommonResponse<Page<UserSearchInfo>> searchDesigner(@RequestBody SearchDesignerRequest request) {
+        try {
+            UserCondition condition = new UserCondition();
+            condition.setMaxPay(request.getMaxPay());
+            condition.setMinPay(request.getMinPay());
+            condition.setPageSize(request.getPageSize());
+            condition.setOffset((request.getPageNo() - 1) * request.getPageSize());
+            if (CollectionUtils.isNotEmpty(request.getCity())) {
+                List<Integer> tmp = new ArrayList<Integer>();
+                for (KVInfo info : request.getCity()) {
+                    tmp.add(info.getId());
+                }
+                condition.setCity(tmp);
+            }
+            if (CollectionUtils.isNotEmpty(request.getSkill())) {
+                List<Integer> tmp = new ArrayList<Integer>();
+                for (KVInfo info : request.getSkill()) {
+                    tmp.add(info.getId());
+                }
+                condition.setSkill(tmp);
+            }
+            if (CollectionUtils.isNotEmpty(request.getIndustry())) {
+                List<Integer> tmp = new ArrayList<Integer>();
+                for (KVInfo info : request.getIndustry()) {
+                    tmp.add(info.getId());
+                }
+                condition.setIndustry(tmp);
+            }
+            condition.setKeyword(request.getKeyword());
+            return new CommonResponse<Page<UserSearchInfo>>(userService.search(condition));
+        } catch (Exception e) {
+            log.error("user search error!", e);
+        }
+        return new CommonResponse<Page<UserSearchInfo>>(ResponseStatus.SYSTEM_ERROR);
     }
 
     @RequestMapping(value = "/rate", method = RequestMethod.POST, consumes = "application/json")

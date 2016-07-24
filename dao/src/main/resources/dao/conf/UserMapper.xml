@@ -301,7 +301,9 @@
         select
         <include refid="Base_Column_List"/>
         from USER
-        where status=#{status}
+        <if test="status != null">
+            where status=#{status}
+        </if>
     </select>
 
     <select id="batchSelect" parameterType="map" resultMap="BaseResultMap">

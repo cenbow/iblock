@@ -2,6 +2,7 @@ package com.iblock.dao;
 
 import com.iblock.dao.po.ProjectSkill;
 import com.iblock.dao.po.ProjectSkillDetail;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -47,6 +48,8 @@ public interface ProjectSkillDao {
     int updateByPrimaryKey(ProjectSkill record);
 
     List<ProjectSkillDetail> selectByProject(Long project);
+
+    List<ProjectSkill> selectByProjects(@Param("projects") List<Long> project);
 
     List<ProjectSkill> selectByProjectId(Long project);
 
