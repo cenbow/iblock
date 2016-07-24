@@ -79,6 +79,10 @@ public class UserService {
         return userDao.selectByRole(role);
     }
 
+    public List<User> getUsersByStatus(Integer status) {
+        return userDao.selectByStatus(status);
+    }
+
     public UserDetail getUserDetail(Long userId) {
         return userDao.selectDetailById(userId);
     }

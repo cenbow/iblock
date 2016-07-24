@@ -53,6 +53,8 @@ public interface UserDao {
 
     User selectByMobile(String mobile);
 
+    List<User> selectByStatus(@Param("status") Integer status);
+
     List<User> selectByRole(@Param("role") Integer role);
 
     List<User> batchSelect(@Param("ids") List<Long> ids);

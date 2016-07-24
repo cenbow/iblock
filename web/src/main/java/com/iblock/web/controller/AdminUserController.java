@@ -112,6 +112,29 @@ public class AdminUserController extends BaseController {
         return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
     }
 
+    @RequestMapping(value = "/freeze/list", method = RequestMethod.GET)
+    @Auth(role = RoleConstant.ADMINISTRATOR)
+    @ResponseBody
+    public CommonResponse<List<AdminUserInfo>> freeze() {
+        try {
+            List<User> users = userService.getUsersByStatus(UserStatus.FREEZE.getCode());
+            List<AdminUserInfo> result = new ArrayList<AdminUserInfo>();
+            if(CollectionUtils.isNotEmpty(users)) {
+                for (User user : users) {
+                    AdminUserInfo info = new AdminUserInfo();
+                    info.setId(user.getId());
+                    info.setName(user.getUserName());
+                    info.setMobile(user.getMobile());
+                    result.add(info);
+                }
+            }
+            return new CommonResponse<List<AdminUserInfo>>(result);
+        } catch (Exception e) {
+            log.error("admin list user error!", e);
+        }
+        return new CommonResponse<List<AdminUserInfo>>(ResponseStatus.SYSTEM_ERROR);
+    }
+
     @RequestMapping(value = "/unfreeze/{id}", method = RequestMethod.GET)
     @Auth(role = RoleConstant.ADMINISTRATOR)
     @ResponseBody

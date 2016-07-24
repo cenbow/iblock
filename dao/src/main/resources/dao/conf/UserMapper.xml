@@ -297,6 +297,13 @@
         and status=1
     </select>
 
+    <select id="selectByStatus" parameterType="map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from USER
+        where status=#{status}
+    </select>
+
     <select id="batchSelect" parameterType="map" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
