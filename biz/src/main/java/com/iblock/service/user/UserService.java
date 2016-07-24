@@ -66,7 +66,7 @@ public class UserService {
             }
             JobInterest interest = jobInterestDao.selectByUser(userId);
             if (interest == null || StringUtils.isBlank(interest.getCityList()) || StringUtils.isBlank(interest
-                    .getJobTypeList())) {
+                    .getJobTypeList()) || interest.getStartPay() <= 0 || interest.getEndPay() <= 0) {
                 return false;
             }
             return true;
@@ -145,7 +145,7 @@ public class UserService {
         if (bo.getUser().getRole().intValue() == UserRole.MANAGER.getRole() && bo.getManager() != null) {
             managerDao.updateByPrimaryKey(bo.getManager());
         }
-        if(bo.getUserGeo() != null) {
+        if (bo.getUserGeo() != null) {
             if (bo.getUserGeo().getId() != null) {
                 userGeoDao.updateByPrimaryKey(bo.getUserGeo());
             } else {

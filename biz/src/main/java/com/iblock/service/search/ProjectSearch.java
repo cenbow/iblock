@@ -36,10 +36,12 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.util.BytesRef;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -114,72 +116,73 @@ public class ProjectSearch {
         }
     }
 
-    public Page<ProjectSimpleInfo> search(ProjectCondition condition) throws IOException, ParseException {
+    public Page<ProjectSimpleInfo> search(ProjectCondition c) throws IOException, ParseException {
         BooleanQuery rootQuery = new BooleanQuery();
-        if (condition.getMinPay() != null && condition.getMaxPay() != null) {
-            rootQuery.add(new QueryParser("agentId", analyzer).parse(String.valueOf(condition.getAgentId())),
+        if (c.getMinPay() != null || c.getMaxPay() != null) {
+            BytesRef min = c.getMinPay() == null ? null : new BytesRef(c.getMinPay().byteValue());
+            BytesRef max = c.getMaxPay() == null ? null : new BytesRef(c.getMaxPay().byteValue());
+            rootQuery.add(new TermRangeQuery("maxPay", min, max, true, true), BooleanClause.Occur.MUST);
+        }
+        if (c.getAgentId() != null) {
+            rootQuery.add(new QueryParser("agentId", analyzer).parse(String.valueOf(c.getAgentId())),
                     BooleanClause.Occur.MUST);
         }
-        if (condition.getAgentId() != null) {
-            rootQuery.add(new QueryParser("agentId", analyzer).parse(String.valueOf(condition.getAgentId())),
-                    BooleanClause.Occur.MUST);
-        }
-        if (condition.getFreeze() != null) {
-            rootQuery.add(new QueryParser("freeze", analyzer).parse(condition.getFreeze() ? "1" : "0"), BooleanClause
+        if (c.getFreeze() != null) {
+            rootQuery.add(new QueryParser("freeze", analyzer).parse(c.getFreeze() ? "1" : "0"), BooleanClause
                     .Occur.MUST);
         }
-        if (condition.getKeyword() != null) {
-            rootQuery.add(new QueryParser("name", analyzer).parse(condition.getKeyword()), BooleanClause.Occur.MUST);
+        if (c.getKeyword() != null) {
+            rootQuery.add(new QueryParser("name", analyzer).parse(c.getKeyword()), BooleanClause.Occur.MUST);
         }
-        if (condition.getManagerId() != null) {
-            rootQuery.add(new QueryParser("managerId", analyzer).parse(String.valueOf(condition.getManagerId())), BooleanClause
+        if (c.getManagerId() != null) {
+            rootQuery.add(new QueryParser("managerId", analyzer).parse(String.valueOf(c.getManagerId())), BooleanClause
                     .Occur.MUST);
         }
-        if (condition.getCity() != null) {
+        if (c.getCity() != null) {
             BooleanQuery cityQuery = new BooleanQuery();
-            for (Integer i : condition.getCity()) {
+            for (Integer i : c.getCity()) {
                 cityQuery.add(new QueryParser("city", analyzer).parse(String.valueOf(i)), BooleanClause.Occur.SHOULD);
             }
             rootQuery.add(cityQuery, BooleanClause.Occur.MUST);
         }
-        if (condition.getIndustry() != null) {
+        if (c.getIndustry() != null) {
             BooleanQuery industryQuery = new BooleanQuery();
-            for (Integer i : condition.getIndustry()) {
+            for (Integer i : c.getIndustry()) {
                 industryQuery.add(new QueryParser("industry", analyzer).parse(String.valueOf(i)), BooleanClause.Occur
                         .SHOULD);
             }
             rootQuery.add(industryQuery, BooleanClause.Occur.MUST);
         }
-        if (condition.getSkill() != null) {
+        if (c.getSkill() != null) {
             BooleanQuery skillQuery = new BooleanQuery();
-            for (Integer i : condition.getSkill()) {
+            for (Integer i : c.getSkill()) {
                 skillQuery.add(new QueryParser("skill", analyzer).parse(String.valueOf(i)), BooleanClause.Occur
                         .SHOULD);
             }
             rootQuery.add(skillQuery, BooleanClause.Occur.MUST);
         }
-        if (condition.getStatus() != null) {
+        if (c.getStatus() != null) {
             BooleanQuery statusQuery = new BooleanQuery();
-            for (Integer i : condition.getStatus()) {
+            for (Integer i : c.getStatus()) {
                 statusQuery.add(new QueryParser("industry", analyzer).parse(String.valueOf(i)), BooleanClause.Occur
                         .SHOULD);
             }
             rootQuery.add(statusQuery, BooleanClause.Occur.MUST);
         }
-        int hitsPerPage = condition.getPageSize();
+        int hitsPerPage = c.getPageSize();
         IndexReader reader = DirectoryReader.open(index);
         IndexSearcher searcher = new IndexSearcher(reader);
         TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, null);
         searcher.search(rootQuery, collector);
-        TopDocs topDocs = collector.topDocs(condition.getOffset(), condition.getPageSize());
+        TopDocs topDocs = collector.topDocs(c.getOffset(), c.getPageSize());
         ScoreDoc[] hits = topDocs.scoreDocs;
         System.out.println("Found " + hits.length + " hits.");
         List<ProjectSimpleInfo> list = new ArrayList<ProjectSimpleInfo>();
         for (int i = 0; i < hits.length; ++i) {
             list.add(buildInfo(searcher.doc(hits[i].doc)));
         }
-        return new Page<ProjectSimpleInfo>(list, condition.getOffset() / condition.getPageSize
-                () + 1, condition.getPageSize(), topDocs.totalHits);
+        return new Page<ProjectSimpleInfo>(list, c.getOffset() / c.getPageSize
+                () + 1, c.getPageSize(), topDocs.totalHits);
     }
 
     private ProjectSimpleInfo buildInfo(Document d) {

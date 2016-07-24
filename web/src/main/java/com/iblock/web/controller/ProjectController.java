@@ -331,7 +331,7 @@ public class ProjectController extends BaseController {
     }
 
     @RequestMapping(value = "/terminate", method = RequestMethod.POST, consumes = "application/json")
-    @Auth(role = RoleConstant.MANAGER)
+    @Auth(role = RoleConstant.MANAGER + "," + RoleConstant.AGENT)
     @ResponseBody
     public CommonResponse<Boolean> terminate(@RequestBody ProjectIdRequest request) {
         try {
