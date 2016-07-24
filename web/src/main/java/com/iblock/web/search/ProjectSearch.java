@@ -209,6 +209,13 @@ public class ProjectSearch implements Search<ProjectSimpleInfo> {
         w.close();
     }
 
+    public void add(Project p) throws IOException {
+        IndexWriterConfig config = new IndexWriterConfig(analyzer);
+        IndexWriter w = new IndexWriter(index, config);
+        addDoc(w, p);
+        w.close();
+    }
+
     private void addDoc(IndexWriter w, Project p) throws IOException {
         Document doc = new Document();
         doc.add(new TextField("name", p.getName(), Field.Store.NO));

@@ -42,15 +42,9 @@ public class MessageService {
 
     public Page<Message> getMsgs(long userId, int pageNo, int pageSize, boolean processed, Integer role) {
         syncBroadCast(userId, role);
-        List<Integer> status = new ArrayList<Integer>();
-        if (processed) {
-            status.add(MessageStatus.FINISH.getCode());
-        } else {
-            status.add(MessageStatus.READ.getCode());
-            status.add(MessageStatus.UNREAD.getCode());
-        }
-        List<Message> messages = messageDao.selectByUserAndStatus(userId, status, (pageNo - 1) * pageSize, pageSize);
-        int count = messageDao.countByUserAndStatus(userId, status);
+        List<Message> messages = messageDao.selectByIfProcess(userId, processed ? 1 : 0, (pageNo - 1) * pageSize,
+                pageSize);
+        int count = messageDao.countByIfProcess(userId, processed ? 1 : 0);
         return new Page<Message>(messages, pageNo, pageSize, count, "sendTime", "desc");
     }
 

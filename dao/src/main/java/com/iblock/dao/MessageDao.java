@@ -47,10 +47,10 @@ public interface MessageDao {
      */
     int updateByPrimaryKey(Message record);
 
-    List<Message> selectByUserAndStatus(@Param("userId") long userId, @Param("status") List<Integer> status, @Param("offset")
-    int offset, @Param("pageSize") int pageSize);
+    List<Message> selectByIfProcess(@Param("userId") long userId, @Param("processed") Integer processed,
+                                    @Param("offset") int offset, @Param("pageSize") int pageSize);
 
-    int countByUserAndStatus(@Param("userId") long userId, @Param("status") List<Integer> status);
+    int countByIfProcess(@Param("userId") long userId, @Param("processed") Integer processed);
 
     List<Message> selectUnloadBroadcastMsg(@Param("time") Date time, @Param("role") Integer role);
 }
