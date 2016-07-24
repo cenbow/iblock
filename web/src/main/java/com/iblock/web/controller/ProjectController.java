@@ -206,10 +206,10 @@ public class ProjectController extends BaseController {
 
     @RequestMapping(value = "/recommended", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
-    public CommonResponse<Page<Project>> recommended(@RequestBody PageRequest request) {
+    public CommonResponse<Page<ProjectSimpleInfo>> recommended(@RequestBody PageRequest request) {
         try {
             JobInterest interest = jobInterestService.get(getUserInfo().getId());
-            ProjectSearchBean bean = new ProjectSearchBean();
+            ProjectCondition bean = new ProjectCondition();
             bean.setPageSize(request.getPageSize());
             bean.setOffset((request.getPageNo() - 1) * request.getPageSize());
             bean.setFreeze(false);
@@ -233,35 +233,40 @@ public class ProjectController extends BaseController {
                     bean.setCity(list);
                 }
             }
-            return new CommonResponse<Page<Project>>(projectService.search(bean));
+            Page<ProjectSimpleInfo> page = projectService.search(bean);
+            buildProject(page);
+            return new CommonResponse<Page<ProjectSimpleInfo>>(page);
         } catch (Exception e) {
             log.error("recommended project error!", e);
         }
-        return new CommonResponse<Page<Project>>(ResponseStatus.SYSTEM_ERROR);
+        return new CommonResponse<Page<ProjectSimpleInfo>>(ResponseStatus.SYSTEM_ERROR);
     }
 
     @RequestMapping(value = "/latest", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
-    public CommonResponse<Page<Project>> latest(@RequestBody PageRequest request) {
+    public CommonResponse<Page<ProjectSimpleInfo>> latest(@RequestBody PageRequest request) {
         try {
-            ProjectSearchBean bean = new ProjectSearchBean();
+            ProjectCondition bean = new ProjectCondition();
             bean.setOffset((request.getPageNo() - 1) * request.getPageSize());
             bean.setPageSize(request.getPageSize());
             bean.setFreeze(false);
             bean.setStatus(Arrays.asList(ProjectStatus.RECRUITING.getCode()));
-            return new CommonResponse<Page<Project>>(projectService.search(bean));
+            Page<ProjectSimpleInfo> page = projectService.search(bean);
+            buildProject(page);
+            return new CommonResponse<Page<ProjectSimpleInfo>>(page);
         } catch (Exception e) {
             log.error("latest project error!", e);
         }
-        return new CommonResponse<Page<Project>>(ResponseStatus.SYSTEM_ERROR);
+        return new CommonResponse<Page<ProjectSimpleInfo>>(ResponseStatus.SYSTEM_ERROR);
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody
     public CommonResponse<Page<ProjectSimpleInfo>> search(@RequestBody ProjectSearchRequest request) {
         try {
-            Page<Project> page = projectService.search(request.toBean());
-            return new CommonResponse<Page<ProjectSimpleInfo>>(buildProjects(page));
+            Page<ProjectSimpleInfo> page = projectService.search(request.toBean());
+            buildProject(page);
+            return new CommonResponse<Page<ProjectSimpleInfo>>(page);
         } catch (Exception e) {
             log.error("search project error!", e);
         }
@@ -285,7 +290,7 @@ public class ProjectController extends BaseController {
     @ResponseBody
     public CommonResponse<Page<ProjectSimpleInfo>> myProject(@RequestBody MyProjectSearchRequest request) {
         try {
-            ProjectSearchBean bean = new ProjectSearchBean();
+            ProjectCondition bean = new ProjectCondition();
             if (getUserInfo().getRole() == UserRole.MANAGER.getRole()) {
                 bean.setManagerId(getUserInfo().getId());
             }else if (getUserInfo().getRole() == UserRole.AGENT.getRole()) {
@@ -307,8 +312,9 @@ public class ProjectController extends BaseController {
             if (CollectionUtils.isNotEmpty(request.getStatus())) {
                 bean.setStatus(request.getStatus());
             }
-            Page<Project> page = projectService.search(bean);
-            return new CommonResponse<Page<ProjectSimpleInfo>>(buildProjects(page));
+            Page<ProjectSimpleInfo> page = projectService.search(bean);
+            buildProject(page);
+            return new CommonResponse<Page<ProjectSimpleInfo>>(page);
         } catch (Exception e) {
             log.error("search project error!", e);
         }
@@ -432,6 +438,34 @@ public class ProjectController extends BaseController {
             log.error("acceptHiring project error!", e);
         }
         return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    private void buildProject(Page<ProjectSimpleInfo> page) {
+        List<ProjectSimpleInfo> tmp = page.getResult();
+        Map<Long, String> userMap = new HashMap<Long, String>();
+        Set<Long> userIds = new HashSet<Long>();
+        if (CollectionUtils.isNotEmpty(tmp)) {
+            for (ProjectSimpleInfo p : tmp) {
+                if (p.getManager() != null) {
+                    userIds.add(p.getManager().getId());
+                }
+                if (p.getBroker() != null) {
+                    userIds.add(p.getBroker().getId());
+                }
+            }
+            for (User user : userService.batchGet(new ArrayList<Long>(userIds))) {
+                userMap.put(user.getId(), user.getUserName());
+            }
+            for (ProjectSimpleInfo p : tmp) {
+                if (p.getManager() != null ) {
+                    p.setManager(new KVLongInfo(p.getManager().getId(), userMap.get(p.getManager().getId())));
+                }
+                if (p.getBroker() != null) {
+                    p.setBroker(new KVLongInfo(p.getBroker().getId(), userMap.get(p.getBroker().getId())));
+                }
+            }
+        }
+
     }
 
     private Page<ProjectSimpleInfo> buildProjects(Page<Project> page) {

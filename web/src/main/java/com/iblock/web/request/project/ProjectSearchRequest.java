@@ -3,6 +3,7 @@ package com.iblock.web.request.project;
 import com.iblock.common.bean.ProjectSearchBean;
 import com.iblock.common.enums.ProjectStatus;
 import com.iblock.service.info.KVInfo;
+import com.iblock.service.search.ProjectCondition;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -24,8 +25,8 @@ public class ProjectSearchRequest {
     private Integer pageNo;
     private Integer pageSize;
 
-    public ProjectSearchBean toBean() {
-        ProjectSearchBean bean = new ProjectSearchBean();
+    public ProjectCondition toBean() {
+        ProjectCondition bean = new ProjectCondition();
         bean.setOffset((pageNo - 1) * pageSize);
         bean.setPageSize(pageSize);
         bean.setStatus(Arrays.asList(ProjectStatus.RECRUITING.getCode()));

@@ -21,9 +21,12 @@ import com.iblock.dao.po.ProjectSkill;
 import com.iblock.dao.po.ProjectSkillDetail;
 import com.iblock.dao.po.User;
 import com.iblock.service.bo.ProjectAcceptBo;
+import com.iblock.service.info.ProjectSimpleInfo;
 import com.iblock.service.message.MessageService;
+import com.iblock.service.search.ProjectCondition;
 import com.iblock.service.search.ProjectSearch;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -296,6 +299,10 @@ public class ProjectService {
         int size = projectDao.size(search);
         return new Page<Project>(list, search.getOffset() / search.getPageSize() + 1, search.getPageSize(), size, search
                 .getOrder(), search.getOrderBy());
+    }
+
+    public Page<ProjectSimpleInfo> search(ProjectCondition condition) throws IOException, ParseException {
+        return projectSearch.search(condition);
     }
 
     @Transactional

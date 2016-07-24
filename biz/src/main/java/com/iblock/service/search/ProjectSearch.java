@@ -21,6 +21,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.IntField;
+import org.apache.lucene.document.LongField;
+import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
@@ -34,10 +37,14 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.TopFieldCollector;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
@@ -119,9 +126,12 @@ public class ProjectSearch {
     public Page<ProjectSimpleInfo> search(ProjectCondition c) throws IOException, ParseException {
         BooleanQuery rootQuery = new BooleanQuery();
         if (c.getMinPay() != null || c.getMaxPay() != null) {
-            BytesRef min = c.getMinPay() == null ? null : new BytesRef(c.getMinPay().byteValue());
-            BytesRef max = c.getMaxPay() == null ? null : new BytesRef(c.getMaxPay().byteValue());
-            rootQuery.add(new TermRangeQuery("maxPay", min, max, true, true), BooleanClause.Occur.MUST);
+            BooleanQuery payQuery = new BooleanQuery();
+            payQuery.add(NumericRangeQuery.newIntRange("maxPay", c.getMinPay(), c.getMaxPay(), true, true),
+                    BooleanClause.Occur.SHOULD);
+            payQuery.add(NumericRangeQuery.newIntRange("minPay", c.getMinPay(), c.getMaxPay(), true, true),
+                    BooleanClause.Occur.SHOULD);
+            rootQuery.add(payQuery, BooleanClause.Occur.MUST);
         }
         if (c.getAgentId() != null) {
             rootQuery.add(new QueryParser("agentId", analyzer).parse(String.valueOf(c.getAgentId())),
@@ -164,15 +174,24 @@ public class ProjectSearch {
         if (c.getStatus() != null) {
             BooleanQuery statusQuery = new BooleanQuery();
             for (Integer i : c.getStatus()) {
-                statusQuery.add(new QueryParser("industry", analyzer).parse(String.valueOf(i)), BooleanClause.Occur
+                statusQuery.add(new QueryParser("status", analyzer).parse(String.valueOf(i)), BooleanClause.Occur
                         .SHOULD);
             }
             rootQuery.add(statusQuery, BooleanClause.Occur.MUST);
         }
+        if (c.getIds() != null) {
+            BooleanQuery idQuery = new BooleanQuery();
+            for (Long i : c.getIds()) {
+                idQuery.add(new QueryParser("id", analyzer).parse(String.valueOf(i)), BooleanClause.Occur.SHOULD);
+            }
+            rootQuery.add(idQuery, BooleanClause.Occur.MUST);
+        }
         int hitsPerPage = c.getPageSize();
         IndexReader reader = DirectoryReader.open(index);
         IndexSearcher searcher = new IndexSearcher(reader);
-        TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, null);
+        Sort sort = new Sort(new SortField("addTime", SortField.Type.LONG, true));
+        TopFieldCollector collector = TopFieldCollector.create(sort, hitsPerPage, false, false, false);
+
         searcher.search(rootQuery, collector);
         TopDocs topDocs = collector.topDocs(c.getOffset(), c.getPageSize());
         ScoreDoc[] hits = topDocs.scoreDocs;
@@ -223,11 +242,13 @@ public class ProjectSearch {
         doc.add(new TextField("name", p.getName(), Field.Store.NO));
         doc.add(new StringField("managerId", String.valueOf(p.getManagerId()), Field.Store.NO));
         doc.add(new StringField("agentId", String.valueOf(p.getAgentId()), Field.Store.NO));
-        doc.add(new StringField("minPay", String.valueOf(p.getMinPay()), Field.Store.NO));
-        doc.add(new StringField("maxPay", String.valueOf(p.getMaxPay()), Field.Store.NO));
+        doc.add(new IntField("minPay", p.getMinPay(), Field.Store.NO));
+        doc.add(new IntField("maxPay", p.getMaxPay(), Field.Store.NO));
         doc.add(new StringField("resident", p.getResident() ? "1" : "0", Field.Store.NO));
         doc.add(new StringField("status", String.valueOf(p.getStatus().intValue()), Field.Store.NO));
         doc.add(new StringField("city", String.valueOf(p.getCity()), Field.Store.NO));
+        doc.add(new LongField("addTime", p.getAddTime().getTime(), Field.Store.YES));
+        doc.add(new NumericDocValuesField("addTime", p.getAddTime().getTime()));
         doc.add(new StringField("industry", String.valueOf(p.getIndustry()), Field.Store.NO));
         StringBuffer sb = new StringBuffer();
         if (CollectionUtils.isNotEmpty(skills)) {
