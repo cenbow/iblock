@@ -337,11 +337,11 @@ public class ProjectController extends BaseController {
     }
 
     @RequestMapping(value = "/terminate", method = RequestMethod.POST, consumes = "application/json")
-    @Auth(role = RoleConstant.MANAGER + "," + RoleConstant.AGENT)
+    @Auth(role = RoleConstant.MANAGER + "," + RoleConstant.AGENT + "," + RoleConstant.ADMINISTRATOR)
     @ResponseBody
     public CommonResponse<Boolean> terminate(@RequestBody ProjectIdRequest request) {
         try {
-            if (!projectService.terminate(request.getId(), getUserInfo().getId())) {
+            if (!projectService.terminate(request.getId(), getUserInfo().getId(), getUserInfo().getRole())) {
                 return new CommonResponse<Boolean>(ResponseStatus.VALIDATE_ERROR);
             }
             return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);

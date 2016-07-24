@@ -149,10 +149,15 @@ public class ProjectService {
 
 
     @Transactional
-    public boolean terminate(long id, long managerId) throws InvalidRequestException, IOException {
+    public boolean terminate(long id, long userId, int role) throws InvalidRequestException, IOException {
         Project pro = projectDao.selectByPrimaryKey(id);
-        if (!pro.getManagerId().equals(managerId)) {
-            throw new InvalidRequestException();
+        if (role == UserRole.MANAGER.getRole() || role == UserRole.AGENT.getRole()) {
+            if (pro.getManagerId().intValue() != userId && pro.getAgentId().intValue() != userId) {
+                throw new InvalidRequestException("用户无权限");
+            }
+        }
+        if (role == UserRole.DESIGNER.getRole()) {
+            throw new InvalidRequestException("用户无权限");
         }
         pro.setStatus((byte) ProjectStatus.TERMINATION.getCode());
         projectSearch.update(pro);
