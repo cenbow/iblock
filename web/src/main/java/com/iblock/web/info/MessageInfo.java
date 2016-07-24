@@ -16,6 +16,7 @@ import java.util.Set;
  */
 @Data
 public class MessageInfo {
+    private Long msgId;
     private int readStatus;
     private String sendTime;
     private int type;
@@ -26,11 +27,11 @@ public class MessageInfo {
 
     public static MessageInfo parse(Message message) {
         MessageInfo info = new MessageInfo();
+        info.setMsgId(message.getId());
         info.setService(message.getService());
         info.setInputparams(message.getInputType());
         info.setMsg(message.getDetail());
-        Set<String> paramSet = MsgContentUtil.getInstance().getMsg(message.getAction()).getParams();
-        if (paramSet != null && paramSet.contains("msgId")) {
+        if (message.getType() > 0) {
             JSONObject o = JSON.parseObject(message.getParams());
             o.put("msgId", message.getId());
             info.setPostparams(o.toString());
