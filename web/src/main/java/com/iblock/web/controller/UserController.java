@@ -93,6 +93,18 @@ public class UserController extends BaseController {
     @Autowired
     protected MetaService metaService;
 
+    @RequestMapping(value = "/profilecomplete", method = RequestMethod.GET)
+    @Auth
+    @ResponseBody
+    public CommonResponse<Boolean> profileComplete() {
+        try {
+            return new CommonResponse<Boolean>(userService.profileComplete(getUserInfo().getId()));
+        } catch (Exception e) {
+            log.error("profileComplete user error!", e);
+        }
+        return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
+    }
+
     @RequestMapping(value = "/rate", method = RequestMethod.POST, consumes = "application/json")
     @Auth
     @ResponseBody
@@ -508,7 +520,7 @@ public class UserController extends BaseController {
         try {
             List<User> users = userService.getUsersByRole(role);
             List<AdminUserInfo> result = new ArrayList<AdminUserInfo>();
-            if(CollectionUtils.isNotEmpty(users)) {
+            if (CollectionUtils.isNotEmpty(users)) {
                 for (User user : users) {
                     AdminUserInfo info = new AdminUserInfo();
                     info.setId(user.getId());

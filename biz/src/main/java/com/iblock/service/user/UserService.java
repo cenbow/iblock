@@ -3,6 +3,7 @@ package com.iblock.service.user;
 import com.iblock.common.enums.CommonStatus;
 import com.iblock.common.enums.UserRole;
 import com.iblock.dao.IndustryDao;
+import com.iblock.dao.JobInterestDao;
 import com.iblock.dao.ManagerDao;
 import com.iblock.dao.SkillDao;
 import com.iblock.dao.UserDao;
@@ -47,6 +48,28 @@ public class UserService {
     private UserRatingDao userRatingDao;
     @Autowired
     private MessageService messageService;
+    @Autowired
+    private JobInterestDao jobInterestDao;
+
+    public boolean profileComplete(Long userId) {
+        User user = userDao.selectByPrimaryKey(userId);
+        if (user.getRole().intValue() == UserRole.MANAGER.getRole()) {
+            Manager manager = managerDao.selectByUser(userId);
+            return StringUtils.isNotBlank(manager.getCompanyName()) && StringUtils.isNotBlank(manager.getDesc());
+        } else if (user.getRole().intValue() == UserRole.DESIGNER.getRole()) {
+            if (user.getEducation() == null || user.getEducation() <= 0) {
+                return false;
+            }
+            if (StringUtils.isBlank(user.getSkills())) {
+                return false;
+            }
+            if (jobInterestDao.selectByUser(userId) == null) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
 
     public boolean rate(Long userId, Integer rating, Long operator, Long msgId) {
         UserRating userRating = new UserRating();
