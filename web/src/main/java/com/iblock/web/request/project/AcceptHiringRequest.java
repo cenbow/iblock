@@ -9,4 +9,5 @@ import lombok.Data;
 public class AcceptHiringRequest {
     private long hireid;
     private boolean accept;
+    private long msgId;
 }

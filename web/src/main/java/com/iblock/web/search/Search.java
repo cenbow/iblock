@@ -11,5 +11,5 @@ public interface Search<T> {
 
     void update(T entity);
 
-    Page<T> search(Condition condition);
+//    Page<T> search(Condition condition);
 }

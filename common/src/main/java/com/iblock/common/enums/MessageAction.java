@@ -7,7 +7,7 @@ public enum MessageAction {
 
     AUDIT_SUCCESS(1, "审核成功"), AUDIT_FAIL(2, "审核失败"),
     HIRE(3, "招募"), ACCEPT_HIRE(4, "同意招募"), DENY_HIRE(5, "拒绝招募"), MANAGER_RATING(6, "为项目经理打分"), DESIGNER_RATING(7,
-            "为设计师打分"), APPLY_JOB(8, "申请职位");
+            "为设计师打分"), APPLY_JOB(8, "申请职位"), PROJECT_RATING(9, "为项目打分");
 
     private int code;
     private String msg;

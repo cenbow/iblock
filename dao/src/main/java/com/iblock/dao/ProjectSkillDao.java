@@ -49,4 +49,6 @@ public interface ProjectSkillDao {
     List<ProjectSkillDetail> selectByProject(Long project);
 
     int disable(Long project);
+
+    List<ProjectSkill> selectAll();
 }

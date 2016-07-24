@@ -16,6 +16,7 @@ import com.iblock.dao.po.UserDetail;
 import com.iblock.dao.po.UserGeo;
 import com.iblock.dao.po.UserRating;
 import com.iblock.service.bo.UserUpdateBo;
+import com.iblock.service.message.MessageService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,14 +45,17 @@ public class UserService {
     private IndustryDao industryDao;
     @Autowired
     private UserRatingDao userRatingDao;
+    @Autowired
+    private MessageService messageService;
 
-    public boolean rate(Long userId, Integer rating, Long operator) {
+    public boolean rate(Long userId, Integer rating, Long operator, Long msgId) {
         UserRating userRating = new UserRating();
         userRating.setOperator(operator);
         userRating.setUserId(userId);
         userRating.setStatus((byte) CommonStatus.NORMAL.getCode());
         userRating.setRating(rating);
         userRating.setAddTime(new Date());
+        messageService.finish(msgId, operator);
         return userRatingDao.insertSelective(userRating) > 0;
     }
 

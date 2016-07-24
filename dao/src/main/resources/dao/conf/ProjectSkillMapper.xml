@@ -169,4 +169,11 @@
     set status=0
     where project_id=#{project}
   </update>
+
+  <select id="selectAll" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from PROJECT_SKILL
+    where status=1
+  </select>
 </mapper>

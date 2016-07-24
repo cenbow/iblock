@@ -40,6 +40,7 @@ import com.iblock.web.request.user.ResetMobileRequest;
 import com.iblock.web.request.user.SendValidateCodeRequest;
 import com.iblock.web.request.user.SignUpDesignerRequest;
 import com.iblock.web.request.user.SignUpManagerRequest;
+import com.iblock.web.request.user.UserRatingRequest;
 import com.iblock.web.response.CommonResponse;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -91,6 +92,22 @@ public class UserController extends BaseController {
     protected SMSService smsService;
     @Autowired
     protected MetaService metaService;
+
+    @RequestMapping(value = "/rate", method = RequestMethod.POST, consumes = "application/json")
+    @Auth
+    @ResponseBody
+    public CommonResponse<Void> rate(@RequestBody UserRatingRequest request) {
+        try {
+            if (userService.rate(request.getId(), request.getRating(), getUserInfo().getId(), request.getMsgId())) {
+                return new CommonResponse<Void>(ResponseStatus.SUCCESS);
+            } else {
+                return new CommonResponse<Void>(ResponseStatus.PARAM_ERROR, "评分失败，项目未完结");
+            }
+        } catch (Exception e) {
+            log.error("rate user error!", e);
+        }
+        return new CommonResponse<Void>(ResponseStatus.SYSTEM_ERROR);
+    }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST, consumes = "application/json")
     @ResponseBody

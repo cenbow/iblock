@@ -223,7 +223,10 @@
         <include refid="Base_Column_List"/>
         from MESSAGE
         where target_id=#{userId}
-        and status=#{status}
+        and status in
+        <foreach close=")" collection="status" index="index" item="item" open="(" separator=",">
+            #{item}
+        </foreach>
         order by add_time desc
         limit #{offset}, #{pageSize}
     </select>
@@ -232,7 +235,10 @@
     select count(1)
     from MESSAGE
     where target_id=#{userId}
-    and status=#{status}
+    and status in
+        <foreach close=")" collection="status" index="index" item="item" open="(" separator=",">
+            #{item}
+        </foreach>
   </select>
 
     <select id="selectUnloadBroadcastMsg" parameterType="map" resultMap="BaseResultMap">

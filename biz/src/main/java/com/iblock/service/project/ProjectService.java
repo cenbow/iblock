@@ -53,7 +53,8 @@ public class ProjectService {
     @Autowired
     private ProjectRatingDao projectRatingDao;
 
-    public boolean rate(Long projectId, Integer rating, Long userId) {
+    @Transactional
+    public boolean rate(Long projectId, Integer rating, Long userId, Long msgId) {
         Project p = projectDao.selectByPrimaryKey(projectId);
         if (p.getStatus().intValue() != ProjectStatus.FINISH.getCode()) {
             return false;
@@ -67,6 +68,7 @@ public class ProjectService {
         projectRating.setStatus((byte) CommonStatus.NORMAL.getCode());
         projectRating.setRating(rating);
         projectRating.setAddTime(new Date());
+        messageService.finish(msgId, userId);
         return projectRatingDao.insertSelective(projectRating) > 0;
     }
 
@@ -80,6 +82,21 @@ public class ProjectService {
 
     public List<ProjectSkillDetail> getSkills(Long projectId) {
         return projectSkillDao.selectByProject(projectId);
+    }
+
+    public Map<Long, ArrayList<ProjectSkill>> getAllSkills() {
+        List<ProjectSkill> list = projectSkillDao.selectAll();
+        Map<Long, ArrayList<ProjectSkill>> map = new HashMap<Long, ArrayList<ProjectSkill>>();
+        if (CollectionUtils.isEmpty(list)) {
+            return map;
+        }
+        for (ProjectSkill skill : list) {
+            if (!map.containsKey(skill.getProjectId())) {
+                map.put(skill.getProjectId(), new ArrayList<ProjectSkill>());
+            }
+            map.get(skill.getProjectId()).add(skill);
+        }
+        return map;
     }
 
     public List<ProjectDesigner> getProjectDesigner(Long userId) {
@@ -162,17 +179,20 @@ public class ProjectService {
         if (designers != null) {
             Map<String, String> managerMap = new HashMap<String, String>();
             Map<String, String> designerMap = new HashMap<String, String>();
-            managerMap.put("id", String.valueOf(id));
-            managerMap.put("userid", String.valueOf(pro.getManagerId()));
+            Map<String, String> proMap = new HashMap<String, String>();
+            proMap.put("id", String.valueOf(pro.getId()));
+            proMap.put("rating", "5");
+            managerMap.put("id", String.valueOf(pro.getManagerId()));
             managerMap.put("rating", "5");
-            designerMap.put("id", String.valueOf(id));
             designerMap.put("rating", "5");
             for (ProjectDesigner designer : designers) {
-                designerMap.put("userid", String.valueOf(designer.getDesignerId()));
+                designerMap.put("id", String.valueOf(designer.getDesignerId()));
                 messageService.send(-1L, pro.getManagerId(), MessageAction.DESIGNER_RATING, null, null, designer
                         .getDesignerId(), pro, designerMap);
                 messageService.send(-1L, designer.getDesignerId(), MessageAction.MANAGER_RATING, pro.getManagerId(), null,
-                        null, pro, designerMap);
+                        null, pro, managerMap);
+                messageService.send(-1L, designer.getDesignerId(), MessageAction.PROJECT_RATING, pro.getManagerId(), null,
+                        null, pro, proMap);
             }
         }
         return projectDao.updateByPrimaryKeySelective(pro) > 0;
@@ -228,7 +248,7 @@ public class ProjectService {
     }
 
     @Transactional
-    public boolean acceptHiring(long id, long userId, boolean accept) throws InvalidRequestException,
+    public boolean acceptHiring(long id, long userId, long msgId, boolean accept) throws InvalidRequestException,
             InnerLogicException, IOException {
         Project pro = projectDao.selectByPrimaryKey(id);
         ProjectDesigner designer = projectDesignerDao.selectByProjectAndDesigner(id, userId);
@@ -248,6 +268,7 @@ public class ProjectService {
         designer.setStatus((byte) (accept ? HireStatus.ACCEPT.getCode(): HireStatus.DENY.getCode()));
         Map<String, String> params = new HashMap<String, String>();
         params.put("hireid", String.valueOf(pro.getId()));
+        messageService.finish(msgId, userId);
         messageService.send(-1L, userId, accept ? MessageAction.ACCEPT_HIRE : MessageAction.DENY_HIRE, null, null,
                 userId, pro, params);
         if (accept) {

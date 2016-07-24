@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,10 +42,15 @@ public class MessageService {
 
     public Page<Message> getMsgs(long userId, int pageNo, int pageSize, boolean read, Integer role) {
         syncBroadCast(userId, role);
-        List<Message> messages = messageDao.selectByUserAndStatus(userId, read ? MessageStatus.READ.getCode() :
-                MessageStatus.UNREAD.getCode(), (pageNo - 1) * pageSize, pageSize);
-        int count = messageDao.countByUserAndStatus(userId, read ? MessageStatus.READ.getCode() :
-                MessageStatus.UNREAD.getCode());
+        List<Integer> status = new ArrayList<Integer>();
+        if (read) {
+            status.add(MessageStatus.READ.getCode());
+            status.add(MessageStatus.FINISH.getCode());
+        } else {
+            status.add(MessageStatus.UNREAD.getCode());
+        }
+        List<Message> messages = messageDao.selectByUserAndStatus(userId, status, (pageNo - 1) * pageSize, pageSize);
+        int count = messageDao.countByUserAndStatus(userId, status);
         return new Page<Message>(messages, pageNo, pageSize, count, "sendTime", "desc");
     }
 
@@ -54,6 +60,18 @@ public class MessageService {
             return false;
         }
         msg.setStatus((byte) MessageStatus.READ.getCode());
+        if (msg.getStatus().intValue() == MessageStatus.UNREAD.getCode()) {
+            msg.setStatus((byte) MessageStatus.READ.getCode());
+        }
+        return messageDao.updateByPrimaryKeySelective(msg) > 0;
+    }
+
+    public boolean finish(long msgId, long userId) {
+        Message msg = messageDao.selectByPrimaryKey(msgId);
+        if (msg == null || !msg.getTargetId().equals(userId)) {
+            return false;
+        }
+        msg.setStatus((byte) MessageStatus.FINISH.getCode());
         return messageDao.updateByPrimaryKeySelective(msg) > 0;
     }
 

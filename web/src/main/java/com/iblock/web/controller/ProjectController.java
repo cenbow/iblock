@@ -35,6 +35,8 @@ import com.iblock.web.request.project.ProjectRatingRequest;
 import com.iblock.web.request.project.ProjectSearchRequest;
 import com.iblock.web.request.project.ProjectUpdateRequest;
 import com.iblock.web.response.CommonResponse;
+import com.iblock.web.search.ProjectCondition;
+import com.iblock.web.search.ProjectSearch;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -70,13 +72,15 @@ public class ProjectController extends BaseController {
     private MetaService metaService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private ProjectSearch projectSearch;
 
     @RequestMapping(value = "/rate", method = RequestMethod.POST, consumes = "application/json")
-    @Auth(role = RoleConstant.MANAGER)
+    @Auth(role = RoleConstant.DESIGNER)
     @ResponseBody
     public CommonResponse<Void> rate(@RequestBody ProjectRatingRequest request) {
         try {
-            if (projectService.rate(request.getId(), request.getRating(), getUserInfo().getId())) {
+            if (projectService.rate(request.getId(), request.getRating(), getUserInfo().getId(), request.getMsgId())) {
                 return new CommonResponse<Void>(ResponseStatus.SUCCESS);
             } else {
                 return new CommonResponse<Void>(ResponseStatus.PARAM_ERROR, "评分失败，项目未完结");
@@ -119,6 +123,9 @@ public class ProjectController extends BaseController {
     public CommonResponse<Long> save(@RequestBody ProjectUpdateRequest project) {
         try {
             Project p = projectService.get(project.getId());
+            if (p == null) {
+                return new CommonResponse<Long>(ResponseStatus.NOT_FOUND);
+            }
             project.updateProject(p);
             p.setStatus((byte) ProjectStatus.AUDIT.getCode());
             long id = projectService.save(p, project.toSkills(), getUserInfo().getId());
@@ -255,6 +262,18 @@ public class ProjectController extends BaseController {
         try {
             Page<Project> page = projectService.search(request.toBean());
             return new CommonResponse<Page<ProjectSimpleInfo>>(buildProjects(page));
+        } catch (Exception e) {
+            log.error("search project error!", e);
+        }
+        return new CommonResponse<Page<ProjectSimpleInfo>>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/searchtest", method = RequestMethod.POST, consumes = "application/json")
+    @ResponseBody
+    public CommonResponse<Page<ProjectSimpleInfo>> searchtest(@RequestBody ProjectCondition request) {
+        try {
+            Page<ProjectSimpleInfo> page = projectSearch.search(request);
+            return new CommonResponse<Page<ProjectSimpleInfo>>(page);
         } catch (Exception e) {
             log.error("search project error!", e);
         }
@@ -404,7 +423,8 @@ public class ProjectController extends BaseController {
     @ResponseBody
     public CommonResponse<Boolean> acceptHiring(@RequestBody AcceptHiringRequest request) {
         try {
-            if (!projectService.acceptHiring(request.getHireid(), getUserInfo().getId(), request.isAccept())) {
+            if (!projectService.acceptHiring(request.getHireid(), getUserInfo().getId(), request.getMsgId(), request
+                            .isAccept())) {
                 return new CommonResponse<Boolean>(ResponseStatus.VALIDATE_ERROR);
             }
             return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);
@@ -453,7 +473,7 @@ public class ProjectController extends BaseController {
                 info.setManager(new KVLongInfo(p.getManagerId(), userMap.get(p.getManagerId())));
             }
             if (p.getAgentId() != null && !p.getAgentId().equals(0L)) {
-                info.setManager(new KVLongInfo(p.getAgentId(), userMap.get(p.getAgentId())));
+                info.setBroker(new KVLongInfo(p.getAgentId(), userMap.get(p.getAgentId())));
             }
             list.add(info);
         }

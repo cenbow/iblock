@@ -9,32 +9,46 @@
         <params>
             <param name="hireid"/>
             <param name="accept"/>
+            <param name="msgId"/>
         </params>
     </message>
     <message type="0" action="4" detail="设计师 {designer} 接受了您在项目 {project} 的招聘申请。">
     </message>
     <message type="0" action="5" detail="设计师 {designer} 拒绝了您在项目 {project} 的招聘申请。">
     </message>
-    <message type="2" action="6" detail="项目 {project} 已完结，请给项目经理 {manager} 评分。如已达成协议，请确认；如您和该项目不熟悉，请拒绝。">
+    <message type="2" action="6" service="user/rate"
+             detail="项目 {project} 已完结，请给项目经理 {manager} 评分。如已达成协议，请确认；如您和该项目不熟悉，请拒绝。">
         <params>
             <param name="id"/>
-            <param name="userid"/>
             <param name="rating"/>
+            <param name="msgId"/>
         </params>
         <inputs>
             <input name="rating" type="integer"/>
         </inputs>
     </message>
-    <message type="2" action="7" detail="项目 {project} 已完结，请给设计师 {designer} 评分。如已达成协议，请确认；如您和该项目不熟悉，请拒绝。">
+    <message type="2" action="7" service="user/rate"
+             detail="项目 {project} 已完结，请给设计师 {designer} 评分。如已达成协议，请确认；如您和该项目不熟悉，请拒绝。">
         <params>
             <param name="id"/>
-            <param name="userid"/>
             <param name="rating"/>
+            <param name="msgId"/>
         </params>
         <inputs>
             <input name="rating" type="integer"/>
         </inputs>
     </message>
     <message type="0" action="8" detail="设计师 {designer} 申请应聘项目 {project} 的职位。">
+    </message>
+    <message type="2" action="9" service="project/rate"
+             detail="项目 {project} 已完结，请给该项目评分评分。如已达成协议，请确认；如您和该项目不熟悉，请拒绝。">
+        <params>
+            <param name="id"/>
+            <param name="rating"/>
+            <param name="msgId"/>
+        </params>
+        <inputs>
+            <input name="rating" type="integer"/>
+        </inputs>
     </message>
 </messages>
