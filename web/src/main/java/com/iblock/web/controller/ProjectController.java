@@ -72,6 +72,8 @@ public class ProjectController extends BaseController {
     private MetaService metaService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private ProjectSearch projectSearch;
 
     @RequestMapping(value = "/rate", method = RequestMethod.POST, consumes = "application/json")
     @Auth(role = RoleConstant.DESIGNER)
@@ -260,6 +262,18 @@ public class ProjectController extends BaseController {
         try {
             Page<Project> page = projectService.search(request.toBean());
             return new CommonResponse<Page<ProjectSimpleInfo>>(buildProjects(page));
+        } catch (Exception e) {
+            log.error("search project error!", e);
+        }
+        return new CommonResponse<Page<ProjectSimpleInfo>>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/searchtest", method = RequestMethod.POST, consumes = "application/json")
+    @ResponseBody
+    public CommonResponse<Page<ProjectSimpleInfo>> searchtest(@RequestBody ProjectCondition request) {
+        try {
+            Page<ProjectSimpleInfo> page = projectSearch.search(request);
+            return new CommonResponse<Page<ProjectSimpleInfo>>(page);
         } catch (Exception e) {
             log.error("search project error!", e);
         }

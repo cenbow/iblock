@@ -22,6 +22,7 @@ import com.iblock.dao.po.ProjectSkillDetail;
 import com.iblock.dao.po.User;
 import com.iblock.service.bo.ProjectAcceptBo;
 import com.iblock.service.message.MessageService;
+import com.iblock.service.search.ProjectSearch;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -52,6 +53,8 @@ public class ProjectService {
     private ProjectSkillDao projectSkillDao;
     @Autowired
     private ProjectRatingDao projectRatingDao;
+    @Autowired
+    private ProjectSearch projectSearch;
 
     @Transactional
     public boolean rate(Long projectId, Integer rating, Long userId, Long msgId) {
@@ -84,21 +87,6 @@ public class ProjectService {
         return projectSkillDao.selectByProject(projectId);
     }
 
-    public Map<Long, ArrayList<ProjectSkill>> getAllSkills() {
-        List<ProjectSkill> list = projectSkillDao.selectAll();
-        Map<Long, ArrayList<ProjectSkill>> map = new HashMap<Long, ArrayList<ProjectSkill>>();
-        if (CollectionUtils.isEmpty(list)) {
-            return map;
-        }
-        for (ProjectSkill skill : list) {
-            if (!map.containsKey(skill.getProjectId())) {
-                map.put(skill.getProjectId(), new ArrayList<ProjectSkill>());
-            }
-            map.get(skill.getProjectId()).add(skill);
-        }
-        return map;
-    }
-
     public List<ProjectDesigner> getProjectDesigner(Long userId) {
         return projectDesignerDao.selectByDesigner(userId);
     }
@@ -117,13 +105,15 @@ public class ProjectService {
         return userDao.batchSelect(ids);
     }
     @Transactional
-    public long save(Project p, List<ProjectSkill> skills, Long managerId) throws InvalidRequestException {
+    public long save(Project p, List<ProjectSkill> skills, Long managerId) throws InvalidRequestException, IOException {
+        boolean isNew = p.getId() == null;
         if (p.getId() == null) {
             p.setAddTime(new Date());
             p.setManagerId(managerId);
             p.setStatus((byte) ProjectStatus.AUDIT.getCode());
             p.setFreeze(false);
             projectDao.insertSelective(p);
+
         } else {
             Project tmp = projectDao.selectByPrimaryKey(p.getId());
             if (!tmp.getManagerId().equals(managerId) || (tmp.getStatus().intValue() != ProjectStatus.AUDIT.getCode()
@@ -140,31 +130,40 @@ public class ProjectService {
                 projectSkillDao.insertSelective(skill);
             }
         }
+        if (isNew) {
+            projectSearch.add(p);
+        } else {
+            projectSearch.update(p);
+        }
         return p.getId();
     }
 
-    public boolean update(Project p) {
-        return projectDao.updateByPrimaryKeySelective(p) > 0;
+    public boolean update(Project p) throws IOException {
+        boolean result = projectDao.updateByPrimaryKeySelective(p) > 0;
+        projectSearch.update(p);
+        return result;
     }
 
 
     @Transactional
-    public boolean terminate(long id, long managerId) throws InvalidRequestException {
+    public boolean terminate(long id, long managerId) throws InvalidRequestException, IOException {
         Project pro = projectDao.selectByPrimaryKey(id);
         if (!pro.getManagerId().equals(managerId)) {
             throw new InvalidRequestException();
         }
         pro.setStatus((byte) ProjectStatus.TERMINATION.getCode());
+        projectSearch.update(pro);
         return projectDao.updateByPrimaryKeySelective(pro) > 0;
     }
 
     @Transactional
-    public boolean start(long id, long managerId) throws InvalidRequestException {
+    public boolean start(long id, long managerId) throws InvalidRequestException, IOException {
         Project pro = projectDao.selectByPrimaryKey(id);
         if (!pro.getManagerId().equals(managerId)) {
             throw new InvalidRequestException();
         }
         pro.setStatus((byte) ProjectStatus.ONGOING.getCode());
+        projectSearch.update(pro);
         return projectDao.updateByPrimaryKeySelective(pro) > 0;
     }
 
@@ -191,20 +190,20 @@ public class ProjectService {
                         .getDesignerId(), pro, designerMap);
                 messageService.send(-1L, designer.getDesignerId(), MessageAction.MANAGER_RATING, pro.getManagerId(), null,
                         null, pro, managerMap);
-                messageService.send(-1L, designer.getDesignerId(), MessageAction.PROJECT_RATING, pro.getManagerId(), null,
-                        null, pro, proMap);
             }
         }
+        projectSearch.update(pro);
         return projectDao.updateByPrimaryKeySelective(pro) > 0;
     }
 
     @Transactional
-    public boolean completeHire(long id, long manager) throws InvalidRequestException {
+    public boolean completeHire(long id, long manager) throws InvalidRequestException, IOException {
         Project pro = projectDao.selectByPrimaryKey(id);
         if (!pro.getManagerId().equals(manager)) {
             throw new InvalidRequestException();
         }
         pro.setStatus((byte) ProjectStatus.READY.getCode());
+        projectSearch.update(pro);
         return projectDao.updateByPrimaryKeySelective(pro) > 0;
     }
 
@@ -273,6 +272,7 @@ public class ProjectService {
                 userId, pro, params);
         if (accept) {
             pro.setHired(pro.getHired() + 1);
+            projectSearch.update(pro);
             projectDao.updateByPrimaryKeySelective(pro);
         }
         return projectDesignerDao.updateByPrimaryKey(designer) > 0;
@@ -308,6 +308,7 @@ public class ProjectService {
         p.setStatus((byte) (bo.getAccept() ? ProjectStatus.RECRUITING.getCode() : ProjectStatus.AUDIT_DENY.getCode()));
         messageService.send(-1L, p.getManagerId(), bo.getAccept() ? MessageAction.AUDIT_SUCCESS : MessageAction
                 .AUDIT_FAIL, null, p.getAgentId(), null, p, null);
+        projectSearch.update(p);
         return projectDao.updateByPrimaryKeySelective(p) > 0;
     }
 

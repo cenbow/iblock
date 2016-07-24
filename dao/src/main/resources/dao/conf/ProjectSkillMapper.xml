@@ -164,6 +164,16 @@
     and p.status=1
   </select>
 
+  <select id="selectByProjectId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    <include refid="Base_Column_List" />
+    from PROJECT_SKILL
+    where project_id = #{project,jdbcType=BIGINT}
+    and status=1
+  </select>
+
+
+
   <update id="disable" parameterType="java.lang.Long">
     update PROJECT_SKILL
     set status=0

@@ -10,6 +10,7 @@ import com.iblock.dao.UserDao;
 import com.iblock.dao.UserGeoDao;
 import com.iblock.dao.UserRatingDao;
 import com.iblock.dao.po.Industry;
+import com.iblock.dao.po.JobInterest;
 import com.iblock.dao.po.Manager;
 import com.iblock.dao.po.Skill;
 import com.iblock.dao.po.User;
@@ -63,7 +64,9 @@ public class UserService {
             if (StringUtils.isBlank(user.getSkills())) {
                 return false;
             }
-            if (jobInterestDao.selectByUser(userId) == null) {
+            JobInterest interest = jobInterestDao.selectByUser(userId);
+            if (interest == null || StringUtils.isBlank(interest.getCityList()) || StringUtils.isBlank(interest
+                    .getJobTypeList())) {
                 return false;
             }
             return true;
