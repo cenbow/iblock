@@ -40,13 +40,13 @@ public class MessageService {
     @Autowired
     private UserDao userDao;
 
-    public Page<Message> getMsgs(long userId, int pageNo, int pageSize, boolean read, Integer role) {
+    public Page<Message> getMsgs(long userId, int pageNo, int pageSize, boolean processed, Integer role) {
         syncBroadCast(userId, role);
         List<Integer> status = new ArrayList<Integer>();
-        if (read) {
-            status.add(MessageStatus.READ.getCode());
+        if (processed) {
             status.add(MessageStatus.FINISH.getCode());
         } else {
+            status.add(MessageStatus.READ.getCode());
             status.add(MessageStatus.UNREAD.getCode());
         }
         List<Message> messages = messageDao.selectByUserAndStatus(userId, status, (pageNo - 1) * pageSize, pageSize);
