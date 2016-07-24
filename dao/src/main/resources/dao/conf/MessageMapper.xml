@@ -250,7 +250,9 @@
         <include refid="Base_Column_List"/>
         from MESSAGE
         where target_id=-1
+        <if test="time != null">
         and add_time>=#{time}
+        </if>
         and role in (0, #{role})
     </select>
 </mapper>
