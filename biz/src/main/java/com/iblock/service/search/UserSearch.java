@@ -228,6 +228,9 @@ public class UserSearch {
     }
 
     public void update(User u) throws IOException {
+        if (u.getRole().intValue() != UserRole.DESIGNER.getRole()) {
+            return;
+        }
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
         IndexWriter w = new IndexWriter(index, config);
         w.updateDocument(new Term("id", String.valueOf(u.getId())), buildDoc(u, jobInterestDao.selectByUser(u.getId())));
@@ -235,6 +238,9 @@ public class UserSearch {
     }
 
     public void add(User u) throws IOException {
+        if (u.getRole().intValue() != UserRole.DESIGNER.getRole()) {
+            return;
+        }
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
         IndexWriter w = new IndexWriter(index, config);
         addDoc(w, u, jobInterestDao.selectByUser(u.getId()));
