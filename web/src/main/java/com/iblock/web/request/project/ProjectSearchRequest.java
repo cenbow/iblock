@@ -5,6 +5,7 @@ import com.iblock.common.enums.ProjectStatus;
 import com.iblock.service.info.KVInfo;
 import com.iblock.service.search.ProjectCondition;
 import lombok.Data;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +31,7 @@ public class ProjectSearchRequest {
         bean.setOffset((pageNo - 1) * pageSize);
         bean.setPageSize(pageSize);
         bean.setStatus(Arrays.asList(ProjectStatus.RECRUITING.getCode()));
-        if (skill != null) {
+        if (CollectionUtils.isNotEmpty(skill)) {
             List<Integer> list = new ArrayList<Integer>();
             for (KVInfo kv : skill) {
                 list.add(kv.getId());
@@ -38,7 +39,7 @@ public class ProjectSearchRequest {
             bean.setSkill(list);
         }
 
-        if (city != null) {
+        if (CollectionUtils.isNotEmpty(city)) {
             List<Integer> list = new ArrayList<Integer>();
             for (KVInfo kv : city) {
                 list.add(kv.getId());
@@ -46,7 +47,7 @@ public class ProjectSearchRequest {
             bean.setCity(list);
         }
 
-        if (industry != null) {
+        if (CollectionUtils.isNotEmpty(industry)) {
             List<Integer> list = new ArrayList<Integer>();
             for (KVInfo kv : industry) {
                 list.add(kv.getId());
