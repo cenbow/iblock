@@ -167,6 +167,7 @@ public class UserController extends BaseController {
             condition.setMaxPay(request.getMaxPay());
             condition.setMinPay(request.getMinPay());
             condition.setPageSize(request.getPageSize());
+            condition.setStatus(Arrays.asList(UserStatus.NORMAL.getCode()));
             condition.setOffset((request.getPageNo() - 1) * request.getPageSize());
             if (CollectionUtils.isNotEmpty(request.getCity())) {
                 List<Integer> tmp = new ArrayList<Integer>();
