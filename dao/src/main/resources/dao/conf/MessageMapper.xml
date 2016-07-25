@@ -224,10 +224,10 @@
         from MESSAGE
         where target_id=#{userId}
         <if test="processed!=0">
-            and (status=3 or type=0)
+            and (status=3 or (type=0 and status=2))
         </if>
         <if test="processed!=1">
-            and status in (1,2) and type in (1,2)
+            and ((status in (1,2) and type in (1,2)) or (type=0 and status=1))
         </if>
         order by add_time desc
         limit #{offset}, #{pageSize}
