@@ -6,6 +6,7 @@ import com.iblock.service.info.KVInfo;
 import com.iblock.service.search.ProjectCondition;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +55,9 @@ public class ProjectSearchRequest {
             }
             bean.setIndustry(list);
         }
-        bean.setKeyword(keyword);
+        if (StringUtils.isNotBlank(keyword)) {
+            bean.setKeyword(keyword);
+        }
         bean.setMaxPay(maxPay);
         bean.setMinPay(minPay);
         bean.setFreeze(false);

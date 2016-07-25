@@ -190,7 +190,9 @@ public class UserController extends BaseController {
                 }
                 condition.setIndustry(tmp);
             }
-            condition.setKeyword(request.getKeyword());
+            if (StringUtils.isNotBlank(request.getKeyword())) {
+                condition.setKeyword(request.getKeyword());
+            }
             return new CommonResponse<Page<UserSearchInfo>>(userService.search(condition));
         } catch (Exception e) {
             log.error("user search error!", e);

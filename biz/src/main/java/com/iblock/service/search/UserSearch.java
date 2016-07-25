@@ -3,6 +3,7 @@ package com.iblock.service.search;
 import com.google.gson.Gson;
 import com.iblock.common.bean.Page;
 import com.iblock.common.bean.ProjectSearchBean;
+import com.iblock.common.enums.UserRole;
 import com.iblock.dao.IndustryDao;
 import com.iblock.dao.JobInterestDao;
 import com.iblock.dao.SkillDao;
@@ -130,9 +131,6 @@ public class UserSearch {
         refreshIndustry();
         refreshInterest();
         refreshSkill();
-
-
-
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
@@ -221,6 +219,9 @@ public class UserSearch {
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
         IndexWriter w = new IndexWriter(index, config);
         for (User u : list) {
+            if (u.getRole().intValue() != UserRole.DESIGNER.getRole()) {
+                continue;
+            }
             addDoc(w, u, interestMap.get(u.getId()));
         }
         w.close();
