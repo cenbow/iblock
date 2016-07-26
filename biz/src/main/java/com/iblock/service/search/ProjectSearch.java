@@ -255,11 +255,14 @@ public class ProjectSearch {
         Document doc = new Document();
         doc.add(new StringField("id", String.valueOf(p.getId()), Field.Store.NO));
         doc.add(new TextField("name", p.getName(), Field.Store.NO));
-        doc.add(new StringField("managerId", String.valueOf(p.getManagerId()), Field.Store.NO));
-        doc.add(new StringField("agentId", String.valueOf(p.getAgentId()), Field.Store.NO));
+        doc.add(new StringField("managerId", p.getManagerId() == null ? "" : String.valueOf(p.getManagerId()), Field
+                .Store.NO));
+        doc.add(new StringField("agentId", p.getAgentId() == null ? "" : String.valueOf(p.getAgentId()), Field.Store
+                .NO));
         doc.add(new IntField("minPay", p.getMinPay(), Field.Store.NO));
         doc.add(new IntField("maxPay", p.getMaxPay(), Field.Store.NO));
-        doc.add(new StringField("resident", p.getResident() ? "1" : "0", Field.Store.NO));
+        doc.add(new StringField("resident", p.getResident() == null ? "0" : p.getResident() ? "1" : "0", Field.Store
+                .NO));
         doc.add(new StringField("status", String.valueOf(p.getStatus().intValue()), Field.Store.NO));
         doc.add(new StringField("city", String.valueOf(p.getCity()), Field.Store.NO));
         doc.add(new LongField("addTime", p.getAddTime().getTime(), Field.Store.YES));

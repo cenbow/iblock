@@ -138,9 +138,9 @@ public class ProjectService {
             }
         }
         if (isNew) {
-            projectSearch.add(p);
+            projectSearch.add(projectDao.selectByPrimaryKey(p.getId()));
         } else {
-            projectSearch.update(p);
+            projectSearch.update(projectDao.selectByPrimaryKey(p.getId()));
         }
         return p.getId();
     }
