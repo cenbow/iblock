@@ -263,7 +263,8 @@ public class UserSearch {
         doc.add(new LongField("addTime", u.getAddTime().getTime(), Field.Store.YES));
         doc.add(new NumericDocValuesField("addTime", u.getAddTime().getTime()));
         doc.add(new TextField("industry", i == null ? "" : i.getJobTypeList().replaceAll(",", " "), Field.Store.NO));
-        doc.add(new TextField("skill", u.getSkills().replaceAll(",", " "), Field.Store.NO));
+        doc.add(new TextField("skill", StringUtils.isBlank(u.getSkills()) ? "" : u.getSkills().replaceAll(",", " "),
+                Field.Store.NO));
         doc.add(new StringField("json", toJson(u, i), Field.Store.YES));
         return doc;
     }
