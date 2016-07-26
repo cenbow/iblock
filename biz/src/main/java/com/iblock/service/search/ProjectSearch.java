@@ -128,9 +128,6 @@ public class ProjectSearch {
         refreshSkill();
         refreshIndustry();
         refreshCity();
-        if (CollectionUtils.isEmpty(list)) {
-            return;
-        }
         try {
             create(list);
         } catch (Exception e) {
@@ -227,8 +224,10 @@ public class ProjectSearch {
     private void create(List<Project> list) throws IOException {
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
         IndexWriter w = new IndexWriter(index, config);
-        for (Project p : list) {
-            addDoc(w, p, skillMap.get(p.getId()));
+        if (CollectionUtils.isNotEmpty(list)) {
+            for (Project p : list) {
+                addDoc(w, p, skillMap.get(p.getId()));
+            }
         }
         w.close();
     }
