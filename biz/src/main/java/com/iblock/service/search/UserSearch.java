@@ -131,9 +131,7 @@ public class UserSearch {
         refreshIndustry();
         refreshInterest();
         refreshSkill();
-        if (CollectionUtils.isEmpty(list)) {
-            return;
-        }
+
         try {
             create(list);
         } catch (Exception e) {
@@ -218,11 +216,13 @@ public class UserSearch {
     private void create(List<User> list) throws IOException {
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
         IndexWriter w = new IndexWriter(index, config);
-        for (User u : list) {
-            if (u.getRole().intValue() != UserRole.DESIGNER.getRole()) {
-                continue;
+        if (CollectionUtils.isNotEmpty(list)) {
+            for (User u : list) {
+                if (u.getRole().intValue() != UserRole.DESIGNER.getRole()) {
+                    continue;
+                }
+                addDoc(w, u, interestMap.get(u.getId()));
             }
-            addDoc(w, u, interestMap.get(u.getId()));
         }
         w.close();
     }
