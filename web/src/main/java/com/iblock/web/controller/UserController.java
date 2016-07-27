@@ -378,6 +378,14 @@ public class UserController extends BaseController {
             if (info.getOnline() != null) {
                 user.setOnline(info.getOnline());
             }
+            if (info.getGender() != null) {
+                if (info.getGender() == 1) {
+                    user.setSex(true);
+                }
+                if (info.getGender() == 2) {
+                    user.setSex(false);
+                }
+            }
             if (info.getEducation() != null) {
                 user.setEducation((byte) info.getEducation().getId());
             }

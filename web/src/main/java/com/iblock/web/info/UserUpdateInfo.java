@@ -11,6 +11,7 @@ import java.util.List;
 @Data
 public class UserUpdateInfo {
 
+    private Integer gender;
     private GeoInfo geo;
     private Boolean online;
     private KVInfo education;

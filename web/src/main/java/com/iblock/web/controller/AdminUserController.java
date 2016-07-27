@@ -62,6 +62,9 @@ public class AdminUserController extends BaseController {
     @ResponseBody
     public CommonResponse<Boolean> userAdd(@RequestBody AddUserRequest request) {
         try {
+            if (userService.getByMobile(request.getMobile()) != null) {
+                return new CommonResponse<Boolean>(ResponseStatus.PARAM_ERROR, "该手机号已被注册");
+            }
             if (userService.simpleAdd(request.toUser())) {
                 return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);
             }
