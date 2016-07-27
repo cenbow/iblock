@@ -1,14 +1,18 @@
 package com.iblock.web.controller;
 
 import com.iblock.common.advice.Auth;
+import com.iblock.common.enums.UserRole;
 import com.iblock.common.enums.UserStatus;
 import com.iblock.dao.po.User;
 import com.iblock.service.user.UserService;
+import com.iblock.web.constant.CommonProperties;
 import com.iblock.web.constant.RoleConstant;
 import com.iblock.web.enums.ResponseStatus;
 import com.iblock.web.info.AdminUserInfo;
+import com.iblock.web.info.UserInfo;
 import com.iblock.web.info.UserStatusInfo;
 import com.iblock.web.request.admin.AddUserRequest;
+import com.iblock.web.request.user.LoginRequest;
 import com.iblock.web.response.CommonResponse;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -20,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +39,23 @@ public class AdminUserController extends BaseController {
 
     @Autowired
     private UserService userService;
+
+    @RequestMapping(value = "/login", method = RequestMethod.POST, consumes = "application/json")
+    @ResponseBody
+    public CommonResponse<UserInfo> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
+        try {
+            User user = userService.login(request.getMobile(), request.getPassword());
+            if (user != null && user.getRole().intValue() == UserRole.ADMINISTRATOR.getRole()) {
+                UserInfo info = new UserInfo(user);
+                httpRequest.getSession().setAttribute(CommonProperties.USER_INFO, info);
+                return new CommonResponse<UserInfo>(info);
+            }
+            return new CommonResponse<UserInfo>(ResponseStatus.NO_AUTH);
+        } catch (Exception e) {
+            log.error("login error!", e);
+        }
+        return new CommonResponse<UserInfo>(ResponseStatus.SYSTEM_ERROR);
+    }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST, consumes = "application/json")
     @Auth(role = RoleConstant.ADMINISTRATOR)

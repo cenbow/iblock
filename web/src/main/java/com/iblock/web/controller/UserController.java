@@ -221,7 +221,7 @@ public class UserController extends BaseController {
     public CommonResponse<UserInfo> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         try {
             User user = userService.login(request.getMobile(), request.getPassword());
-            if (user != null) {
+            if (user != null && user.getRole().intValue() != UserRole.ADMINISTRATOR.getRole()) {
                 UserInfo info = new UserInfo(user);
                 httpRequest.getSession().setAttribute(CommonProperties.USER_INFO, info);
                 return new CommonResponse<UserInfo>(info);
