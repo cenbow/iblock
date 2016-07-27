@@ -12,7 +12,8 @@ public enum ResponseStatus {
     EXTERNAL_INTERFACE_ERROR(501, "外部接口错误"),
     NO_AUTH(403, "没有权限"),
     PARAM_ERROR(415, "参数错误或无参数"),
-    VALIDATE_ERROR(501, "校验错误");
+    VALIDATE_ERROR(501, "校验错误"),
+    FREEZE(502, "该用户已被冻结,请联系管理员"),;
 
     private int code;
     private String value;

@@ -2,6 +2,7 @@ package com.iblock.web.controller;
 
 import com.iblock.common.advice.Auth;
 import com.iblock.common.bean.Page;
+import com.iblock.common.enums.CommonStatus;
 import com.iblock.common.enums.Education;
 import com.iblock.common.enums.ProjectStatus;
 import com.iblock.common.enums.UserRole;
@@ -71,6 +72,7 @@ import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -109,6 +111,9 @@ public class UserController extends BaseController {
     @ResponseBody
     public CommonResponse<Boolean> profileComplete() {
         try {
+            if (getUserInfo().getRole() != UserRole.DESIGNER.getRole()) {
+                return new CommonResponse<Boolean>(true);
+            }
             return new CommonResponse<Boolean>(userService.profileComplete(getUserInfo().getId()));
         } catch (Exception e) {
             log.error("profileComplete user error!", e);
@@ -222,9 +227,13 @@ public class UserController extends BaseController {
         try {
             User user = userService.login(request.getMobile(), request.getPassword());
             if (user != null && user.getRole().intValue() != UserRole.ADMINISTRATOR.getRole()) {
-                UserInfo info = new UserInfo(user);
-                httpRequest.getSession().setAttribute(CommonProperties.USER_INFO, info);
-                return new CommonResponse<UserInfo>(info);
+                if (user.getStatus().intValue() == UserStatus.FREEZE.getCode()) {
+                    return new CommonResponse<UserInfo>(ResponseStatus.FREEZE);
+                } else if (user.getStatus().intValue() == UserStatus.NORMAL.getCode()) {
+                    UserInfo info = new UserInfo(user);
+                    httpRequest.getSession().setAttribute(CommonProperties.USER_INFO, info);
+                    return new CommonResponse<UserInfo>(info);
+                }
             }
             return new CommonResponse<UserInfo>(ResponseStatus.NO_AUTH);
         } catch (Exception e) {
@@ -404,6 +413,8 @@ public class UserController extends BaseController {
                 if (userGeo == null) {
                     userGeo = new UserGeo();
                     userGeo.setUserId(user.getId());
+                    userGeo.setStatus((byte) CommonStatus.NORMAL.getCode());
+                    userGeo.setAddTime(new Date());
                 }
                 userGeo.setDistrict(info.getGeo().getDistrict());
                 userGeo.setCity(info.getGeo().getCity().getName());
