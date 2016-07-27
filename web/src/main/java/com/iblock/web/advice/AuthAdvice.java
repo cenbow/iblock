@@ -31,7 +31,7 @@ public class AuthAdvice implements Ordered {
         if (auth != null && (user == null || (StringUtils.isNotBlank(auth.role()) && !auth.role().contains(String
                 .valueOf(user.getRole()))))) {
             log.info(String.format("accessor has no auth, interface auth is %s and accessor role is %d", auth.role(),
-                    user.getRole()));
+                    user != null ? user.getRole() : 0));
             return new CommonResponse<Boolean>(ResponseStatus.NO_AUTH);
         }
         return joinPoint.proceed();
