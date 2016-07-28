@@ -3,12 +3,14 @@ package com.iblock.web.controller;
 import com.iblock.common.advice.Auth;
 import com.iblock.common.bean.Page;
 import com.iblock.common.bean.ProjectSearchBean;
+import com.iblock.common.enums.MessageAction;
 import com.iblock.common.enums.ProjectStatus;
 import com.iblock.common.enums.UserRole;
 import com.iblock.dao.po.City;
 import com.iblock.dao.po.Industry;
 import com.iblock.dao.po.Project;
 import com.iblock.dao.po.User;
+import com.iblock.service.message.MessageService;
 import com.iblock.service.meta.MetaService;
 import com.iblock.service.project.ProjectService;
 import com.iblock.service.user.UserService;
@@ -53,6 +55,8 @@ public class AdminProjectController extends BaseController {
     private UserService userService;
     @Autowired
     private MetaService metaService;
+    @Autowired
+    private MessageService messageService;
 
     @RequestMapping(value = "/allnew", method = RequestMethod.GET)
     @Auth(role = RoleConstant.ADMINISTRATOR)
@@ -131,6 +135,8 @@ public class AdminProjectController extends BaseController {
             }
             project.setAgentId(request.getBroker());
             if (projectService.update(project)) {
+                messageService.send(-1L, project.getAgentId(), MessageAction.ASSIGN_BROKER, project.getManagerId(), project
+                        .getAgentId(), null, project, null);
                 return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);
             }
         } catch (Exception e) {

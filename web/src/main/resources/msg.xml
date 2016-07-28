@@ -51,4 +51,8 @@
             <input name="rating" type="integer"/>
         </inputs>
     </message>
+    <message type="0" action="10" detail="您被指定为项目 {project} 的经纪人 请审核该项目。">
+    </message>
+    <message type="0" action="11" detail="经理 {manager} 已对项目 {project} 重新修改并提交 请审核该项目。">
+    </message>
 </messages>

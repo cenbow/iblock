@@ -191,11 +191,10 @@ public class UserSearch {
             }
             rootQuery.add(idQuery, BooleanClause.Occur.MUST);
         }
-        int hitsPerPage = c.getPageSize();
         IndexReader reader = DirectoryReader.open(index);
         IndexSearcher searcher = new IndexSearcher(reader);
         Sort sort = new Sort(new SortField("addTime", SortField.Type.LONG, true));
-        TopFieldCollector collector = TopFieldCollector.create(sort, hitsPerPage, false, false, false);
+        TopFieldCollector collector = TopFieldCollector.create(sort, c.getOffset() + c.getPageSize(), false, false, false);
 
         searcher.search(rootQuery, collector);
         TopDocs topDocs = collector.topDocs(c.getOffset(), c.getPageSize());

@@ -14,6 +14,7 @@ import com.iblock.dao.po.ProjectSkillDetail;
 import com.iblock.dao.po.User;
 import com.iblock.service.bo.ProjectAcceptBo;
 import com.iblock.service.interest.JobInterestService;
+import com.iblock.service.message.MessageService;
 import com.iblock.service.meta.MetaService;
 import com.iblock.service.project.ProjectService;
 import com.iblock.service.user.UserService;
@@ -74,6 +75,8 @@ public class ProjectController extends BaseController {
     private UserService userService;
     @Autowired
     private ProjectSearch projectSearch;
+    @Autowired
+    private MessageService messageService;
 
     @RequestMapping(value = "/rate", method = RequestMethod.POST, consumes = "application/json")
     @Auth(role = RoleConstant.DESIGNER)
@@ -129,6 +132,7 @@ public class ProjectController extends BaseController {
             project.updateProject(p);
             p.setStatus((byte) ProjectStatus.AUDIT.getCode());
             long id = projectService.save(p, project.toSkills(), getUserInfo().getId());
+
             if (id > 0) {
                 return new CommonResponse<Long>(id);
             }

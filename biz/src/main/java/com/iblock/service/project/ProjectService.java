@@ -112,7 +112,7 @@ public class ProjectService {
         return userDao.batchSelect(ids);
     }
     @Transactional
-    public long save(Project p, List<ProjectSkill> skills, Long managerId) throws InvalidRequestException, IOException {
+    public long save(Project p, List<ProjectSkill> skills, Long managerId) throws InvalidRequestException, IOException, InnerLogicException {
         boolean isNew = p.getId() == null;
         if (p.getId() == null) {
             p.setAddTime(new Date());
@@ -127,8 +127,12 @@ public class ProjectService {
             && tmp.getStatus().intValue() != ProjectStatus.AUDIT_DENY.getCode())) {
                 throw new InvalidRequestException();
             }
-            projectDao.updateByPrimaryKeySelective(p);
 
+            projectDao.updateByPrimaryKeySelective(p);
+            if (tmp.getAgentId() != null) {
+                messageService.send(-1L, tmp.getAgentId(), MessageAction.PROJECT_RESUBMIT, tmp.getManagerId(), tmp
+                        .getAgentId(), null, tmp, null);
+            }
         }
         projectSkillDao.disable(p.getId());
         if (CollectionUtils.isNotEmpty(skills)) {
