@@ -321,13 +321,13 @@ public class UserController extends BaseController {
             info.setRating(userService.getRating(userId));
             info.setContactPhone(user.getMobile());
             info.setOnline(user.getOnline());
+            List<SkillInfo> skills = new ArrayList<SkillInfo>();
             if (StringUtils.isNotBlank(user.getSkills())) {
-                List<SkillInfo> skills = new ArrayList<SkillInfo>();
                 for (Skill skill : userService.getSkillByIds(user.getSkills())) {
                     skills.add(new SkillInfo(skill.getId(), skill.getName()));
                 }
-                info.setSkills(skills);
             }
+            info.setSkills(skills);
             UserGeo geo = userService.getUserGeo(userId);
             if (geo != null) {
                 info.setGeo(GeoInfo.parse(userService.getUserGeo(userId)));
@@ -472,7 +472,13 @@ public class UserController extends BaseController {
         try {
             JobInterest interest = jobInterestService.get(userId);
             if (interest == null) {
-                return new CommonResponse<JobInterestInfo>(null, ResponseStatus.SUCCESS);
+                JobInterestInfo tmp = new JobInterestInfo();
+                tmp.setIndustries(new ArrayList<KVInfo>());
+                tmp.setCities(new ArrayList<KVInfo>());
+                tmp.setIsLongTerm(false);
+                tmp.setMinPay(0);
+                tmp.setMaxPay(0);
+                return new CommonResponse<JobInterestInfo>(tmp, ResponseStatus.SUCCESS);
             }
             JobInterestInfo info = JobInterestInfo.parse(interest);
             List<KVInfo> cities = new ArrayList<KVInfo>();

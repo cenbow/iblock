@@ -81,7 +81,7 @@ public class UserService {
             }
             JobInterest interest = jobInterestDao.selectByUser(userId);
             if (interest == null || StringUtils.isBlank(interest.getCityList()) || StringUtils.isBlank(interest
-                    .getJobTypeList()) || interest.getStartPay() <= 0 || interest.getEndPay() <= 0) {
+                    .getJobTypeList()) || interest.getStartPay() == null || interest.getEndPay() == null) {
                 return false;
             }
             return true;
