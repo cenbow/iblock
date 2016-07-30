@@ -162,7 +162,7 @@ public class MessageService {
         if (msg.getParams() != null) {
             JsonObject json = new JsonObject();
             for (String s : msg.getParams()) {
-                if (!params.containsKey(s)) {
+                if (!params.containsKey(s) && !s.equals("msgId")) {
                     throw new InnerLogicException("cannot find param " + s);
                 }
                 json.addProperty(s, params.get(s));

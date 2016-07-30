@@ -1,6 +1,7 @@
 package com.iblock.web.controller;
 
 import com.iblock.common.advice.Auth;
+import com.iblock.common.utils.MD5Utils;
 import com.iblock.dao.po.User;
 import com.iblock.service.message.SMSService;
 import com.iblock.service.user.UserService;
@@ -38,10 +39,10 @@ public class AccountController extends BaseController {
     public CommonResponse<Void> modifyPassword(@RequestBody ModifyPasswordRequest request) {
         try {
             User user = userService.getUser(getUserInfo().getId());
-            if (!request.getOldPassword().equals(user.getPassword())) {
+            if (!MD5Utils.encrypt(request.getOldPassword()).equals(user.getPassword())) {
                 return new CommonResponse<Void>(ResponseStatus.PARAM_ERROR, "旧密码输入错误");
             }
-            user.setPassword(request.getNewPassword());
+            user.setPassword(MD5Utils.encrypt(request.getNewPassword()));
             userService.update(user);
             return new CommonResponse<Void>(ResponseStatus.SUCCESS);
         } catch (Exception e) {
@@ -59,7 +60,7 @@ public class AccountController extends BaseController {
                 return new CommonResponse<Void>(ResponseStatus.PARAM_ERROR, "验证码校验失败");
             }
             User user = userService.getUser(getUserInfo().getId());
-            if (!user.getPassword().equals(request.getPassword())) {
+            if (!user.getPassword().equals(MD5Utils.encrypt(request.getPassword()))) {
                 return new CommonResponse<Void>(ResponseStatus.PARAM_ERROR, "密码校验失败");
             }
             if (request.getPhone().equals(user.getMobile())) {
@@ -102,7 +103,7 @@ public class AccountController extends BaseController {
                 return new CommonResponse<Void>(ResponseStatus.PARAM_ERROR, "用户不存在");
             }
             if (check(request.getPhone(), request.getToken())) {
-                user.setPassword(request.getPassword());
+                user.setPassword(MD5Utils.encrypt(request.getPassword()));
                 userService.update(user);
                 return new CommonResponse<Void>(ResponseStatus.SUCCESS);
             }

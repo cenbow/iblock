@@ -142,6 +142,7 @@ public class UserSearch {
 
     public Page<UserSearchInfo> search(UserCondition c) throws IOException, ParseException {
         BooleanQuery rootQuery = new BooleanQuery();
+        rootQuery.add(new QueryParser("online", analyzer).parse("1"), BooleanClause.Occur.MUST);
         if (c.getMinPay() != null || c.getMaxPay() != null) {
             BooleanQuery payQuery = new BooleanQuery();
             payQuery.add(NumericRangeQuery.newIntRange("maxPay", c.getMinPay(), c.getMaxPay(), true, true),
@@ -254,6 +255,7 @@ public class UserSearch {
     private Document buildDoc(User u, JobInterest i) {
         Document doc = new Document();
         doc.add(new StringField("id", String.valueOf(u.getId()), Field.Store.NO));
+        doc.add(new StringField("online", u.getOnline() ? "1" : "0", Field.Store.NO));
         doc.add(new TextField("name", u.getUserName(), Field.Store.NO));
         doc.add(new IntField("minPay", i == null ? -1 : i.getStartPay(), Field.Store.NO));
         doc.add(new IntField("maxPay", i == null ? -1 : i.getEndPay(), Field.Store.NO));

@@ -1,5 +1,6 @@
 package com.iblock.web.request.admin;
 
+import com.iblock.common.utils.MD5Utils;
 import com.iblock.dao.po.User;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
@@ -26,7 +27,7 @@ public class AddUserRequest {
         user.setRole(role.byteValue());
         user.setMobile(mobile);
         user.setUserName(username);
-        user.setPassword(password);
+        user.setPassword(MD5Utils.encrypt(password));
         return user;
     }
 }

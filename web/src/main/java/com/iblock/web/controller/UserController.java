@@ -7,6 +7,7 @@ import com.iblock.common.enums.Education;
 import com.iblock.common.enums.ProjectStatus;
 import com.iblock.common.enums.UserRole;
 import com.iblock.common.enums.UserStatus;
+import com.iblock.common.utils.MD5Utils;
 import com.iblock.dao.po.City;
 import com.iblock.dao.po.Industry;
 import com.iblock.dao.po.JobInterest;
@@ -225,7 +226,7 @@ public class UserController extends BaseController {
     @ResponseBody
     public CommonResponse<UserInfo> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         try {
-            User user = userService.login(request.getMobile(), request.getPassword());
+            User user = userService.login(request.getMobile(), MD5Utils.encrypt(request.getPassword()));
             if (user != null && user.getRole().intValue() != UserRole.ADMINISTRATOR.getRole()) {
                 if (user.getStatus().intValue() == UserStatus.FREEZE.getCode()) {
                     return new CommonResponse<UserInfo>(ResponseStatus.FREEZE);

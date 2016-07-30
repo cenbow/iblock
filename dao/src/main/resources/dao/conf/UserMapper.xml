@@ -262,6 +262,7 @@
         from USER
         where mobile=#{userName}
         and password=#{password}
+        and status > 0
     </select>
 
     <select id="selectDetailById" parameterType="map" resultMap="DetailResultMap">

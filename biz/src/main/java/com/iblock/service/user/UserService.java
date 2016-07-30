@@ -157,7 +157,8 @@ public class UserService {
 
     @Transactional
     public boolean update(UserUpdateBo bo) throws IOException {
-        userDao.updateByPrimaryKey(bo.getUser());
+        User user = bo.getUser();
+        userDao.updateByPrimaryKey(user);
         userSearch.update(bo.getUser());
         if (bo.getUser().getRole().intValue() == UserRole.MANAGER.getRole() && bo.getManager() != null) {
             managerDao.updateByPrimaryKey(bo.getManager());

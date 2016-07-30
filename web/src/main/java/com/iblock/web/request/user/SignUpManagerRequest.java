@@ -2,6 +2,7 @@ package com.iblock.web.request.user;
 
 import com.iblock.common.enums.CommonStatus;
 import com.iblock.common.enums.UserRole;
+import com.iblock.common.utils.MD5Utils;
 import com.iblock.dao.po.Manager;
 import com.iblock.dao.po.User;
 import com.iblock.dao.po.UserGeo;
@@ -31,7 +32,7 @@ public class SignUpManagerRequest {
 
         User user = new User();
         user.setUserName(username);
-        user.setPassword(password);
+        user.setPassword(MD5Utils.encrypt(password));
         user.setMobile(mobile);
         if (gender != null) {
             user.setSex(gender.equals(1));
