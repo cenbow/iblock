@@ -2,7 +2,7 @@
 <messages>
     <message type="0" action="1" detail="您的项目 {project} 通过审核，经纪人为 {agent}">
     </message>
-    <message type="0" action="2" detail="您的项目 {project} 未通过审核，请对项目进行修改并重新提交">
+    <message type="0" action="2" detail="您的项目 {project} 未通过审核，未通过原因为: {desc}, 请对项目进行修改并重新提交">
     </message>
     <message type="1" action="3" service="project/acceptHiring"
              detail="{manager} 希望应聘您为项目 {project} 项目设计师,如已达成协议，请确认；如您和改项目不熟悉，请拒绝。">

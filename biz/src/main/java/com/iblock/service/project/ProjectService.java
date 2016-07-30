@@ -326,8 +326,10 @@ public class ProjectService {
         }
         p.setId(bo.getId());
         p.setStatus((byte) (bo.getAccept() ? ProjectStatus.RECRUITING.getCode() : ProjectStatus.AUDIT_DENY.getCode()));
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("desc", bo.getReason());
         messageService.send(-1L, p.getManagerId(), bo.getAccept() ? MessageAction.AUDIT_SUCCESS : MessageAction
-                .AUDIT_FAIL, null, p.getAgentId(), null, p, null);
+                .AUDIT_FAIL, null, p.getAgentId(), null, p, params);
         projectSearch.update(p);
         return projectDao.updateByPrimaryKeySelective(p) > 0;
     }

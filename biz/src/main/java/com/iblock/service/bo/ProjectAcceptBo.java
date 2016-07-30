@@ -9,4 +9,5 @@ import lombok.Data;
 public class ProjectAcceptBo {
     private Long id;
     private Boolean accept;
+    private String reason;
 }

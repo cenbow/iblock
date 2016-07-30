@@ -92,6 +92,7 @@ public class MessageService {
                 throw new InnerLogicException("invalid designer id");
             }
         }
+
         Message msg = buildMessage(sourceId, targetId, action, manager, agent, designer, project, params);
         return messageDao.insertSelective(msg) > 0;
     }
@@ -154,6 +155,9 @@ public class MessageService {
         }
         if (designer != null) {
             content = content.replaceAll("\\{designer\\}", "{" + designer.getUserName() + "|user?id=" + designer.getId() + "}");
+        }
+        if (params != null && params.containsKey("desc")) {
+            content = content.replaceAll("\\{desc\\}", params.get("desc"));
         }
         message.setDetail(content);
         if (MapUtils.isNotEmpty(msg.getInputType())) {
