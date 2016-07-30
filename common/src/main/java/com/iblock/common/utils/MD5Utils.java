@@ -1,36 +1,51 @@
 package com.iblock.common.utils;
 
+import org.apache.commons.lang.StringUtils;
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.DESKeySpec;
 import java.security.MessageDigest;
+import java.security.SecureRandom;
 
 /**
  * Created by baidu on 16/7/30.
  */
 public class MD5Utils {
 
-    public static String encrypt(String s) {
+    private static final String SECRET_KEY = "fasdfadfljladnvfadsfef13vdw137hf";
+
+    private static byte[] desEncryptToBytes(String content, String encryptKey) throws Exception {
         try {
-            // 生成一个MD5加密计算摘要
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            // 计算md5函数
-            md.update(s.getBytes());
-            // digest()最后确定返回md5 hash值，返回值为8为字符串。因为md5 hash值是16位的hex值，实际上就是8位的字符
-            // BigInteger函数则将8位的字符串转换成16位hex值，用字符串来表示；得到字符串形式的hash值
-            System.out.println(s + " " + getString(md.digest()));
-            return new String(md.digest());
+            SecureRandom random = new SecureRandom();
+            DESKeySpec desKey = new DESKeySpec(encryptKey.getBytes("UTF-8"));
+            SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
+            SecretKey secureKey = keyFactory.generateSecret(desKey);
+            Cipher cipher = Cipher.getInstance("DES");
+            cipher.init(Cipher.ENCRYPT_MODE, secureKey, random);
+            return cipher.doFinal(content.getBytes("UTF-8"));
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static String encrypt(String content) {
+        try {
+            return base64Encode(desEncryptToBytes(content, SECRET_KEY));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return s;
+        return content;
     }
 
-
-    private static String getString(byte[] b){
-        StringBuffer sb = new StringBuffer();
-        for(int i = 0; i < b.length; i ++){
-            sb.append(b[i]);
-        }
-        return sb.toString();
+    private static String base64Encode(byte[] bytes) {
+        return new BASE64Encoder().encode(bytes);
     }
+
 
     public static void main(String[] args) {
         MD5Utils.encrypt("Test1234!");
