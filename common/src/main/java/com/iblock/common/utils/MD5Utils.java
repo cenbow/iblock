@@ -45,13 +45,4 @@ public class MD5Utils {
     private static String base64Encode(byte[] bytes) {
         return new BASE64Encoder().encode(bytes);
     }
-
-
-    public static void main(String[] args) {
-        MD5Utils.encrypt("Test1234!");
-        MD5Utils.encrypt("Test1234");
-        MD5Utils.encrypt("jgjg1jap");
-
-        MD5Utils.encrypt("admin");
-    }
 }

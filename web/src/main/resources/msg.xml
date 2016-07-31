@@ -55,4 +55,8 @@
     </message>
     <message type="0" action="11" detail="经理 {manager} 已对项目 {project} 重新修改并提交 请审核该项目。">
     </message>
+    <message type="0" action="12" detail="经理 {manager} 已将项目 {project} 终止。">
+    </message>
+    <message type="0" action="13" detail="经纪人 {agent} 已将项目 {project} 终止。">
+    </message>
 </messages>

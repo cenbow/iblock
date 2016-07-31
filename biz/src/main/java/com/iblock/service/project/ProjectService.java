@@ -157,7 +157,7 @@ public class ProjectService {
 
 
     @Transactional
-    public boolean terminate(long id, long userId, int role) throws InvalidRequestException, IOException {
+    public boolean terminate(long id, long userId, int role) throws InvalidRequestException, IOException, InnerLogicException {
         Project pro = projectDao.selectByPrimaryKey(id);
         if (role == UserRole.MANAGER.getRole() || role == UserRole.AGENT.getRole()) {
             if (pro.getManagerId().intValue() != userId && pro.getAgentId().intValue() != userId) {
@@ -169,6 +169,17 @@ public class ProjectService {
         }
         pro.setStatus((byte) ProjectStatus.TERMINATION.getCode());
         projectSearch.update(pro);
+        List<ProjectDesigner> designers = projectDesignerDao.selectByProject(pro.getId());
+        MessageAction action = pro.getManagerId().intValue() != userId ? MessageAction.MANAGER_PROJECT_TERMINATE :
+                MessageAction.AGENT_PROJECT_TERMINATE;
+        for (ProjectDesigner designer : designers) {
+            messageService.send(-1L, designer.getDesignerId(), action, pro.getManagerId(), pro.getAgentId(), null,
+                    pro, null);
+        }
+        messageService.send(-1L, pro.getManagerId(), action, pro.getManagerId(), pro.getAgentId(), null, pro, null);
+        if (pro.getAgentId() != null) {
+            messageService.send(-1L, pro.getAgentId(), action, pro.getManagerId(), pro.getAgentId(), null, pro, null);
+        }
         return projectDao.updateByPrimaryKeySelective(pro) > 0;
     }
 
@@ -284,8 +295,15 @@ public class ProjectService {
         Map<String, String> params = new HashMap<String, String>();
         params.put("hireid", String.valueOf(pro.getId()));
         messageService.finish(msgId, userId);
-        messageService.send(-1L, userId, accept ? MessageAction.ACCEPT_HIRE : MessageAction.DENY_HIRE, null, null,
-                userId, pro, params);
+        if (pro.getManagerId() != null) {
+            messageService.send(-1L, pro.getManagerId(), accept ? MessageAction.ACCEPT_HIRE : MessageAction.DENY_HIRE, null,
+                    null, userId, pro, params);
+        }
+
+        if (pro.getAgentId() != null) {
+            messageService.send(-1L, pro.getAgentId(), accept ? MessageAction.ACCEPT_HIRE : MessageAction.DENY_HIRE, null,
+                    null, userId, pro, params);
+        }
         if (accept) {
             pro.setHired(pro.getHired() + 1);
             projectSearch.update(pro);
