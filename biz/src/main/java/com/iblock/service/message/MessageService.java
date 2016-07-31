@@ -156,7 +156,7 @@ public class MessageService {
         if (designer != null) {
             content = content.replaceAll("\\{designer\\}", "{" + designer.getUserName() + "|user?id=" + designer.getId() + "}");
         }
-        if (params != null && params.containsKey("desc")) {
+        if (params != null && params.get("desc") != null) {
             content = content.replaceAll("\\{desc\\}", params.get("desc"));
         }
         message.setDetail(content);

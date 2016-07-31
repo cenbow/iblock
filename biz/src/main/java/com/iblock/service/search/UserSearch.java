@@ -80,6 +80,7 @@ public class UserSearch {
 
     private StandardAnalyzer analyzer = new StandardAnalyzer();
     private Directory index = new RAMDirectory();
+    private IndexWriter indexWriter;
 
     public void refreshCity() {
         List<City> cities = metaService.getCities(null);
@@ -215,16 +216,16 @@ public class UserSearch {
 
     private void create(List<User> list) throws IOException {
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
-        IndexWriter w = new IndexWriter(index, config);
+        indexWriter = new IndexWriter(index, config);
         if (CollectionUtils.isNotEmpty(list)) {
             for (User u : list) {
                 if (u.getRole().intValue() != UserRole.DESIGNER.getRole()) {
                     continue;
                 }
-                addDoc(w, u, interestMap.get(u.getId()));
+                addDoc(indexWriter, u, interestMap.get(u.getId()));
             }
         }
-        w.close();
+        indexWriter.close();
     }
 
     public void update(User u) throws IOException {
@@ -232,9 +233,9 @@ public class UserSearch {
             return;
         }
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
-        IndexWriter w = new IndexWriter(index, config);
-        w.updateDocument(new Term("id", String.valueOf(u.getId())), buildDoc(u, jobInterestDao.selectByUser(u.getId())));
-        w.close();
+        indexWriter = new IndexWriter(index, config);
+        indexWriter.updateDocument(new Term("id", String.valueOf(u.getId())), buildDoc(u, jobInterestDao.selectByUser(u.getId())));
+        indexWriter.close();
     }
 
     public void add(User u) throws IOException {
@@ -242,9 +243,9 @@ public class UserSearch {
             return;
         }
         IndexWriterConfig config = new IndexWriterConfig(analyzer);
-        IndexWriter w = new IndexWriter(index, config);
-        addDoc(w, u, jobInterestDao.selectByUser(u.getId()));
-        w.close();
+        indexWriter = new IndexWriter(index, config);
+        addDoc(indexWriter, u, jobInterestDao.selectByUser(u.getId()));
+        indexWriter.close();
     }
 
     private void addDoc(IndexWriter w, User u, JobInterest interest) throws IOException {
