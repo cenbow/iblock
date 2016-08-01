@@ -39,7 +39,7 @@ public class ContentTypeFilter implements Filter {
         if (req.getMethod().equalsIgnoreCase("get")) {
             req = new GetHttpServletRequestWrapper(req, charset);
         }
-        httpServletResponse.setHeader("Access-Control-Allow-Origin", "http://www.iblock.com:8000");
+        httpServletResponse.setHeader("Access-Control-Allow-Origin", "http://www.mi-zhu.com:8000");
         httpServletResponse.setHeader("Access-Control-Allow-Credentials", "true");
         httpServletResponse.setHeader("Access-Control-Max-Age", "86400");
         httpServletResponse.setHeader("Access-Control-Allow-Headers", "Content-Type, *");

@@ -198,7 +198,7 @@ public class RedisSessionFactory implements SessionFactory<RedisHttpSession> {
     private void setCookie(String name, String value, HttpServletResponse response) {
         Cookie cookie = new Cookie(name, value);
         cookie.setMaxAge(cookieMaxAge);
-        cookie.setDomain(".iblock.com");
+        cookie.setDomain(".mi-zhu.com");
         cookie.setPath("/");
         response.addCookie(cookie);
     }
