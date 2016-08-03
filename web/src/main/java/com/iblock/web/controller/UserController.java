@@ -157,8 +157,15 @@ public class UserController extends BaseController {
                     uc.setSkill(tmp);
                 }
             }
-
-            return new CommonResponse<Page<UserSearchInfo>>(userService.search(uc));
+            Page<UserSearchInfo> page = userService.search(uc);
+            if (page.getTotalCount() == 0) {
+                uc = new UserCondition();
+                uc.setPageSize(5);
+                uc.setOffset(0);
+                uc.setStatus(Arrays.asList(UserStatus.NORMAL.getCode()));
+                page = userService.search(uc);
+            }
+            return new CommonResponse<Page<UserSearchInfo>>(page);
         } catch (Exception e) {
             log.error("user recommended error!", e);
         }
@@ -456,7 +463,7 @@ public class UserController extends BaseController {
             if (user == null) {
                 return new CommonResponse<Boolean>(false, ResponseStatus.NOT_FOUND);
             }
-            String name = fileService.uploadFile(file);
+            String name = fileService.uploadImage(file, 150);
             user.setHeadFigure(name);
             return new CommonResponse<Boolean>(userService.update(user));
         } catch (Exception e) {

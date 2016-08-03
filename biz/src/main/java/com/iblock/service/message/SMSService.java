@@ -39,8 +39,8 @@ public class SMSService {
         restAPI.setAppId(appID);
         String code = getRandomString(6);
         redisUtils.put("verify_" + mobile, code, time);
-        HashMap<String, Object> result = restAPI.sendTemplateSMS(mobile, "1", new String[]{code, String.valueOf
-                (time / 60)});
+        HashMap<String, Object> result = restAPI.sendTemplateSMS(mobile, "105309", new String[]{code, String.valueOf
+                (time / 60) + "分钟"});
         if (!"000000".equals(result.get("statusCode"))) {
             log.error("verify code send error, 错误码=" + result.get("statusCode") + " 错误信息= " + result.get("statusMsg"));
         }
@@ -56,7 +56,7 @@ public class SMSService {
     }
 
     public String getRandomString(int length) {
-        String base = "abcdefghijklmnopqrstuvwxyz0123456789";
+        String base = "0123456789";
         Random random = new Random();
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < length; i++) {

@@ -238,6 +238,14 @@ public class ProjectController extends BaseController {
                 }
             }
             Page<ProjectSimpleInfo> page = projectService.search(bean);
+            if (page.getTotalCount() == 0) {
+                bean = new ProjectCondition();
+                bean.setPageSize(5);
+                bean.setOffset(0);
+                bean.setFreeze(false);
+                bean.setStatus(Arrays.asList(ProjectStatus.RECRUITING.getCode()));
+                page = projectService.search(bean);
+            }
             buildProject(page);
             return new CommonResponse<Page<ProjectSimpleInfo>>(page);
         } catch (Exception e) {

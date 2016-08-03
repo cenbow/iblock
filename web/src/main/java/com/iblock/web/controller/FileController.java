@@ -78,4 +78,16 @@ public class FileController extends BaseController {
         }
         return new CommonResponse<String>(ResponseStatus.SYSTEM_ERROR);
     }
+
+    @RequestMapping(value = "/project/image/new", method = RequestMethod.POST)
+    @ResponseBody
+    public CommonResponse<String> newProjectImage(@RequestParam(value = "file") CommonsMultipartFile file) {
+        try {
+            String name = fileService.uploadImage(file, 200);
+            return new CommonResponse<String>(name);
+        } catch (Exception e) {
+            log.error("new image error!", e);
+        }
+        return new CommonResponse<String>(ResponseStatus.SYSTEM_ERROR);
+    }
 }
