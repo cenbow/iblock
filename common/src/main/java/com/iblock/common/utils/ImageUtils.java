@@ -21,7 +21,6 @@ public class ImageUtils {
      */
     public static void resize(CommonsMultipartFile file, int w, String originPath) throws IOException,
             InvalidRequestException, IM4JavaException, InterruptedException {
-        String suffix = originPath.substring(originPath.lastIndexOf(".") + 1);
         String dest = originPath.substring(0, originPath.lastIndexOf(".")) + "-small" + originPath.substring(originPath
                 .lastIndexOf("."));
         BufferedImage image = ImageIO.read(file.getInputStream());
