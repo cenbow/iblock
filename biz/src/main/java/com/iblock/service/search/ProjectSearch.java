@@ -78,6 +78,8 @@ public class ProjectSearch {
     @Resource
     private IndustryDao industryDao;
 
+    private IndexWriter indexWriter;
+
     private Map<Integer, String> cityMap;
     private Map<Integer, String> industryMap;
     private Map<Long, ArrayList<ProjectSkill>> skillMap;
@@ -221,28 +223,46 @@ public class ProjectSearch {
     }
 
     private void create(List<Project> list) throws IOException {
-        IndexWriterConfig config = new IndexWriterConfig(analyzer);
-        IndexWriter w = new IndexWriter(index, config);
-        if (CollectionUtils.isNotEmpty(list)) {
-            for (Project p : list) {
-                addDoc(w, p, skillMap.get(p.getId()));
+        try {
+            IndexWriterConfig config = new IndexWriterConfig(analyzer);
+            indexWriter = new IndexWriter(index, config);
+            if (CollectionUtils.isNotEmpty(list)) {
+                for (Project p : list) {
+                    addDoc(indexWriter, p, skillMap.get(p.getId()));
+                }
+            }
+        } finally {
+            if (indexWriter != null) {
+                indexWriter.close();
             }
         }
-        w.close();
+
     }
 
     public void update(Project p) throws IOException {
-        IndexWriterConfig config = new IndexWriterConfig(analyzer);
-        IndexWriter w = new IndexWriter(index, config);
-        w.updateDocument(new Term("id", String.valueOf(p.getId())), buildDoc(p, projectSkillDao.selectByProjectId(p.getId())));
-        w.close();
+        try {
+            IndexWriterConfig config = new IndexWriterConfig(analyzer);
+            indexWriter = new IndexWriter(index, config);
+            indexWriter.updateDocument(new Term("id", String.valueOf(p.getId())), buildDoc(p, projectSkillDao.selectByProjectId(p.getId())));
+            indexWriter.close();
+        } finally {
+            if (indexWriter != null) {
+                indexWriter.close();
+            }
+        }
+
     }
 
     public void add(Project p) throws IOException {
-        IndexWriterConfig config = new IndexWriterConfig(analyzer);
-        IndexWriter w = new IndexWriter(index, config);
-        addDoc(w, p, projectSkillDao.selectByProjectId(p.getId()));
-        w.close();
+        try {
+            IndexWriterConfig config = new IndexWriterConfig(analyzer);
+            indexWriter = new IndexWriter(index, config);
+            addDoc(indexWriter, p, projectSkillDao.selectByProjectId(p.getId()));
+        } finally {
+            if (indexWriter != null) {
+                indexWriter.close();
+            }
+        }
     }
 
     private void addDoc(IndexWriter w, Project p, List<ProjectSkill> skills) throws IOException {
