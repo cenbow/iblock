@@ -215,37 +215,54 @@ public class UserSearch {
     }
 
     private void create(List<User> list) throws IOException {
-        IndexWriterConfig config = new IndexWriterConfig(analyzer);
-        indexWriter = new IndexWriter(index, config);
-        if (CollectionUtils.isNotEmpty(list)) {
-            for (User u : list) {
-                if (u.getRole().intValue() != UserRole.DESIGNER.getRole()) {
-                    continue;
+        try {
+            IndexWriterConfig config = new IndexWriterConfig(analyzer);
+            indexWriter = new IndexWriter(index, config);
+            if (CollectionUtils.isNotEmpty(list)) {
+                for (User u : list) {
+                    if (u.getRole().intValue() != UserRole.DESIGNER.getRole()) {
+                        continue;
+                    }
+                    addDoc(indexWriter, u, interestMap.get(u.getId()));
                 }
-                addDoc(indexWriter, u, interestMap.get(u.getId()));
+            }
+        } finally {
+            if (indexWriter != null) {
+                indexWriter.close();
             }
         }
-        indexWriter.close();
+
     }
 
     public void update(User u) throws IOException {
+        
         if (u.getRole().intValue() != UserRole.DESIGNER.getRole()) {
             return;
         }
-        IndexWriterConfig config = new IndexWriterConfig(analyzer);
-        indexWriter = new IndexWriter(index, config);
-        indexWriter.updateDocument(new Term("id", String.valueOf(u.getId())), buildDoc(u, jobInterestDao.selectByUser(u.getId())));
-        indexWriter.close();
+        try {
+            IndexWriterConfig config = new IndexWriterConfig(analyzer);
+            indexWriter = new IndexWriter(index, config);
+            indexWriter.updateDocument(new Term("id", String.valueOf(u.getId())), buildDoc(u, jobInterestDao.selectByUser(u.getId())));
+        } finally {
+            if (indexWriter != null) {
+                indexWriter.close();
+            }
+        }
     }
 
     public void add(User u) throws IOException {
         if (u.getRole().intValue() != UserRole.DESIGNER.getRole()) {
             return;
         }
-        IndexWriterConfig config = new IndexWriterConfig(analyzer);
-        indexWriter = new IndexWriter(index, config);
-        addDoc(indexWriter, u, jobInterestDao.selectByUser(u.getId()));
-        indexWriter.close();
+        try {
+            IndexWriterConfig config = new IndexWriterConfig(analyzer);
+            indexWriter = new IndexWriter(index, config);
+            addDoc(indexWriter, u, jobInterestDao.selectByUser(u.getId()));
+        } finally {
+            if (indexWriter != null) {
+                indexWriter.close();
+            }
+        }
     }
 
     private void addDoc(IndexWriter w, User u, JobInterest interest) throws IOException {
