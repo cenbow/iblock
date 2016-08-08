@@ -128,8 +128,13 @@ public class UserService {
         return userDao.selectDetailById(userId);
     }
 
-    public boolean update(User user) {
-        return userDao.updateByPrimaryKeySelective(user) > 0;
+    public boolean update(User user) throws IOException {
+        boolean result = userDao.updateByPrimaryKeySelective(user) > 0;
+        if (result) {
+            User tmp = userDao.selectByPrimaryKey(user.getId());
+            userSearch.update(tmp);
+        }
+        return result;
     }
 
     public UserGeo getUserGeo(Long userId) {
