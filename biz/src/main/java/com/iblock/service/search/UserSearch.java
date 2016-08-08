@@ -195,7 +195,7 @@ public class UserSearch {
         }
         IndexReader reader = DirectoryReader.open(index);
         IndexSearcher searcher = new IndexSearcher(reader);
-        Sort sort = new Sort(new SortField("addTime", SortField.Type.LONG, true));
+        Sort sort = new Sort(SortField.FIELD_SCORE, new SortField("addTime", SortField.Type.LONG, true));
         TopFieldCollector collector = TopFieldCollector.create(sort, c.getOffset() + c.getPageSize(), false, false, false);
 
         searcher.search(rootQuery, collector);
