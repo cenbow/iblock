@@ -261,6 +261,10 @@ public class ProjectService {
         if (user.getRole().intValue() != UserRole.DESIGNER.getRole()) {
             throw new InvalidRequestException("designer role is invalid");
         }
+        ProjectDesigner tmp = projectDesignerDao.selectByProjectAndDesigner(id, userId);
+        if (tmp != null) {
+            return true;
+        }
         ProjectDesigner designer = new ProjectDesigner();
         designer.setStatus((byte) HireStatus.HIRING.getCode());
         designer.setAddTime(new Date());
