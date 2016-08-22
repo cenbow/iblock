@@ -103,7 +103,7 @@ public class UserService {
     public double getRating(Long userId) {
         Double d = userRatingDao.selectAVG(userId);
         if (d == null) {
-            return 5;
+            return 0;
         }
         return d;
     }

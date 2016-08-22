@@ -22,10 +22,13 @@ import com.iblock.dao.po.ProjectSkillDetail;
 import com.iblock.dao.po.User;
 import com.iblock.service.bo.ProjectAcceptBo;
 import com.iblock.service.info.ProjectSimpleInfo;
+import com.iblock.service.mail.MailService;
 import com.iblock.service.message.MessageService;
+import com.iblock.service.message.SMSService;
 import com.iblock.service.search.ProjectCondition;
 import com.iblock.service.search.ProjectSearch;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -58,6 +61,10 @@ public class ProjectService {
     private ProjectRatingDao projectRatingDao;
     @Autowired
     private ProjectSearch projectSearch;
+    @Autowired
+    private MailService mailService;
+    @Autowired
+    private SMSService smsService;
 
     @Transactional
     public boolean rate(Long projectId, Integer rating, Long userId, Long msgId) {
@@ -111,6 +118,7 @@ public class ProjectService {
         }
         return userDao.batchSelect(ids);
     }
+
     @Transactional
     public long save(Project p, List<ProjectSkill> skills, Long managerId) throws InvalidRequestException, IOException, InnerLogicException {
         boolean isNew = p.getId() == null;
@@ -124,7 +132,7 @@ public class ProjectService {
         } else {
             Project tmp = projectDao.selectByPrimaryKey(p.getId());
             if (!tmp.getManagerId().equals(managerId) || (tmp.getStatus().intValue() != ProjectStatus.AUDIT.getCode()
-            && tmp.getStatus().intValue() != ProjectStatus.AUDIT_DENY.getCode())) {
+                    && tmp.getStatus().intValue() != ProjectStatus.AUDIT_DENY.getCode())) {
                 throw new InvalidRequestException();
             }
 
@@ -143,6 +151,21 @@ public class ProjectService {
         }
         if (isNew) {
             projectSearch.add(projectDao.selectByPrimaryKey(p.getId()));
+            List<User> adminList = userDao.selectByRole(UserRole.ADMINISTRATOR.getRole());
+            User manager = userDao.selectByPrimaryKey(managerId);
+            if (CollectionUtils.isNotEmpty(adminList)) {
+                List<String> tos = new ArrayList<String>();
+                for (User admin : adminList) {
+                    if (StringUtils.isNotBlank(admin.getEmail())) {
+                        tos.add(admin.getEmail());
+                    }
+                }
+                if (CollectionUtils.isNotEmpty(tos)) {
+                    String[] array = tos.toArray(new String[tos.size()]);
+                    mailService.send("项目创建通知",
+                            array, "项目 " + p.getName() + " 已被项目经理 " + manager.getUserName() + " 创建,请知晓!");
+                }
+            }
         } else {
             projectSearch.update(projectDao.selectByPrimaryKey(p.getId()));
         }
@@ -274,6 +297,8 @@ public class ProjectService {
         params.put("hireid", String.valueOf(pro.getId()));
         params.put("accept", "true");
         messageService.send(-1L, userId, MessageAction.HIRE, pro.getManagerId(), null, userId, pro, params);
+        User op = userDao.selectByPrimaryKey(opId);
+        smsService.sendHireMsg(user.getMobile(), op.getUserName(), pro.getName());
         return projectDesignerDao.insertSelective(designer) > 0;
     }
 
@@ -295,7 +320,7 @@ public class ProjectService {
         if (user.getRole().intValue() != UserRole.DESIGNER.getRole()) {
             throw new InvalidRequestException("designer role is invalid");
         }
-        designer.setStatus((byte) (accept ? HireStatus.ACCEPT.getCode(): HireStatus.DENY.getCode()));
+        designer.setStatus((byte) (accept ? HireStatus.ACCEPT.getCode() : HireStatus.DENY.getCode()));
         Map<String, String> params = new HashMap<String, String>();
         params.put("hireid", String.valueOf(pro.getId()));
         messageService.finish(msgId, userId);

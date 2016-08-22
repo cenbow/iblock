@@ -10,6 +10,7 @@ import com.iblock.dao.po.City;
 import com.iblock.dao.po.Industry;
 import com.iblock.dao.po.Project;
 import com.iblock.dao.po.User;
+import com.iblock.service.mail.MailService;
 import com.iblock.service.message.MessageService;
 import com.iblock.service.meta.MetaService;
 import com.iblock.service.project.ProjectService;
@@ -21,9 +22,11 @@ import com.iblock.service.info.KVLongInfo;
 import com.iblock.service.info.ProjectSimpleInfo;
 import com.iblock.web.request.PageRequest;
 import com.iblock.web.request.admin.AddBrokerRequest;
+import com.iblock.web.request.user.UserIdRequest;
 import com.iblock.web.response.CommonResponse;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -57,6 +60,8 @@ public class AdminProjectController extends BaseController {
     private MetaService metaService;
     @Autowired
     private MessageService messageService;
+    @Autowired
+    private MailService mailService;
 
     @RequestMapping(value = "/allnew", method = RequestMethod.GET)
     @Auth(role = RoleConstant.ADMINISTRATOR)
@@ -137,12 +142,25 @@ public class AdminProjectController extends BaseController {
             if (projectService.update(project)) {
                 messageService.send(-1L, project.getAgentId(), MessageAction.ASSIGN_BROKER, project.getManagerId(), project
                         .getAgentId(), null, project, null);
+                if (StringUtils.isNotBlank(user.getEmail())) {
+                    mailService.send("请审核新增项目", new String[]{user.getEmail()}, "您被指定为项目 " + project.getName() + " 的经纪人 " +
+                            "请审核该项目。");
+                }
                 return new CommonResponse<Boolean>(ResponseStatus.SUCCESS);
             }
         } catch (Exception e) {
             log.error("admin addBroker error!", e);
         }
         return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
+    }
+
+    @RequestMapping(value = "/mail", method = RequestMethod.POST, consumes = "application/json")
+    @Auth(role = RoleConstant.ADMINISTRATOR)
+    @ResponseBody
+    public CommonResponse<Void> allFreezed(@RequestBody UserIdRequest request) {
+        User user = userService.getUser(request.getUserId().longValue());
+        mailService.send("测试", new String[]{user.getEmail()}, "哈哈哈");
+        return new CommonResponse<Void>(ResponseStatus.SUCCESS);
     }
 
     @RequestMapping(value = "/allfreezed", method = RequestMethod.POST, consumes = "application/json")

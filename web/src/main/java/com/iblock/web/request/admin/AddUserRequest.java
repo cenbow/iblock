@@ -21,6 +21,7 @@ public class AddUserRequest {
     private String password;
     @NotNull
     private Integer role;
+    private String email;
 
     public User toUser() {
         User user = new User();
@@ -28,6 +29,7 @@ public class AddUserRequest {
         user.setMobile(mobile);
         user.setUserName(username);
         user.setPassword(MD5Utils.encrypt(password));
+        user.setEmail(email);
         return user;
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -32,11 +33,17 @@ public class SMSService {
     @Autowired
     private RedisUtils redisUtils;
 
-    public boolean sendVerifyCode(String mobile) {
-        CCPRestSmsSDK restAPI = new CCPRestSmsSDK();
+    private CCPRestSmsSDK restAPI;
+
+    @PostConstruct
+    public void init() {
+        restAPI = new CCPRestSmsSDK();
         restAPI.init(serverIP, serverPort);
         restAPI.setAccount(accountSID, accountToken);
         restAPI.setAppId(appID);
+    }
+
+    public boolean sendVerifyCode(String mobile) {
         String code = getRandomString(6);
         redisUtils.put("verify_" + mobile, code, time);
         HashMap<String, Object> result = restAPI.sendTemplateSMS(mobile, "105309", new String[]{code, String.valueOf
@@ -45,6 +52,20 @@ public class SMSService {
             log.error("verify code send error, 错误码=" + result.get("statusCode") + " 错误信息= " + result.get("statusMsg"));
         }
         return "000000".equals(result.get("statusCode"));
+    }
+
+    public boolean sendHireMsg(String mobile, String manager, String project) {
+        try {
+            HashMap<String, Object> result = restAPI.sendTemplateSMS(mobile, "109173", new String[]{manager, project});
+            if (!"000000".equals(result.get("statusCode"))) {
+                log.error("verify code send error, 错误码=" + result.get("statusCode") + " 错误信息= " + result.get("statusMsg"));
+            }
+            return "000000".equals(result.get("statusCode"));
+        } catch (Exception e) {
+            log.error("send sms error", e);
+        }
+        return false;
+
     }
 
     public boolean checkVerifyCode(String mobile, String code) {
