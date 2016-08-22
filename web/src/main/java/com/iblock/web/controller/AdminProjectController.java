@@ -154,15 +154,6 @@ public class AdminProjectController extends BaseController {
         return new CommonResponse<Boolean>(ResponseStatus.SYSTEM_ERROR);
     }
 
-    @RequestMapping(value = "/mail", method = RequestMethod.POST, consumes = "application/json")
-    @Auth(role = RoleConstant.ADMINISTRATOR)
-    @ResponseBody
-    public CommonResponse<Void> allFreezed(@RequestBody UserIdRequest request) {
-        User user = userService.getUser(request.getUserId().longValue());
-        mailService.send("测试", new String[]{user.getEmail()}, "哈哈哈");
-        return new CommonResponse<Void>(ResponseStatus.SUCCESS);
-    }
-
     @RequestMapping(value = "/allfreezed", method = RequestMethod.POST, consumes = "application/json")
     @Auth(role = RoleConstant.ADMINISTRATOR)
     @ResponseBody
