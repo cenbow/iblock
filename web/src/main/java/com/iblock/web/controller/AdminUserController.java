@@ -196,6 +196,7 @@ public class AdminUserController extends BaseController {
                     info.setRole(user.getRole());
                     info.setName(user.getUserName());
                     info.setMobile(user.getMobile());
+                    info.setEmail(user.getEmail());
                     result.add(info);
                 }
             }

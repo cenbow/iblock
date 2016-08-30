@@ -12,4 +12,5 @@ public class AdminUserInfo {
     private String name;
     private String mobile;
     private int role;
+    private String email;
 }
